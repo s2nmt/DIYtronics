@@ -266,6 +266,9 @@ body {
     border: 1px solid #e2e8f0;
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .product-card::before {
@@ -305,6 +308,21 @@ body {
     color: #2563eb;
 }
 
+.product-image-link {
+    text-decoration: none !important;
+}
+.product-image-link:visited,
+.product-image-link:active,
+.product-image-link:hover {
+    text-decoration: none !important;
+}
+
+.product-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
+
 .product-info h3 {
     font-size: 1.5rem;
     font-weight: 600;
@@ -338,6 +356,23 @@ body {
     font-size: 1.5rem;
     font-weight: 700;
     color: #2563eb;
+}
+
+.current-price {
+    color: #d60000;
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin-right: 10px;
+}
+.original-price {
+    color: #a0a0a0;
+    text-decoration: line-through;
+    font-size: 1.1rem;
+    vertical-align: middle;
+}
+
+.product-bottom {
+    margin-top: auto;
 }
 
 /* About Section */
@@ -685,6 +720,17 @@ body {
     .product-card {
         padding: 1.5rem;
     }
+    
+    .product-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .details-btn,
+    .buy-btn {
+        padding: 8px 20px;
+        font-size: 0.9rem;
+    }
 }
 
 /* Smooth Scrolling */
@@ -849,6 +895,13 @@ html {
     }
 } 
 
+.product-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 1.2rem;
+    flex-wrap: wrap;
+}
+
 .details-btn {
     display: inline-block;
     padding: 10px 26px;
@@ -860,12 +913,32 @@ html {
     font-size: 1rem;
     transition: background 0.2s, box-shadow 0.2s, color 0.2s;
     box-shadow: 0 4px 18px rgba(37,99,235,0.10);
-    margin-top: 1.2rem;
 }
+
 .details-btn:hover {
     background: linear-gradient(135deg, #1e40af, #2563eb);
     color: #fff;
     box-shadow: 0 8px 24px rgba(37,99,235,0.18);
+    text-decoration: none;
+}
+
+.buy-btn {
+    display: inline-block;
+    padding: 10px 26px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff !important;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+    box-shadow: 0 4px 18px rgba(16,185,129,0.10);
+}
+
+.buy-btn:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(16,185,129,0.18);
     text-decoration: none;
 } 
 
