@@ -396,7 +396,7 @@ const translations = {
         'products.details': 'Chi tiết',
         
         // About Section
-        'about.title': 'Về DIYtronics',
+        'about.title': 'Giới thiệu DIYtronics',
         'about.desc1': 'Tôi đam mê tạo ra các thiết bị điện tử độc đáo kết hợp chức năng với thiết kế cá nhân hóa. Mỗi sản phẩm được thiết kế riêng và kiểm tra để đảm bảo chất lượng cao nhất.',
         'about.desc2': 'Từ bộ điều khiển LED đơn giản đến hệ thống robot phức tạp, mọi dự án đều được thiết kế với cộng đồng maker trong tâm trí - dễ hiểu, dễ sửa đổi và mở rộng.',
         'about.stats.products': 'Sản phẩm đã tạo',
