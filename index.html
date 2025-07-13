@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIYtronics - Handcrafted Electronics</title>
+    <title>DIYtronics - DIY Electronics</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -16,10 +16,10 @@
                     <h1>DIYtronics</h1>
                 </div>
                 <ul class="nav-menu">
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#products">Products</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#home" data-translate="nav.home">Home</a></li>
+                    <li><a href="#products" data-translate="nav.products">Products</a></li>
+                    <li><a href="#about" data-translate="nav.about">About</a></li>
+                    <li><a href="#contact" data-translate="nav.contact">Contact</a></li>
                 </ul>
                 <div class="hamburger">
                     <span></span>
@@ -34,9 +34,9 @@
         <section id="home" class="hero">
             <div class="hero-container">
                 <div class="hero-content">
-                    <h1>Handcrafted Electronics</h1>
-                    <p>Discover unique, custom-made electronic devices crafted with passion and precision</p>
-                    <a href="#products" class="cta-button">View Products</a>
+                    <h1 data-translate="hero.title">Handcrafted Electronics</h1>
+                    <p data-translate="hero.subtitle">Discover unique, custom-made electronic devices crafted with passion and precision</p>
+                    <a href="#products" class="cta-button" data-translate="hero.cta">View Products</a>
                 </div>
                 <div class="hero-image">
                     <div class="hero-placeholder">
@@ -48,21 +48,21 @@
 
         <section id="products" class="products">
             <div class="container">
-                <h2>Featured Products</h2>
+                <h2 data-translate="products.title">Featured Products</h2>
                 <div class="products-grid">
                     <div class="product-card" data-product="micromourse">
                         <div class="product-image">
                             <i class="fas fa-robot icon-micromouse"></i>
                         </div>
                         <div class="product-info">
-                            <h3>Micromourse</h3>
-                            <p>A compact and fast micromouse robot for maze solving competitions.</p>
+                            <h3 data-translate="products.micromouse.title">Micromouse</h3>
+                            <p data-translate="products.micromouse.desc">A compact and fast micromouse robot for maze solving competitions.</p>
                             <div class="product-features">
-                                <span>High-speed line following</span>
-                                <span>Precise sensor array</span>
-                                <span>Customizable firmware</span>
+                                <span data-translate="products.micromouse.feature1">High-speed line following</span>
+                                <span data-translate="products.micromouse.feature2">Precise sensor array</span>
+                                <span data-translate="products.micromouse.feature3">Customizable firmware</span>
                             </div>
-                            <a class="details-btn" href="product-detail.html">Details</a>
+                            <a class="details-btn" href="product-detail.html" data-translate="products.details">Details</a>
                         </div>
                     </div>
 
@@ -71,14 +71,14 @@
                             <i class="fas fa-id-card"></i>
                         </div>
                         <div class="product-info">
-                            <h3>RFID & NFC Reader - IoT Device</h3>
-                            <p>An IoT device for reading RFID and NFC tags, perfect for smart access and automation.</p>
+                            <h3 data-translate="products.rfid.title">RFID & NFC Reader - IoT Device</h3>
+                            <p data-translate="products.rfid.desc">An IoT device for reading RFID and NFC tags, perfect for smart access and automation.</p>
                             <div class="product-features">
-                                <span>Supports RFID & NFC</span>
-                                <span>WiFi connectivity</span>
-                                <span>Easy integration</span>
+                                <span data-translate="products.rfid.feature1">Supports RFID & NFC</span>
+                                <span data-translate="products.rfid.feature2">WiFi connectivity</span>
+                                <span data-translate="products.rfid.feature3">Easy integration</span>
                             </div>
-                            <a class="details-btn" href="product-detail.html">Details</a>
+                            <a class="details-btn" href="product-detail.html" data-translate="products.details">Details</a>
                         </div>
                     </div>
 
@@ -87,14 +87,14 @@
                             <i class="fas fa-language"></i>
                         </div>
                         <div class="product-info">
-                            <h3>App Translate Mini (Android)</h3>
-                            <p>A lightweight Android app for instant translation on the go.</p>
+                            <h3 data-translate="products.translate.title">App Translate Mini (Android)</h3>
+                            <p data-translate="products.translate.desc">A lightweight Android app for instant translation on the go.</p>
                             <div class="product-features">
-                                <span>Multiple languages</span>
-                                <span>Voice input</span>
-                                <span>Offline support</span>
+                                <span data-translate="products.translate.feature1">Multiple languages</span>
+                                <span data-translate="products.translate.feature2">Voice input</span>
+                                <span data-translate="products.translate.feature3">Offline support</span>
                             </div>
-                            <a class="details-btn" href="product-detail.html">Details</a>
+                            <a class="details-btn" href="product-detail.html" data-translate="products.details">Details</a>
                         </div>
                     </div>
 
@@ -103,14 +103,14 @@
                             <i class="fas fa-clock"></i>
                         </div>
                         <div class="product-info">
-                            <h3>Smart Desk Clock</h3>
-                            <p>A smart desk clock that displays both time and real-time weather information.</p>
+                            <h3 data-translate="products.clock.title">Smart Desk Clock</h3>
+                            <p data-translate="products.clock.desc">A smart desk clock that displays both time and real-time weather information.</p>
                             <div class="product-features">
-                                <span>Digital clock</span>
-                                <span>Weather updates</span>
-                                <span>Alarm function</span>
+                                <span data-translate="products.clock.feature1">Digital clock</span>
+                                <span data-translate="products.clock.feature2">Weather updates</span>
+                                <span data-translate="products.clock.feature3">Alarm function</span>
                             </div>
-                            <a class="details-btn" href="product-detail.html">Details</a>
+                            <a class="details-btn" href="product-detail.html" data-translate="products.details">Details</a>
                         </div>
                     </div>
 
@@ -119,14 +119,14 @@
                             <i class="fas fa-gamepad"></i>
                         </div>
                         <div class="product-info">
-                            <h3>Handheld Game Console</h3>
-                            <p>A portable game console for retro gaming fun anywhere.</p>
+                            <h3 data-translate="products.console.title">Handheld Game Console</h3>
+                            <p data-translate="products.console.desc">A portable game console for retro gaming fun anywhere.</p>
                             <div class="product-features">
-                                <span>Built-in classic games</span>
-                                <span>Rechargeable battery</span>
-                                <span>Color display</span>
+                                <span data-translate="products.console.feature1">Built-in classic games</span>
+                                <span data-translate="products.console.feature2">Rechargeable battery</span>
+                                <span data-translate="products.console.feature3">Color display</span>
                             </div>
-                            <a class="details-btn" href="product-detail.html">Details</a>
+                            <a class="details-btn" href="product-detail.html" data-translate="products.details">Details</a>
                         </div>
                     </div>
                 </div>
@@ -147,21 +147,21 @@
             <div class="container">
                 <div class="about-content">
                     <div class="about-text">
-                        <h2>About DIYtronics</h2>
-                        <p>I'm passionate about creating unique electronic devices that combine functionality with craftsmanship. Each product is hand-assembled and tested to ensure the highest quality.</p>
-                        <p>From simple LED controllers to complex robotic systems, every project is designed with the maker community in mind - easy to understand, modify, and expand upon.</p>
+                        <h2 data-translate="about.title">About DIYtronics</h2>
+                        <p data-translate="about.desc1">I'm passionate about creating unique electronic devices that combine functionality with craftsmanship. Each product is hand-assembled and tested to ensure the highest quality.</p>
+                        <p data-translate="about.desc2">From simple LED controllers to complex robotic systems, every project is designed with the maker community in mind - easy to understand, modify, and expand upon.</p>
                         <div class="about-stats">
                             <div class="stat">
                                 <h3>50+</h3>
-                                <p>Products Created</p>
+                                <p data-translate="about.stats.products">Products Created</p>
                             </div>
                             <div class="stat">
                                 <h3>100%</h3>
-                                <p>Handcrafted</p>
+                                <p data-translate="about.stats.handcrafted">Handcrafted</p>
                             </div>
                             <div class="stat">
                                 <h3>24/7</h3>
-                                <p>Support</p>
+                                <p data-translate="about.stats.support">Support</p>
                             </div>
                         </div>
                     </div>
@@ -174,16 +174,13 @@
             </div>
         </section>
 
-        <!-- Our Team Section -->
-        <!-- (đã xóa toàn bộ section our-team và div section-gradient) -->
-
         <section id="contact" class="contact">
             <div class="container">
-                <h2>Get In Touch</h2>
+                <h2 data-translate="contact.title">Get In Touch</h2>
                 <div class="contact-content">
                     <div class="contact-info">
-                        <h3>Let's Build Something Amazing</h3>
-                        <p>Interested in a custom project or have questions about my products? I'd love to hear from you!</p>
+                        <h3 data-translate="contact.subtitle">Let's Build Something Amazing</h3>
+                        <p data-translate="contact.desc">Interested in a custom project or have questions about my products? I'd love to hear from you!</p>
                         <div class="contact-details">
                             <div class="contact-item">
                                 <i class="fas fa-envelope"></i>
@@ -201,18 +198,18 @@
                     </div>
                     <form class="contact-form">
                         <div class="form-group">
-                            <input type="text" placeholder="Your Name" required>
+                            <input type="text" placeholder="Your Name" data-translate="contact.form.name" required>
                         </div>
                         <div class="form-group">
-                            <input type="email" placeholder="Your Email" required>
+                            <input type="email" placeholder="Your Email" data-translate="contact.form.email" required>
                         </div>
                         <div class="form-group">
-                            <input type="text" placeholder="Subject">
+                            <input type="text" placeholder="Subject" data-translate="contact.form.subject">
                         </div>
                         <div class="form-group">
-                            <textarea placeholder="Your Message" rows="5" required></textarea>
+                            <textarea placeholder="Your Message" rows="5" data-translate="contact.form.message" required></textarea>
                         </div>
-                        <button type="submit" class="submit-button">Send Message</button>
+                        <button type="submit" class="submit-button" data-translate="contact.form.send">Send Message</button>
                     </form>
                 </div>
             </div>
@@ -224,29 +221,29 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>DIYtronics</h3>
-                    <p>Handcrafted electronics for makers and enthusiasts</p>
+                    <p data-translate="footer.tagline">Giải pháp điện tử DIY – từ ý tưởng đến sản phẩm</p>
                 </div>
                 <div class="footer-section">
-                    <h4>Quick Links</h4>
+                    <h4 data-translate="footer.quicklinks">Quick Links</h4>
                     <ul>
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#products">Products</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#home" data-translate="nav.home">Home</a></li>
+                        <li><a href="#products" data-translate="nav.products">Products</a></li>
+                        <li><a href="#about" data-translate="nav.about">About</a></li>
+                        <li><a href="#contact" data-translate="nav.contact">Contact</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>Follow Me</h4>
+                    <h4 data-translate="footer.follow">Follow Me</h4>
                     <div class="social-links">
-                        <a href="#"><i class="fab fa-github"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="https://github.com/s2nmt"><i class="fab fa-github"></i></a>
+                        <a href="https://www.youtube.com/@yourchannel"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.linkedin.com/in/yourprofile"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.tiktok.com/@diytronics"><i class="fab fa-tiktok"></i></a>
                     </div>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 DIYtronics. All rights reserved.</p>
+                <p data-translate="footer.copyright">&copy; 2025 DIYtronics. All rights reserved.</p>
             </div>
         </div>
     </footer>

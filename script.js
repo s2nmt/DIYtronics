@@ -56,23 +56,23 @@ if (contactForm) {
         
         // Simple validation
         if (!name || !email || !message) {
-            showNotification('Please fill in all required fields.', 'error');
+            showNotification(translations[currentLanguage]['contact.form.error.required'], 'error');
             return;
         }
         
         if (!isValidEmail(email)) {
-            showNotification('Please enter a valid email address.', 'error');
+            showNotification(translations[currentLanguage]['contact.form.error.email'], 'error');
             return;
         }
         
         // Simulate form submission
         const submitButton = this.querySelector('.submit-button');
         const originalText = submitButton.textContent;
-        submitButton.textContent = 'Sending...';
+        submitButton.textContent = translations[currentLanguage]['contact.form.sending'];
         submitButton.disabled = true;
         
         setTimeout(() => {
-            showNotification('Thank you! Your message has been sent successfully.', 'success');
+            showNotification(translations[currentLanguage]['contact.form.success'], 'success');
             this.reset();
             submitButton.textContent = originalText;
             submitButton.disabled = false;
@@ -192,6 +192,11 @@ window.addEventListener('load', () => {
     }, 100);
 });
 
+// Initialize language system when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initLanguageSystem();
+});
+
 // Parallax effect for hero section
 window.addEventListener('scroll', () => {
     const scrolled = window.pageYOffset;
@@ -263,6 +268,250 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style); 
+
+// Language System
+const translations = {
+    en: {
+        // Navigation
+        'nav.home': 'Home',
+        'nav.products': 'Products',
+        'nav.about': 'About',
+        'nav.contact': 'Contact',
+        
+        // Hero Section
+        'hero.title': 'DIY Electronics',
+        'hero.subtitle': 'Discover unique, custom-made electronic devices crafted with passion and precision',
+        'hero.cta': 'View Products',
+        
+        // Products Section
+        'products.title': 'Featured Products',
+        'products.micromouse.title': 'Micromouse',
+        'products.micromouse.desc': 'A compact and fast micromouse robot for maze solving competitions.',
+        'products.micromouse.feature1': 'High-speed line following',
+        'products.micromouse.feature2': 'Precise sensor array',
+        'products.micromouse.feature3': 'Customizable firmware',
+        'products.rfid.title': 'RFID & NFC Reader - IoT Device',
+        'products.rfid.desc': 'An IoT device for reading RFID and NFC tags, perfect for smart access and automation.',
+        'products.rfid.feature1': 'Supports RFID & NFC',
+        'products.rfid.feature2': 'WiFi connectivity',
+        'products.rfid.feature3': 'Easy integration',
+        'products.translate.title': 'App Translate Mini (Android)',
+        'products.translate.desc': 'A lightweight Android app for instant translation on the go.',
+        'products.translate.feature1': 'Multiple languages',
+        'products.translate.feature2': 'Voice input',
+        'products.translate.feature3': 'Offline support',
+        'products.clock.title': 'Smart Desk Clock',
+        'products.clock.desc': 'A smart desk clock that displays both time and real-time weather information.',
+        'products.clock.feature1': 'Digital clock',
+        'products.clock.feature2': 'Weather updates',
+        'products.clock.feature3': 'Alarm function',
+        'products.console.title': 'Handheld Game Console',
+        'products.console.desc': 'A portable game console for retro gaming fun anywhere.',
+        'products.console.feature1': 'Built-in classic games',
+        'products.console.feature2': 'Rechargeable battery',
+        'products.console.feature3': 'Color display',
+        'products.details': 'Details',
+        
+        // About Section
+        'about.title': 'About DIYtronics',
+        'about.desc1': 'I am passionate about creating unique electronic devices that combine functionality with personalized design. Each product is custom-designed and tested to ensure the highest quality.',
+        'about.desc2': 'From simple LED controllers to complex robotic systems, every project is designed with the maker community in mind - easy to understand, modify, and expand upon.',
+        'about.stats.products': 'Products Created',
+        'about.stats.handcrafted': 'DIY',
+        'about.stats.support': 'Support',
+        
+        // Contact Section
+        'contact.title': 'Get In Touch',
+        'contact.subtitle': 'Let\'s Build Something Amazing',
+        'contact.desc': 'Interested in a custom project or have questions about my products? I\'d love to hear from you!',
+        'contact.form.name': 'Your Name',
+        'contact.form.email': 'Your Email',
+        'contact.form.subject': 'Subject',
+        'contact.form.message': 'Your Message',
+        'contact.form.send': 'Send Message',
+        'contact.form.sending': 'Sending...',
+        'contact.form.success': 'Thank you! Your message has been sent successfully.',
+        'contact.form.error.required': 'Please fill in all required fields.',
+        'contact.form.error.email': 'Please enter a valid email address.',
+        
+        // Footer
+        'footer.tagline': 'DIY electronics solutions – from idea to product',
+        'footer.quicklinks': 'Quick Links',
+        'footer.follow': 'Follow Me',
+        'footer.copyright': '© 2025 DIYtronics. All rights reserved.',
+        
+        // Language Switcher
+        'lang.en': 'English',
+        'lang.vi': 'Tiếng Việt'
+    },
+    vi: {
+        // Navigation
+        'nav.home': 'Trang chủ',
+        'nav.products': 'Sản phẩm',
+        'nav.about': 'Giới thiệu',
+        'nav.contact': 'Liên hệ',
+        
+        // Hero Section
+        'hero.title': 'Điện tử DIY',
+        'hero.subtitle': 'Khám phá các thiết bị điện tử độc đáo được thiết kế cá nhân hóa với niềm đam mê và độ chính xác cao',
+        'hero.cta': 'Xem sản phẩm',
+        
+        // Products Section
+        'products.title': 'Sản phẩm nổi bật',
+        'products.micromouse.title': 'Micromouse',
+        'products.micromouse.desc': 'Robot micromouse nhỏ gọn và nhanh chóng cho các cuộc thi giải mê cung.',
+        'products.micromouse.feature1': 'Theo dõi đường cao tốc',
+        'products.micromouse.feature2': 'Mảng cảm biến chính xác',
+        'products.micromouse.feature3': 'Firmware tùy chỉnh',
+        'products.rfid.title': 'Máy đọc RFID & NFC - Thiết bị IoT',
+        'products.rfid.desc': 'Thiết bị IoT để đọc thẻ RFID và NFC, hoàn hảo cho truy cập thông minh và tự động hóa.',
+        'products.rfid.feature1': 'Hỗ trợ RFID & NFC',
+        'products.rfid.feature2': 'Kết nối WiFi',
+        'products.rfid.feature3': 'Tích hợp dễ dàng',
+        'products.translate.title': 'Ứng dụng Dịch thuật Mini (Android)',
+        'products.translate.desc': 'Ứng dụng Android nhẹ cho dịch thuật tức thì khi di chuyển.',
+        'products.translate.feature1': 'Nhiều ngôn ngữ',
+        'products.translate.feature2': 'Nhập liệu bằng giọng nói',
+        'products.translate.feature3': 'Hỗ trợ ngoại tuyến',
+        'products.clock.title': 'Đồng hồ bàn thông minh',
+        'products.clock.desc': 'Đồng hồ bàn thông minh hiển thị cả thời gian và thông tin thời tiết theo thời gian thực.',
+        'products.clock.feature1': 'Đồng hồ kỹ thuật số',
+        'products.clock.feature2': 'Cập nhật thời tiết',
+        'products.clock.feature3': 'Chức năng báo thức',
+        'products.console.title': 'Máy chơi game cầm tay',
+        'products.console.desc': 'Máy chơi game di động cho niềm vui chơi game retro ở mọi nơi.',
+        'products.console.feature1': 'Game cổ điển tích hợp',
+        'products.console.feature2': 'Pin sạc',
+        'products.console.feature3': 'Màn hình màu',
+        'products.details': 'Chi tiết',
+        
+        // About Section
+        'about.title': 'Về DIYtronics',
+        'about.desc1': 'Tôi đam mê tạo ra các thiết bị điện tử độc đáo kết hợp chức năng với thiết kế cá nhân hóa. Mỗi sản phẩm được thiết kế riêng và kiểm tra để đảm bảo chất lượng cao nhất.',
+        'about.desc2': 'Từ bộ điều khiển LED đơn giản đến hệ thống robot phức tạp, mọi dự án đều được thiết kế với cộng đồng maker trong tâm trí - dễ hiểu, dễ sửa đổi và mở rộng.',
+        'about.stats.products': 'Sản phẩm đã tạo',
+        'about.stats.handcrafted': 'DIY',
+        'about.stats.support': 'Hỗ trợ',
+        
+        // Contact Section
+        'contact.title': 'Liên hệ',
+        'contact.subtitle': 'Hãy cùng xây dựng điều gì đó tuyệt vời',
+        'contact.desc': 'Quan tâm đến một dự án tùy chỉnh hoặc có câu hỏi về sản phẩm của tôi? Tôi rất muốn nghe từ bạn!',
+        'contact.form.name': 'Tên của bạn',
+        'contact.form.email': 'Email của bạn',
+        'contact.form.subject': 'Chủ đề',
+        'contact.form.message': 'Tin nhắn của bạn',
+        'contact.form.send': 'Gửi tin nhắn',
+        'contact.form.sending': 'Đang gửi...',
+        'contact.form.success': 'Cảm ơn! Tin nhắn của bạn đã được gửi thành công.',
+        'contact.form.error.required': 'Vui lòng điền vào tất cả các trường bắt buộc.',
+        'contact.form.error.email': 'Vui lòng nhập địa chỉ email hợp lệ.',
+        
+        // Footer
+        'footer.tagline': 'Giải pháp điện tử DIY – từ ý tưởng đến sản phẩm',
+        'footer.quicklinks': 'Liên kết nhanh',
+        'footer.follow': 'Theo dõi tôi',
+        'footer.copyright': '© 2025 DIYtronics. Tất cả quyền được bảo lưu.',
+        
+        // Language Switcher
+        'lang.en': 'English',
+        'lang.vi': 'Tiếng Việt'
+    }
+};
+
+// Current language (default to Vietnamese)
+let currentLanguage = localStorage.getItem('language') || 'vi';
+
+// Language switcher functionality
+function createLanguageSwitcher() {
+    const navContainer = document.querySelector('.nav-container');
+    const languageSwitcher = document.createElement('div');
+    languageSwitcher.className = 'language-switcher';
+    languageSwitcher.innerHTML = `
+        <button class="lang-btn" data-lang="vi">
+            <img src="img/flagVN.png" alt="VN Flag" class="flag-icon" style="height: 20px; vertical-align: middle; margin-right: 4px;">
+            <span class="lang-text">VI</span>
+        </button>
+        <button class="lang-btn" data-lang="en">
+            <span class="flag"><i class="fas fa-globe"></i></span>
+            <span class="lang-text">EN</span>
+        </button>
+    `;
+    // Insert before hamburger menu
+    const hamburger = document.querySelector('.hamburger');
+    navContainer.insertBefore(languageSwitcher, hamburger);
+    // Add event listeners
+    languageSwitcher.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const lang = btn.dataset.lang;
+            switchLanguage(lang);
+        });
+    });
+    // Set initial active state
+    const activeBtn = languageSwitcher.querySelector(`[data-lang="${currentLanguage}"]`);
+    if (activeBtn) {
+        languageSwitcher.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        activeBtn.classList.add('active');
+    }
+    // Update button content based on current language
+    updateLanguageButtons();
+}
+
+function updateLanguageButtons() {
+    const languageSwitcher = document.querySelector('.language-switcher');
+    if (!languageSwitcher) return;
+    const enBtn = languageSwitcher.querySelector('[data-lang="en"]');
+    const viBtn = languageSwitcher.querySelector('[data-lang="vi"]');
+    if (viBtn) {
+        viBtn.innerHTML = `
+            <img src="img/flagVN.png" alt="VN Flag" class="flag-icon" style="height: 20px; vertical-align: middle; margin-right: 4px;">
+            <span class="lang-text">VI</span>
+        `;
+    }
+    if (enBtn) {
+        enBtn.innerHTML = `
+            <span class="flag"><i class="fas fa-globe"></i></span>
+            <span class="lang-text">EN</span>
+        `;
+    }
+}
+
+// Switch language function
+function switchLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('language', lang);
+    
+    // Update all translatable elements
+    document.querySelectorAll('[data-translate]').forEach(element => {
+        const key = element.dataset.translate;
+        if (translations[lang] && translations[lang][key]) {
+            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                element.placeholder = translations[lang][key];
+            } else {
+                element.textContent = translations[lang][key];
+            }
+        }
+    });
+    
+    // Update page title
+    document.title = lang === 'vi' ? 'DIYtronics - Điện tử DIY' : 'DIYtronics - DIY Electronics';
+    
+    // Update active state of language buttons
+    const languageSwitcher = document.querySelector('.language-switcher');
+    if (languageSwitcher) {
+        languageSwitcher.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        const activeBtn = languageSwitcher.querySelector(`[data-lang="${lang}"]`);
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+        }
+    }
+}
+
+// Initialize language system
+function initLanguageSystem() {
+    createLanguageSwitcher();
+    switchLanguage(currentLanguage);
+}
 
 // Product details data
 const productArticles = {
