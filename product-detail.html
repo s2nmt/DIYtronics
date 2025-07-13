@@ -164,8 +164,7 @@
             box-shadow: 0 4px 18px rgba(37,99,235,0.10);
         }
         .product-title {
-            /* text-align: center; */
-            font-size: 2.5rem;
+            font-size: 2rem;   /* hoặc 2.2rem nếu muốn lớn hơn chút */
             font-weight: 800;
             color: #2563eb;
             margin-bottom: 1.2rem;
@@ -207,14 +206,25 @@
         <nav class="nav">
             <div class="nav-container">
                 <div class="logo">
-                    <h1>DIYtronics</h1>
+                    <a href="index.html#home"><h1>DIYtronics</h1></a>
                 </div>
+
                 <ul class="nav-menu">
                     <li><a href="index.html#home">Home</a></li>
                     <li><a href="index.html#products">Products</a></li>
                     <li><a href="index.html#about">About</a></li>
                     <li><a href="index.html#contact">Contact</a></li>
                 </ul>
+                <div class="language-switcher">
+                    <button class="lang-btn" data-lang="vi">
+                        <img src="img/flagVN.png" alt="VN Flag" class="flag-icon" style="height: 20px; vertical-align: middle; margin-right: 4px;">
+                        <span class="lang-text">VI</span>
+                    </button>
+                    <button class="lang-btn" data-lang="en">
+                        <span class="flag"><i class="fas fa-globe"></i></span>
+                        <span class="lang-text">EN</span>
+                    </button>
+                </div>
             </div>
         </nav>
     </header>
@@ -236,13 +246,13 @@
             </aside>
             <div class="main-content">
                 <section class="product-section">
-                    <h1 class="product-title">Smart Desk Clock</h1>
+                    <h1 class="product-title" data-translate="product.smartclock.title">Smart Desk Clock</h1>
                     <img src="img/smart_desk_clock.jpg" alt="Product Main Image" class="intro-img">
-                    <h2>Introduction</h2>
-                    <p>Introduce your product in detail. What problem does it solve? Who is it for? What makes it special?</p>
+                    <h2 data-translate="product.intro">Introduction</h2>
+                    <p data-translate="product.intro.desc">Introduce your product in detail. What problem does it solve? Who is it for? What makes it special?</p>
                 </section>
                 <section class="product-section">
-                    <h2>Technical Specifications</h2>
+                    <h2 data-translate="product.specs">Technical Specifications</h2>
                     <ul>
                         <li>Processor: STM32/ESP32/ATmega</li>
                         <li>Connectivity: WiFi, Bluetooth, USB</li>
@@ -252,11 +262,11 @@
                     </ul>
                 </section>
                 <section class="product-section">
-                    <h2>Project Details</h2>
+                    <h2 data-translate="product.details">Project Details</h2>
                     <p>Describe the project, how you built it, challenges, and what you learned. You can add more images, code snippets, or even video links here.</p>
                 </section>
                 <section class="product-section">
-                    <h2>Gallery</h2>
+                    <h2 data-translate="product.gallery">Gallery</h2>
                     <img src="img/smart_desk.jpg" alt="Gallery Image 1" style="max-width:100%;border-radius:12px;margin-bottom:1rem;">
                     <!-- <img src="img/product-detail-2.jpg" alt="Gallery Image 2" style="max-width:100%;border-radius:12px;"> -->
                 </section>
@@ -294,5 +304,54 @@
             </div>
         </div>
     </footer>
+    <script>
+const translations = {
+    en: {
+        'product.smartclock.title': 'Smart Desk Clock',
+        'product.intro': 'Introduction',
+        'product.intro.desc': 'Introduce your product in detail. What problem does it solve? Who is it for? What makes it special?',
+        'product.specs': 'Technical Specifications',
+        'product.details': 'Project Details',
+        'product.gallery': 'Gallery',
+        // Thêm các key khác...
+    },
+    vi: {
+        'product.smartclock.title': 'Đồng hồ bàn thông minh',
+        'product.intro': 'Giới thiệu',
+        'product.intro.desc': 'Giới thiệu chi tiết về sản phẩm. Sản phẩm giải quyết vấn đề gì? Dành cho ai? Điều gì làm nó đặc biệt?',
+        'product.specs': 'Thông số kỹ thuật',
+        'product.details': 'Chi tiết dự án',
+        'product.gallery': 'Thư viện ảnh',
+        // Thêm các key khác...
+    }
+};
+
+let currentLanguage = localStorage.getItem('language') || 'en';
+
+function switchLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('language', lang);
+    document.querySelectorAll('[data-translate]').forEach(element => {
+        const key = element.getAttribute('data-translate');
+        if (translations[lang] && translations[lang][key]) {
+            element.textContent = translations[lang][key];
+        }
+    });
+    // Cập nhật trạng thái nút
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.querySelector('.lang-btn[data-lang="' + lang + '"]');
+    if (activeBtn) activeBtn.classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Gán sự kiện cho nút chuyển ngôn ngữ
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            switchLanguage(btn.getAttribute('data-lang'));
+        });
+    });
+    switchLanguage(currentLanguage);
+});
+</script>
 </body>
 </html> 
