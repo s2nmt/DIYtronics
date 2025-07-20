@@ -614,7 +614,12 @@ document.querySelectorAll('.product-card').forEach(card => {
     card.addEventListener('click', function(e) {
         // Nếu click vào nút mua thì không chuyển trang
         if (e.target.closest('.buy-btn')) return;
-        window.location.href = 'product-detail.html';
+        
+        // Tìm link trong product card
+        const linkElement = card.querySelector('.product-image-link');
+        if (linkElement && linkElement.href) {
+            window.location.href = linkElement.href;
+        }
     });
 });
 
