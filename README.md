@@ -1,4 +1,4 @@
-# DIYtronics - Product Showcase Website
+# Gemify - Product Showcase Website
 
 A modern, responsive website designed to showcase your DIY electronics, development kits, and personalized or commercial electronic products. Built with clean HTML, CSS, and JavaScript.
 
@@ -15,7 +15,7 @@ A modern, responsive website designed to showcase your DIY electronics, developm
 ## File Structure
 
 ```
-DIYtronics_website/
+Gemify_website/
 ├── index.html          # Main HTML file
 ├── styles.css          # CSS styles
 ├── script.js           # JavaScript functionality

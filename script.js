@@ -279,7 +279,7 @@ const translations = {
         'nav.contact': 'Contact',
         
         // Hero Section
-        'hero.title': 'DIY Electronics',
+        'hero.title': 'Gemify Electronics',
         'hero.subtitle': 'Discover unique, custom-made electronic devices crafted with passion and precision',
         'hero.cta': 'View Products',
         
@@ -324,7 +324,7 @@ const translations = {
         'products.buy': 'Buy Now',
         
         // About Section
-        'about.title': 'About DIYtronics',
+        'about.title': 'About Gemify',
         'about.desc1': 'I am passionate about creating unique electronic devices that combine functionality with personalized design. Each product is custom-designed and tested to ensure the highest quality.',
         'about.desc2': 'From simple LED controllers to complex robotic systems, every project is designed with the maker community in mind - easy to understand, modify, and expand upon.',
         'about.stats.products': 'Products Created',
@@ -346,10 +346,10 @@ const translations = {
         'contact.form.error.email': 'Please enter a valid email address.',
         
         // Footer
-        'footer.tagline': 'DIY electronics solutions – from idea to product',
+        'footer.tagline': 'Gemify electronics solutions – from idea to product',
         'footer.quicklinks': 'Quick Links',
         'footer.follow': 'Follow Me',
-        'footer.copyright': '© 2025 DIYtronics. All rights reserved.',
+        'footer.copyright': '© 2025 Gemify. All rights reserved.',
         
         // Language Switcher
         'lang.en': 'English',
@@ -363,7 +363,7 @@ const translations = {
         'nav.contact': 'Liên hệ',
         
         // Hero Section
-        'hero.title': 'Điện tử DIY',
+        'hero.title': 'Điện tử Gemify',
         'hero.subtitle': 'Khám phá các thiết bị điện tử độc đáo được thiết kế cá nhân hóa với niềm đam mê và độ chính xác cao',
         'hero.cta': 'Xem sản phẩm',
         
@@ -408,7 +408,7 @@ const translations = {
         'products.buy': 'Mua ngay',
         
         // About Section
-        'about.title': 'Giới thiệu DIYtronics',
+        'about.title': 'Giới thiệu Gemify',
         'about.desc1': 'Tôi đam mê tạo ra các thiết bị điện tử độc đáo kết hợp chức năng với thiết kế cá nhân hóa. Mỗi sản phẩm được thiết kế riêng và kiểm tra để đảm bảo chất lượng cao nhất.',
         'about.desc2': 'Từ bộ điều khiển LED đơn giản đến hệ thống robot phức tạp, mọi dự án đều được thiết kế với cộng đồng maker trong tâm trí - dễ hiểu, dễ sửa đổi và mở rộng.',
         'about.stats.products': 'Sản phẩm đã tạo',
@@ -433,7 +433,7 @@ const translations = {
         'footer.tagline': 'Giải pháp điện tử DIY – từ ý tưởng đến sản phẩm',
         'footer.quicklinks': 'Liên kết nhanh',
         'footer.follow': 'Theo dõi tôi',
-        'footer.copyright': '© 2025 DIYtronics. Tất cả quyền được bảo lưu.',
+        'footer.copyright': '© 2025 Gemify. Tất cả quyền được bảo lưu.',
         
         // Language Switcher
         'lang.en': 'English',
@@ -516,7 +516,7 @@ function switchLanguage(lang) {
     });
     
     // Update page title
-    document.title = lang === 'vi' ? 'DIYtronics - Điện tử DIY' : 'DIYtronics - DIY Electronics';
+    document.title = lang === 'vi' ? 'Gemify - Điện tử Gemify' : 'Gemify - Electronics';
     
     // Update active state of language buttons
     const languageSwitcher = document.querySelector('.language-switcher');
