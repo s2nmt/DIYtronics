@@ -516,7 +516,7 @@ function switchLanguage(lang) {
     });
     
     // Update page title
-    document.title = lang === 'vi' ? 'Gemify - Điện tử Gemify' : 'Gemify - Electronics';
+    document.title = lang === 'vi' ? 'Gemify - Technology' : 'Gemify - Technology';
     
     // Update active state of language buttons
     const languageSwitcher = document.querySelector('.language-switcher');
