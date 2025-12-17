@@ -346,7 +346,7 @@ const translations = {
         'contact.form.error.email': 'Please enter a valid email address.',
         
         // Footer
-        'footer.tagline': 'Gemify technology solutions – from idea to product',
+        'footer.tagline': 'Gemify Technology Solutions – from idea to product',
         'footer.quicklinks': 'Quick Links',
         'footer.follow': 'Follow Me',
         'footer.copyright': '© 2025 Gemify. All rights reserved.',
@@ -430,7 +430,7 @@ const translations = {
         'contact.form.error.email': 'Vui lòng nhập địa chỉ email hợp lệ.',
         
         // Footer
-        'footer.tagline': 'Giải pháp điện tử DIY – từ ý tưởng đến sản phẩm',
+        'footer.tagline': 'Gemify Technology Solutions – từ ý tưởng đến sản phẩm',
         'footer.quicklinks': 'Liên kết nhanh',
         'footer.follow': 'Theo dõi tôi',
         'footer.copyright': '© 2025 Gemify. Tất cả quyền được bảo lưu.',
