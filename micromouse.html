@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
-            background: #f1f5fa;
+            background: #f5f5f5;
+            color: #111;
         }
         .product-layout {
             display: flex;
@@ -22,7 +23,8 @@
         .sidebar-diy {
             background: #fff;
             border-radius: 20px;
-            box-shadow: 0 4px 24px rgba(30,41,59,0.08);
+            box-shadow: none;
+            border: 1px solid #e5e5e5;
             width: 340px;
             min-width: 260px;
             max-width: 340px;
@@ -39,16 +41,16 @@
             height: 110px;
             border-radius: 50%;
             object-fit: cover;
-            box-shadow: 0 2px 12px rgba(37,99,235,0.10);
+            box-shadow: none;
         }
         .sidebar-diy h2 {
             font-size: 2rem;
             font-weight: 800;
-            color: #2563eb;
+            color: #111;
             margin-bottom: 0.5rem;
         }
         .sidebar-diy .desc {
-            color: #475569;
+            color: #666;
             font-size: 1.08rem;
             margin-bottom: 1.2rem;
         }
@@ -61,8 +63,8 @@
         .sidebar-diy .sidebar-social a {
             width: 38px;
             height: 38px;
-            background: #e2e8f0;
-            color: #2563eb;
+            background: #eee;
+            color: #111;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -71,15 +73,15 @@
             transition: background 0.3s, color 0.3s, transform 0.3s;
         }
         .sidebar-diy .sidebar-social a:hover {
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            background: #111;
             color: #fff;
-            transform: translateY(-2px) scale(1.08);
+            transform: none;
         }
         .sidebar-diy .about-btn {
             display: inline-block;
             margin-top: 0.7rem;
             padding: 0.7rem 2.2rem;
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            background: #111;
             color: #fff;
             border: none;
             border-radius: 10px;
@@ -87,12 +89,14 @@
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s, transform 0.2s;
-            box-shadow: 0 2px 10px rgba(37,99,235,0.08);
+            box-shadow: none;
             text-decoration: none;
         }
         .sidebar-diy .about-btn:hover {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            transform: translateY(-2px) scale(1.04);
+            background: #fff;
+            color: #111;
+            border: 1px solid #111;
+            transform: none;
         }
         .main-content {
             flex: 1;
@@ -107,17 +111,17 @@
             max-width: 600px;
             width: 100%;
             border-radius: 24px;
-            box-shadow: 0 8px 32px rgba(37,99,235,0.10);
+            box-shadow: none;
             margin-bottom: 2.7rem;
         }
         .product-hero h1 {
             font-size: 3.2rem;
             font-weight: 800;
-            color: #2563eb;
+            color: #111;
             margin-bottom: 1.7rem;
         }
         .product-hero .product-meta {
-            color: #64748b;
+            color: #666;
             font-size: 1.1rem;
             margin-bottom: 1.5rem;
         }
@@ -127,13 +131,14 @@
         .product-hero p {
             max-width: 600px;
             margin: 0 auto 1.5rem auto;
-            color: #475569;
+            color: #666;
             font-size: 1.15rem;
         }
         .product-section {
             background: #fff;
             border-radius: 18px;
-            box-shadow: 0 4px 24px rgba(30,41,59,0.07);
+            box-shadow: none;
+            border: 1px solid #e5e5e5;
             padding: 2.5rem 2rem;
             margin-bottom: 2.5rem;
             max-width: 900px;
@@ -141,7 +146,7 @@
             margin-right: auto;
         }
         .product-section h2 {
-            color: #2563eb;
+            color: #111;
             font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
@@ -162,12 +167,13 @@
             margin-left: auto;
             margin-right: auto;
             border-radius: 10px;
-            box-shadow: 0 4px 18px rgba(37,99,235,0.10);
+            box-shadow: none;
+            border: 1px solid #e5e5e5;
         }
         .product-title {
             font-size: 2rem;   /* hoặc 2.2rem nếu muốn lớn hơn chút */
             font-weight: 800;
-            color: #2563eb;
+            color: #111;
             margin-bottom: 1.2rem;
             margin-top: 0.2rem;
             letter-spacing: -1px;
@@ -233,7 +239,7 @@
         <div class="product-layout">
             <aside class="sidebar-diy">
                 <div class="logo">
-                    <i class="fas fa-microchip" style="font-size:4.5rem;color:#2563eb;background:linear-gradient(135deg,#2563eb,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.7rem;"></i>
+                    <i class="fas fa-microchip" style="font-size:4.5rem;color:#111;background:#111;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.7rem;"></i>
                 </div>
                 <h2 data-translate="sidebar.title">Gemify</h2>
                 <div class="desc" data-translate="sidebar.desc">Handcrafted electronics, IoT & embedded systems for makers and engineers. Sharing open-source projects and tutorials.</div>
@@ -326,7 +332,7 @@ const translations = {
         'sidebar.title': 'Gemify',
         'sidebar.desc': 'Handcrafted electronics, IoT & embedded systems for makers and engineers. Sharing open-source projects and tutorials.',
         'sidebar.about': 'About Gemify',
-        'footer.tagline': 'Gemify electronics solutions – from idea to product',
+        'footer.tagline': 'Gemify technology solutions – from idea to product',
         'footer.quicklinks': 'Quick Links',
         'footer.follow': 'Follow Me',
         'footer.copyright': '© 2025 Gemify. All rights reserved.',

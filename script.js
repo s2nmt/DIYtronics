@@ -279,8 +279,8 @@ const translations = {
         'nav.contact': 'Contact',
         
         // Hero Section
-        'hero.title': 'Gemify Electronics',
-        'hero.subtitle': 'Discover unique, custom-made electronic devices crafted with passion and precision',
+        'hero.title': 'Gemify Technology',
+        'hero.subtitle': 'Discover unique, custom-made technology devices crafted with passion and precision',
         'hero.cta': 'View Products',
         
         // Products Section
@@ -325,7 +325,7 @@ const translations = {
         
         // About Section
         'about.title': 'About Gemify',
-        'about.desc1': 'I am passionate about creating unique electronic devices that combine functionality with personalized design. Each product is custom-designed and tested to ensure the highest quality.',
+        'about.desc1': 'I am passionate about creating unique technology devices that combine functionality with personalized design. Each product is custom-designed and tested to ensure the highest quality.',
         'about.desc2': 'From simple LED controllers to complex robotic systems, every project is designed with the maker community in mind - easy to understand, modify, and expand upon.',
         'about.stats.products': 'Products Created',
         'about.stats.handcrafted': 'DIY',
@@ -346,7 +346,7 @@ const translations = {
         'contact.form.error.email': 'Please enter a valid email address.',
         
         // Footer
-        'footer.tagline': 'Gemify electronics solutions – from idea to product',
+        'footer.tagline': 'Gemify technology solutions – from idea to product',
         'footer.quicklinks': 'Quick Links',
         'footer.follow': 'Follow Me',
         'footer.copyright': '© 2025 Gemify. All rights reserved.',
@@ -363,8 +363,8 @@ const translations = {
         'nav.contact': 'Liên hệ',
         
         // Hero Section
-        'hero.title': 'Điện tử Gemify',
-        'hero.subtitle': 'Khám phá các thiết bị điện tử độc đáo được thiết kế cá nhân hóa với niềm đam mê và độ chính xác cao',
+        'hero.title': 'Gemify Technology',
+        'hero.subtitle': 'Khám phá các thiết bị công nghệ độc đáo được thiết kế cá nhân hóa với niềm đam mê và độ chính xác cao',
         'hero.cta': 'Xem sản phẩm',
         
         // Products Section
