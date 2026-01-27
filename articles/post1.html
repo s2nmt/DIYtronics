@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started with Bilingual Reading Apps | Gemify Blog</title>
+    <link rel="icon" type="image/png" href="../img/flagVN.png">
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: #fff;
+            color: #111;
+        }
+        .article-page {
+            padding: 100px 0 80px;
+        }
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .article-header {
+            margin-bottom: 3rem;
+        }
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .article-category {
+            background: #111;
+            color: #fff;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .article-date {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .article-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #111;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+        .article-featured-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        .article-content {
+            line-height: 1.8;
+            font-size: 1.05rem;
+            color: #333;
+        }
+        .article-content h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            color: #111;
+        }
+        .article-content h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 0.8rem;
+            color: #111;
+        }
+        .article-content p {
+            margin-bottom: 1.5rem;
+        }
+        .article-content ul, .article-content ol {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .article-content li {
+            margin-bottom: 0.5rem;
+        }
+        .article-content img {
+            width: 100%;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+        .article-footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e5e5;
+        }
+        .back-to-blog {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #111;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 2rem;
+        }
+        .back-to-blog:hover {
+            gap: 0.8rem;
+        }
+        @media (max-width: 768px) {
+            .article-title {
+                font-size: 2rem;
+            }
+            .article-featured-image {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="../index.html"><h1>Gemify</h1></a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="../index.html#home" data-translate="nav.home">Home</a></li>
+                    <li><a href="../index.html#products" data-translate="nav.products">Products</a></li>
+                    <li><a href="../index.html#about" data-translate="nav.about">About</a></li>
+                    <li><a href="../index.html#contact" data-translate="nav.contact">Contact</a></li>
+                    <li><a href="../blog.html" data-translate="nav.blog">Blog</a></li>
+                </ul>
+                <div class="language-switcher">
+                    <button class="lang-btn" data-lang="vi">
+                        <img src="../img/flagVN.png" alt="VN Flag" class="flag-icon" style="height: 20px; vertical-align: middle; margin-right: 4px;">
+                        <span class="lang-text">VI</span>
+                    </button>
+                    <button class="lang-btn" data-lang="en">
+                        <span class="flag"><i class="fas fa-globe"></i></span>
+                        <span class="lang-text">EN</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <article class="article-page">
+            <div class="article-container">
+                <a href="../blog.html" class="back-to-blog">
+                    <i class="fas fa-arrow-left"></i>
+                    <span data-translate="article.back">Back to Blog</span>
+                </a>
+                
+                <header class="article-header">
+                    <div class="article-meta">
+                        <span class="article-category" data-translate="blog.category.tutorial">Tutorial</span>
+                        <span class="article-date">
+                            <i class="far fa-calendar"></i>
+                            <span data-translate="blog.post1.meta">by Gemify | Jan 20, 2025</span>
+                        </span>
+                    </div>
+                    <h1 class="article-title" data-translate="blog.post1.title">Getting Started with Bilingual Reading Apps</h1>
+                </header>
+
+                <img src="../img/blog-3.jpg" alt="Article Image" class="article-featured-image">
+
+                <div class="article-content">
+                    <p data-translate="article.post1.intro">Bilingual reading applications have revolutionized the way we learn languages. These innovative tools combine the power of technology with language learning, making it easier than ever to improve your reading comprehension and vocabulary in multiple languages.</p>
+
+                    <h2 data-translate="article.post1.section1.title">Why Use Bilingual Reading Apps?</h2>
+                    <p data-translate="article.post1.section1.content">Bilingual reading apps offer numerous advantages for language learners. They provide instant translations, context-aware definitions, and the ability to read in two languages simultaneously. This dual-language approach helps learners understand nuances and improve their comprehension skills.</p>
+
+                    <h2 data-translate="article.post1.section2.title">Getting Started</h2>
+                    <p data-translate="article.post1.section2.content">To begin using a bilingual reading app, first choose a book or article that matches your current language level. Start with simpler texts and gradually work your way up to more complex materials. Most apps allow you to adjust the difficulty level and customize your learning experience.</p>
+
+                    <h3 data-translate="article.post1.tip1.title">Tip 1: Start Small</h3>
+                    <p data-translate="article.post1.tip1.content">Begin with short articles or children's books. These simpler texts will help you build confidence and establish a reading routine.</p>
+
+                    <h3 data-translate="article.post1.tip2.title">Tip 2: Use Interactive Features</h3>
+                    <p data-translate="article.post1.tip2.content">Take advantage of features like word highlighting, audio pronunciation, and vocabulary lists. These tools can significantly enhance your learning experience.</p>
+
+                    <h2 data-translate="article.post1.section3.title">Best Practices</h2>
+                    <ul>
+                        <li data-translate="article.post1.practice1">Read daily, even if it's just for 15 minutes</li>
+                        <li data-translate="article.post1.practice2">Keep a vocabulary notebook</li>
+                        <li data-translate="article.post1.practice3">Review difficult words regularly</li>
+                        <li data-translate="article.post1.practice4">Join online reading communities</li>
+                    </ul>
+
+                    <p data-translate="article.post1.conclusion">With consistent practice and the right tools, bilingual reading apps can significantly improve your language skills. Start your journey today and discover the joy of reading in multiple languages!</p>
+                </div>
+
+                <footer class="article-footer">
+                    <a href="../blog.html" class="back-to-blog">
+                        <i class="fas fa-arrow-left"></i>
+                        <span data-translate="article.back">Back to Blog</span>
+                    </a>
+                </footer>
+            </div>
+        </article>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Gemify</h3>
+                    <p data-translate="footer.tagline">Handcrafted electronics for makers and enthusiasts</p>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.quicklinks">Quick Links</h4>
+                    <ul>
+                        <li><a href="../index.html#home" data-translate="nav.home">Home</a></li>
+                        <li><a href="../index.html#products" data-translate="nav.products">Products</a></li>
+                        <li><a href="../index.html#about" data-translate="nav.about">About</a></li>
+                        <li><a href="../index.html#contact" data-translate="nav.contact">Contact</a></li>
+                        <li><a href="../blog.html" data-translate="nav.blog">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.follow">Follow Me</h4>
+                    <div class="social-links">
+                        <a href="https://github.com/s2nmt"><i class="fab fa-github"></i></a>
+                        <a href="https://www.youtube.com/@yourchannel"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.linkedin.com/in/yourprofile"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.tiktok.com/@gemify_technology"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p data-translate="footer.copyright">&copy; 2025 Gemify. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+const translations = {
+    en: {
+        'article.back': 'Back to Blog',
+        'blog.category.tutorial': 'Tutorial',
+        'blog.post1.title': 'Getting Started with Bilingual Reading Apps',
+        'blog.post1.meta': 'by Gemify | Jan 20, 2025',
+        'article.post1.intro': 'Bilingual reading applications have revolutionized the way we learn languages. These innovative tools combine the power of technology with language learning, making it easier than ever to improve your reading comprehension and vocabulary in multiple languages.',
+        'article.post1.section1.title': 'Why Use Bilingual Reading Apps?',
+        'article.post1.section1.content': 'Bilingual reading apps offer numerous advantages for language learners. They provide instant translations, context-aware definitions, and the ability to read in two languages simultaneously. This dual-language approach helps learners understand nuances and improve their comprehension skills.',
+        'article.post1.section2.title': 'Getting Started',
+        'article.post1.section2.content': 'To begin using a bilingual reading app, first choose a book or article that matches your current language level. Start with simpler texts and gradually work your way up to more complex materials. Most apps allow you to adjust the difficulty level and customize your learning experience.',
+        'article.post1.tip1.title': 'Tip 1: Start Small',
+        'article.post1.tip1.content': 'Begin with short articles or children\'s books. These simpler texts will help you build confidence and establish a reading routine.',
+        'article.post1.tip2.title': 'Tip 2: Use Interactive Features',
+        'article.post1.tip2.content': 'Take advantage of features like word highlighting, audio pronunciation, and vocabulary lists. These tools can significantly enhance your learning experience.',
+        'article.post1.section3.title': 'Best Practices',
+        'article.post1.practice1': 'Read daily, even if it\'s just for 15 minutes',
+        'article.post1.practice2': 'Keep a vocabulary notebook',
+        'article.post1.practice3': 'Review difficult words regularly',
+        'article.post1.practice4': 'Join online reading communities',
+        'article.post1.conclusion': 'With consistent practice and the right tools, bilingual reading apps can significantly improve your language skills. Start your journey today and discover the joy of reading in multiple languages!',
+        'nav.home': 'Home',
+        'nav.products': 'Products',
+        'nav.about': 'About',
+        'nav.contact': 'Contact',
+        'nav.blog': 'Blog',
+        'footer.tagline': 'Handcrafted electronics for makers and enthusiasts',
+        'footer.quicklinks': 'Quick Links',
+        'footer.follow': 'Follow Me',
+        'footer.copyright': '© 2025 Gemify. All rights reserved.',
+    },
+    vi: {
+        'article.back': 'Quay lại Blog',
+        'blog.category.tutorial': 'Hướng dẫn',
+        'blog.post1.title': 'Bắt đầu với ứng dụng đọc sách song ngữ',
+        'blog.post1.meta': 'bởi Gemify | 20 Tháng 1, 2025',
+        'article.post1.intro': 'Ứng dụng đọc sách song ngữ đã cách mạng hóa cách chúng ta học ngôn ngữ. Những công cụ sáng tạo này kết hợp sức mạnh của công nghệ với việc học ngôn ngữ, giúp cải thiện khả năng đọc hiểu và từ vựng của bạn trong nhiều ngôn ngữ dễ dàng hơn bao giờ hết.',
+        'article.post1.section1.title': 'Tại sao nên sử dụng ứng dụng đọc sách song ngữ?',
+        'article.post1.section1.content': 'Ứng dụng đọc sách song ngữ mang lại nhiều lợi ích cho người học ngôn ngữ. Chúng cung cấp bản dịch tức thì, định nghĩa theo ngữ cảnh và khả năng đọc bằng hai ngôn ngữ đồng thời. Cách tiếp cận song ngữ này giúp người học hiểu được sắc thái và cải thiện kỹ năng đọc hiểu.',
+        'article.post1.section2.title': 'Bắt đầu',
+        'article.post1.section2.content': 'Để bắt đầu sử dụng ứng dụng đọc sách song ngữ, trước tiên hãy chọn một cuốn sách hoặc bài viết phù hợp với trình độ ngôn ngữ hiện tại của bạn. Bắt đầu với các văn bản đơn giản hơn và dần dần nâng cao lên các tài liệu phức tạp hơn. Hầu hết các ứng dụng cho phép bạn điều chỉnh mức độ khó và tùy chỉnh trải nghiệm học tập.',
+        'article.post1.tip1.title': 'Mẹo 1: Bắt đầu từ những điều nhỏ',
+        'article.post1.tip1.content': 'Bắt đầu với các bài viết ngắn hoặc sách thiếu nhi. Những văn bản đơn giản hơn này sẽ giúp bạn xây dựng sự tự tin và thiết lập thói quen đọc sách.',
+        'article.post1.tip2.title': 'Mẹo 2: Sử dụng các tính năng tương tác',
+        'article.post1.tip2.content': 'Tận dụng các tính năng như làm nổi bật từ, phát âm audio và danh sách từ vựng. Những công cụ này có thể nâng cao đáng kể trải nghiệm học tập của bạn.',
+        'article.post1.section3.title': 'Thực hành tốt nhất',
+        'article.post1.practice1': 'Đọc hàng ngày, ngay cả khi chỉ 15 phút',
+        'article.post1.practice2': 'Giữ một cuốn sổ từ vựng',
+        'article.post1.practice3': 'Ôn tập các từ khó thường xuyên',
+        'article.post1.practice4': 'Tham gia các cộng đồng đọc sách trực tuyến',
+        'article.post1.conclusion': 'Với việc thực hành nhất quán và các công cụ phù hợp, ứng dụng đọc sách song ngữ có thể cải thiện đáng kể kỹ năng ngôn ngữ của bạn. Bắt đầu hành trình của bạn ngay hôm nay và khám phá niềm vui đọc sách bằng nhiều ngôn ngữ!',
+        'nav.home': 'Trang chủ',
+        'nav.products': 'Sản phẩm',
+        'nav.about': 'Giới thiệu',
+        'nav.contact': 'Liên hệ',
+        'nav.blog': 'Bài viết',
+        'footer.tagline': 'Điện tử thủ công cho người làm và người đam mê',
+        'footer.quicklinks': 'Liên kết nhanh',
+        'footer.follow': 'Theo dõi tôi',
+        'footer.copyright': '© 2025 Gemify. Tất cả quyền được bảo lưu.',
+    }
+};
+
+let currentLanguage = localStorage.getItem('language') || 'en';
+
+function switchLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('language', lang);
+    document.querySelectorAll('[data-translate]').forEach(element => {
+        const key = element.getAttribute('data-translate');
+        if (translations[lang] && translations[lang][key]) {
+            element.textContent = translations[lang][key];
+        }
+    });
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.querySelector('.lang-btn[data-lang="' + lang + '"]');
+    if (activeBtn) activeBtn.classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            switchLanguage(btn.getAttribute('data-lang'));
+        });
+    });
+    switchLanguage(currentLanguage);
+});
+</script>
+</body>
+</html>
+

@@ -277,6 +277,7 @@ const translations = {
         'nav.products': 'Products',
         'nav.about': 'About',
         'nav.contact': 'Contact',
+        'nav.blog': 'Blog',
         
         // Hero Section
         'hero.title': 'Gemify Technology',
@@ -299,8 +300,8 @@ const translations = {
         'products.rfid.feature3': 'Easy integration',
         'products.rfid.price': '$38.99',
         'products.rfid.oldprice': '$49.99',
-        'products.translate.title': 'App Translate Mini (Android)',
-        'products.translate.desc': 'A lightweight Android app for instant translation on the go.',
+        'products.translate.title': 'Bilingual Book Reader  (Android)',
+        'products.translate.desc': 'A bilingual book-reading app that helps users read and understand books in two languages.',
         'products.translate.feature1': 'Multiple languages',
         'products.translate.feature2': 'Voice input',
         'products.translate.feature3': 'Offline support',
@@ -346,7 +347,7 @@ const translations = {
         'contact.form.error.email': 'Please enter a valid email address.',
         
         // Footer
-        'footer.tagline': 'Gemify Technology Solutions – from idea to product',
+        'footer.tagline': 'Gemify Technology – from idea to product',
         'footer.quicklinks': 'Quick Links',
         'footer.follow': 'Follow Me',
         'footer.copyright': '© 2025 Gemify. All rights reserved.',
@@ -361,6 +362,7 @@ const translations = {
         'nav.products': 'Sản phẩm',
         'nav.about': 'Giới thiệu',
         'nav.contact': 'Liên hệ',
+        'nav.blog': 'Bài viết',
         
         // Hero Section
         'hero.title': 'Gemify Technology',
@@ -430,7 +432,7 @@ const translations = {
         'contact.form.error.email': 'Vui lòng nhập địa chỉ email hợp lệ.',
         
         // Footer
-        'footer.tagline': 'Gemify Technology Solutions – từ ý tưởng đến sản phẩm',
+        'footer.tagline': 'Gemify Technology – từ ý tưởng đến sản phẩm',
         'footer.quicklinks': 'Liên kết nhanh',
         'footer.follow': 'Theo dõi tôi',
         'footer.copyright': '© 2025 Gemify. Tất cả quyền được bảo lưu.',
