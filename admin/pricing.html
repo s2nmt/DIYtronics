@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Process | Gemify Admin</title>
+    <link rel="icon" type="image/png" href="../img/flagVN.png">
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: #f5f5f5;
+            color: #111;
+        }
+        .admin-page {
+            padding: 100px 0 80px;
+            min-height: 100vh;
+        }
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+        }
+        .sidebar-toc {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+        .toc-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #e5e5e5;
+        }
+        .toc-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #111;
+        }
+        .toc-list {
+            list-style: none;
+        }
+        .toc-list li {
+            margin-bottom: 0.5rem;
+        }
+        .toc-list a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+            display: block;
+            padding: 0.3rem 0;
+        }
+        .toc-list a:hover {
+            color: #111;
+        }
+        .toc-list a.active {
+            color: #111;
+            font-weight: 600;
+        }
+        .content-wrapper {
+            min-width: 0;
+        }
+        .admin-header {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e5e5e5;
+        }
+        .admin-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #111;
+            margin-bottom: 0.5rem;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #111;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+        .back-link:hover {
+            gap: 0.8rem;
+        }
+        .content-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid #e5e5e5;
+            margin-bottom: 2rem;
+        }
+        .content-card h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #111;
+        }
+        .content-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: #111;
+        }
+        .content-card p {
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        .content-card ul, .content-card ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        .content-card li {
+            margin-bottom: 0.5rem;
+            line-height: 1.8;
+        }
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .pricing-table th,
+        .pricing-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .pricing-table th {
+            background: #f5f5f5;
+            font-weight: 600;
+            color: #111;
+        }
+        .pricing-table tr:hover {
+            background: #f9f9f9;
+        }
+        .pricing-table td {
+            vertical-align: top;
+            line-height: 1.6;
+        }
+        /* Chỉ áp dụng kích thước cố định cho các bảng trong Giai đoạn 2 (có class detailed-table) */
+        .detailed-table {
+            table-layout: fixed;
+        }
+        .detailed-table th:nth-child(1),
+        .detailed-table td:nth-child(1) {
+            width: 15%;
+        }
+        .detailed-table th:nth-child(2),
+        .detailed-table td:nth-child(2) {
+            width: 25%;
+        }
+        .detailed-table th:nth-child(3),
+        .detailed-table td:nth-child(3) {
+            width: 45%;
+        }
+        .detailed-table th:nth-child(4),
+        .detailed-table td:nth-child(4) {
+            width: 15%;
+            text-align: center;
+        }
+        .detailed-table td {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .detailed-table td strong {
+            color: #111;
+            font-weight: 600;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        h2[id], h3[id] {
+            scroll-margin-top: 100px;
+        }
+        @media (max-width: 968px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar-toc {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="../index.html"><h1>Gemify</h1></a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="../index.html#home">Home</a></li>
+                    <li><a href="../index.html#products">Products</a></li>
+                    <li><a href="../index.html#about">About</a></li>
+                    <li><a href="../index.html#contact">Contact</a></li>
+                    <li><a href="../blog.html">Blog</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="admin-page">
+            <div class="admin-container">
+                <aside class="sidebar-toc">
+                    <div class="toc-card">
+                        <h3>Table of Contents</h3>
+                        <ul class="toc-list">
+                            <li><a href="#overview">Tổng Quan</a></li>
+                            <li><a href="#pricing-steps">Quy Trình Báo Giá</a></li>
+                            <li><a href="#payment-stages">Các Giai Đoạn Thanh Toán</a></li>
+                            <li><a href="#requirement-analysis">Làm Rõ Yêu Cầu</a></li>
+                            <li><a href="#detailed-breakdown">Phân Tích Chi Tiết</a></li>
+                            <li><a href="#pricing-factors">Yếu Tố Định Giá</a></li>
+                            <li><a href="#standard-pricing">Bảng Giá Sản Phẩm</a></li>
+                            <li><a href="#contact">Liên Hệ Báo Giá Tùy Chỉnh</a></li>
+                        </ul>
+                    </div>
+                </aside>
+                
+                <div class="content-wrapper">
+                    <div class="content-card">
+                        <h1>Quy Trình Báo Giá</h1>
+                        <br><br>
+                        <h2 id="overview">Tổng Quan</h2>
+                        <p>Tài liệu này mô tả quy trình báo giá cho khách hàng và định giá sản phẩm tại Gemify. Làm theo các quy trình này để đảm bảo báo giá chính xác và nhất quán cho tất cả khách hàng.</p>
+
+                        <h3 id="payment-stages">Quy Trình Báo Giá</h3>
+                        <table class="pricing-table">
+                            <thead>
+                                <tr>
+                                    <th>Giai Đoạn</th>
+                                    <th>Tỷ Lệ</th>
+                                    <th>Nội Dung</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Giai đoạn 1</td>
+                                    <td>Free</td>
+                                    <td>Tiếp nhận yêu cầu khách hàng - Nhận và xem xét yêu cầu của khách hàng, đánh giá khả năng thực hiện của dự án.</td>
+                                </tr>
+                                <tr>
+                                    <td>Giai đoạn 2</td>
+                                    <td>15%</td>
+                                    <td>Báo cáo chi tiết nội dung khách hàng yêu cầu. Mô tả cách hoạt động của từng yêu cầu. Báo giá toàn bộ chi phí (Khách chốt OK thu 15% chi phí)</td>
+                                </tr>
+                                <tr>
+                                    <td>Giai đoạn 3</td>
+                                    <td>20%</td>
+                                    <td>Làm layout demo sản phẩm. Mô tả cách sản phẩm sẽ hoạt động như thế nào,</td>
+                                </tr>
+                                <tr>
+                                    <td>Giai đoạn 4</td>
+                                    <td>35%</td>
+                                    <td>Code sản phẩm, demo sản phẩm thực tế. Trước khi release sản phẩm</td>
+                                </tr>
+                                <tr>
+                                    <td>Giai đoạn 5</td>
+                                    <td>30%</td>
+                                    <td>Đưa ứng dụng lên production, bàn giao layout, source code, ...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3 id="requirement-analysis">Giai Đoạn 1: Triển Khai - Làm Rõ Yêu Cầu</h3>
+                        <p><strong>Ví dụ:</strong> Khách hàng yêu cầu 1 website và ứng dụng hiển thị nhiệt độ, độ ẩm. Đây là các yêu cầu khách hàng đưa ra:</p>
+                        <table class="pricing-table">
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Yêu Cầu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Giám sát và điều khiển nhiệt độ độ ẩm ở app và website</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Cảnh báo tối đa 10 alarm qua app, lưu cảnh báo và giá trị theo thời gian thực, có thể xem trên app và website</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Mỗi thiết bị được quản lý id riêng ứng với user riêng</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>Khai báo user và add id esp</td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>Lưu dữ liệu 3 tháng trên server. Lưu theo cảnh báo và timeout setup</td>
+                                </tr>
+                                <tr>
+                                    <td>6</td>
+                                    <td>1 user chính giám sát 1 device A, vài user phụ có thể cùng giám sát</td>
+                                </tr>
+                                <tr>
+                                    <td>7</td>
+                                    <td>Chức năng gửi mail khi có alarm (có thể set alarm, nội dung) và set tối đa 5 email, trên 1 user</td>
+                                </tr>
+                                <tr>
+                                    <td>8</td>
+                                    <td>Hỗ trợ kết nối MQTT cho wifi và sim</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p><h4>Đánh giá:</h4> Dự án có thể làm được, chưa có vấn đề phức tạp.</p>
+
+                        <h3 id="detailed-breakdown">Giai đoạn 2: Phân Tích Chi Tiết Theo Từng Phần</h3>
+                        
+                        <h4>Yêu Cầu 1: Giám sát và điều khiển nhiệt độ độ ẩm ở app và website</h4>
+                        <table class="pricing-table detailed-table">
+                            <thead>
+                                <tr>
+                                    <th>Hạng Mục</th>
+                                    <th>Câu Hỏi Cần Làm Rõ</th>
+                                    <th>Mô Tả</th>
+                                    <th>Báo Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td rowspan="2">Đăng nhập/Đăng ký</td>
+                                    <td>APP và website cần đăng ký đăng nhập tài khoản không?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Cần có 1 màn hình đăng nhập bao gồm tài khoản, mật khẩu, quên mật khẩu, đăng kí.<br>
+                                        <strong>Backend:</strong> API đăng nhập, đăng ký, xác thực token
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td>Có cần lấy OTP không? phương thức từ email hay số điện thoại ,..?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Màn hình nhập OTP, đếm ngược thời gian<br>
+                                        <strong>Backend:</strong> Triển khai OTP qua Zalo, lưu trữ và xác thực OTP
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+
+                                <tr>
+                                    <td rowspan="2">Giao diện chính</td>
+                                    <td>Hiển thị giá trị nhiệt độ độ ẩm (số lượng giá trị cần hiển thị, cố định hay linh hoạt?)</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Thiết kế màn hình hiển thị dữ liệu nhiệt độ và độ ẩm theo thời gian thực<br>
+                                        <strong>Backend:</strong> API lấy dữ liệu real-time, WebSocket hoặc polling
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td>Hiển thị biểu đồ (số lượng biểu đồ, biểu đồ dạng nào, bao nhiêu giá trị?)</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Phát triển biểu đồ hiển thị dữ liệu lịch sử với các tùy chọn loại biểu đồ<br>
+                                        <strong>Backend:</strong> API lấy dữ liệu lịch sử theo khoảng thời gian
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td>Điều khiển</td>
+                                    <td>Điều khiển đèn (hỏi bao nhiêu đèn, cố định hay thêm sửa xóa, phương pháp thêm đèn ntn?)</td>
+                                    <td>
+                                        <strong>Frontend:</strong> 1 màn hình có thể điều khiển on/off, thêm sửa xóa đèn<br>
+                                        <strong>Backend:</strong> API điều khiển thiết bị, quản lý danh sách đèn
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td>Cảnh báo</td>
+                                    <td>Hiển thị trạng thái cảnh báo, hiển thị như thế nào? Trong app hay khi tắt app vẫn?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Thiết kế hệ thống cảnh báo với thông báo push notification, và thông báo trong giao diện home<br>
+                                        <strong>Backend:</strong> Xử lý logic cảnh báo, gửi push notification, lưu trữ lịch sử cảnh báo
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Yêu Cầu 2: Cảnh báo tối đa 10 alarm qua app, lưu cảnh báo và giá trị theo thời gian thực</h4>
+                        <table class="pricing-table detailed-table">
+                            <thead>
+                                <tr>
+                                    <th>Hạng Mục</th>
+                                    <th>Câu Hỏi Cần Làm Rõ</th>
+                                    <th>Mô Tả</th>
+                                    <th>Báo Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Xuất file Excel</td>
+                                    <td>Định dạng file Excel như thế nào? Có cần filter, sort không?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Thiết kế 1 màn hình có thể xuất dữ liệu lịch sử ra file Excel với đầy đủ thông tin và có thể filter<br>
+                                        <strong>Backend:</strong> API xuất file Excel, xử lý dữ liệu và format Excel
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td>Lịch sử cảnh báo</td>
+                                    <td>Hiển thị bao nhiêu bản ghi? Có phân trang không?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Thiết kế 1 màn hình hiển thị lịch sử cảnh báo với tìm kiếm và lọc<br>
+                                        <strong>Backend:</strong> API lấy lịch sử cảnh báo với phân trang, filter, search
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Yêu Cầu 3: Mỗi thiết bị được quản lý id riêng ứng với user riêng</h4>
+                        <table class="pricing-table detailed-table">
+                            <thead>
+                                <tr>
+                                    <th>Hạng Mục</th>
+                                    <th>Câu Hỏi Cần Làm Rõ</th>
+                                    <th>Mô Tả</th>
+                                    <th>Báo Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Khai báo user và add ESP ID</td>
+                                    <td>Cần API nào để quản lý user và device? Có cần phân quyền không?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Màn hình quản lý user, màn hình thêm/sửa/xóa device<br>
+                                        <strong>Backend:</strong> Phát triển hệ thống backend quản lý user và device với authentication và authorization
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Yêu Cầu 4: Khai báo user và add id esp</h4>
+                        <table class="pricing-table detailed-table">
+                            <thead>
+                                <tr>
+                                    <th>Hạng Mục</th>
+                                    <th>Câu Hỏi Cần Làm Rõ</th>
+                                    <th>Mô Tả</th>
+                                    <th>Báo Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Thêm thiết bị</td>
+                                    <td>Quét QR hay nhập ID thiết bị. Thiết bị gồm những thông tin gì?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Màn hình quét QR code, màn hình nhập thủ công thông tin thiết bị<br>
+                                        <strong>Backend:</strong> API thêm thiết bị mới, validate thông tin thiết bị
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3">Kết nối WiFi</td>
+                                    <td>Theo phương pháp nào, gồm phần bluetooth, truyền nhận data bao gồm ssid password?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Màn hình cấu hình WiFi, nhập SSID và password<br>
+                                        <strong>Backend:</strong> API gửi cấu hình WiFi đến thiết bị qua Bluetooth hoặc WiFi AP mode
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td>Có cần check thiết bị kết nối thành công không?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Hiển thị trạng thái kết nối, thông báo kết quả<br>
+                                        <strong>Backend:</strong> API kiểm tra trạng thái kết nối thiết bị
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td>Có WiFi static không?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Màn hình cấu hình IP tĩnh (IP, Subnet, Gateway, DNS)<br>
+                                        <strong>Backend:</strong> API lưu và gửi cấu hình IP tĩnh đến thiết bị
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Yêu Cầu 5: Lưu dữ liệu 3 tháng trên server. Lưu theo cảnh báo và timeout setup</h4>
+                        <table class="pricing-table detailed-table">
+                            <thead>
+                                <tr>
+                                    <th>Hạng Mục</th>
+                                    <th>Câu Hỏi Cần Làm Rõ</th>
+                                    <th>Mô Tả</th>
+                                    <th>Báo Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Timeout setup</td>
+                                    <td>Timeout cho từng loại dữ liệu là bao nhiêu? Có thể tùy chỉnh không?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Thiết kế màn hình cấu hình timeout cho việc lưu trữ dữ liệu và cảnh báo<br>
+                                        <strong>Backend:</strong> API lưu cấu hình timeout, xử lý logic timeout cho từng loại dữ liệu
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Yêu Cầu 6: 1 user chính giám sát 1 device A, vài user phụ có thể cùng giám sát</h4>
+                        <table class="pricing-table detailed-table">
+                            <thead>
+                                <tr>
+                                    <th>Hạng Mục</th>
+                                    <th>Câu Hỏi Cần Làm Rõ</th>
+                                    <th>Mô Tả</th>
+                                    <th>Báo Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Chia sẻ thiết bị</td>
+                                    <td>1 màn hình chia sẻ thiết bị cho user phụ. Cách share như thế nào? Ví dụ share qua email hoặc QR</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Màn hình chia sẻ thiết bị, hiển thị QR code, nhập email để share<br>
+                                        <strong>Backend:</strong> API tạo link/QR code chia sẻ, gửi email mời, quản lý quyền truy cập user phụ
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Yêu Cầu 7: Chức năng gửi mail khi có alarm (có thể set alarm, nội dung) và set tối đa 5 email, trên 1 user</h4>
+                        <table class="pricing-table detailed-table">
+                            <thead>
+                                <tr>
+                                    <th>Hạng Mục</th>
+                                    <th>Câu Hỏi Cần Làm Rõ</th>
+                                    <th>Mô Tả</th>
+                                    <th>Báo Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Màn hình set email</td>
+                                    <td>Có thể tùy chỉnh nội dung email không? Template email như thế nào?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Thiết kế màn hình quản lý danh sách email nhận cảnh báo với tối đa 5 email, tùy chỉnh nội dung email<br>
+                                        <strong>Backend:</strong> API lưu danh sách email, lưu template email
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td>Server gửi email</td>
+                                    <td>Dùng email service nào? SMTP server riêng hay third-party?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> -<br>
+                                        <strong>Backend:</strong> Phát triển hệ thống gửi email tự động từ server khi có cảnh báo, tích hợp SMTP hoặc email service
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Yêu Cầu 8: Hỗ trợ kết nối MQTT cho wifi và sim</h4>
+                        <table class="pricing-table detailed-table">
+                            <thead>
+                                <tr>
+                                    <th>Hạng Mục</th>
+                                    <th>Câu Hỏi Cần Làm Rõ</th>
+                                    <th>Mô Tả</th>
+                                    <th>Báo Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Firmware</td>
+                                    <td>MQTT broker nào? QoS level? Có cần retain message không?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> -<br>
+                                        <strong>Backend/Firmware:</strong> Phát triển firmware ESP32 hỗ trợ MQTT qua WiFi và SIM với các tính năng: connect, disconnect, publish, subscribe, reconnect, QoS handling
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Gemify</h3>
+                    <p>Handcrafted electronics for makers and enthusiasts</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="../index.html#home">Home</a></li>
+                        <li><a href="../index.html#products">Products</a></li>
+                        <li><a href="../index.html#about">About</a></li>
+                        <li><a href="../index.html#contact">Contact</a></li>
+                        <li><a href="../blog.html">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Follow Me</h4>
+                    <div class="social-links">
+                        <a href="https://github.com/s2nmt"><i class="fab fa-github"></i></a>
+                        <a href="https://www.youtube.com/@yourchannel"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.linkedin.com/in/yourprofile"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.tiktok.com/@gemify_technology"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Gemify. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.toc-list a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    const headerOffset = 100;
+                    const elementPosition = targetElement.offsetTop;
+                    const offsetPosition = elementPosition - headerOffset;
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Highlight active section in TOC when scrolling
+        const sections = document.querySelectorAll('h2[id], h3[id]');
+        const tocLinks = document.querySelectorAll('.toc-list a');
+
+        function updateActiveLink() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveLink);
+        updateActiveLink();
+    </script>
+</body>
+</html>
+
