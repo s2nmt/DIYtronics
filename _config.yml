@@ -1,0 +1,17 @@
+# Jekyll Configuration for GitHub Pages
+# Loại bỏ đuôi .html trong URL
+
+# Permalink style - loại bỏ .html và dấu / ở cuối
+permalink: /:title
+
+# Exclude files không cần build
+exclude:
+  - README.md
+  - .git
+  - .gitignore
+  - node_modules
+
+# Site settings
+title: "Gemify"
+description: "Handcrafted electronics for makers and enthusiasts"
+

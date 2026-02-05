@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <script>
+        // Lấy path hiện tại
+        var path = window.location.pathname;
+        
+        // Loại bỏ dấu / ở đầu và cuối
+        path = path.replace(/^\/|\/$/g, '');
+        
+        // Nếu path rỗng, chuyển về index
+        if (!path || path === '404.html') {
+            window.location.href = '/index.html';
+            return;
+        }
+        
+        // Thêm .html nếu chưa có
+        if (!path.endsWith('.html')) {
+            // Kiểm tra xem file có tồn tại không
+            var testPath = '/' + path + '.html';
+            
+            // Thử load file
+            fetch(testPath, { method: 'HEAD' })
+                .then(function(response) {
+                    if (response.ok) {
+                        // File tồn tại, redirect
+                        window.location.href = testPath;
+                    } else {
+                        // File không tồn tại, có thể là thư mục
+                        // Thử với index.html trong thư mục
+                        var dirPath = '/' + path + '/index.html';
+                        fetch(dirPath, { method: 'HEAD' })
+                            .then(function(dirResponse) {
+                                if (dirResponse.ok) {
+                                    window.location.href = dirPath;
+                                } else {
+                                    // Không tìm thấy, về trang chủ
+                                    window.location.href = '/index.html';
+                                }
+                            })
+                            .catch(function() {
+                                window.location.href = '/index.html';
+                            });
+                    }
+                })
+                .catch(function() {
+                    // Lỗi, thử redirect trực tiếp
+                    window.location.href = '/' + path + '.html';
+                });
+        } else {
+            // Đã có .html, giữ nguyên
+            window.location.href = '/' + path;
+        }
+    </script>
+</head>
+<body>
+    <p>Redirecting...</p>
+</body>
+</html>
+
