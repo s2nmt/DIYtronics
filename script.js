@@ -331,6 +331,15 @@ const translations = {
         'about.stats.products': 'Products Created',
         'about.stats.support': 'Support',
         
+        // Services Section
+        'services.title': 'Our Services',
+        'services.hardware.title': 'Hardware Development',
+        'services.hardware.desc': 'Outsource hardware design and firmware development services for custom electronic devices and IoT solutions.',
+        'services.software.title': 'IoT Software Design',
+        'services.software.desc': 'Outsource IoT software solutions including app, website, and server development.',
+        'services.products.title': 'Technology Products & IoT Platforms',
+        'services.products.desc': 'Providing technology products and IoT platforms for your business needs.',
+        
         // Contact Section
         'contact.title': 'Get In Touch',
         'contact.subtitle': 'Let\'s Build Something Amazing',
@@ -346,9 +355,10 @@ const translations = {
         'contact.form.error.email': 'Please enter a valid email address.',
         
         // Footer
-        'footer.tagline': 'Gemify Technology – from idea to product',
+        'footer.tagline': 'Gemify Technology – Let\'s Build Something Amazing',
         'footer.quicklinks': 'Quick Links',
         'footer.follow': 'Follow Me',
+        'footer.contact': 'Contact',
         'footer.copyright': '© 2025 Gemify. All rights reserved.',
         
         // Language Switcher
@@ -415,6 +425,15 @@ const translations = {
         'about.stats.products': 'Sản phẩm đã tạo',
         'about.stats.support': 'Hỗ trợ',
         
+        // Services Section
+        'services.title': 'Các dịch vụ chúng tôi cung cấp',
+        'services.hardware.title': 'Phát triển phần cứng',
+        'services.hardware.desc': 'Thiết kế phần cứng và phát triển firmware cho các thiết bị điện tử tùy chỉnh và giải pháp IoT.',
+        'services.software.title': 'Thiết kế phần mềm IoT',
+        'services.software.desc': 'Giải pháp thiết kế, phát triển phần mềm IoT bao gồm app, website và server,..',
+        'services.products.title': 'Sản phẩm công nghệ & Platform IoT',
+        'services.products.desc': 'Cung cấp các sản phẩm công nghệ và các platform IoT cho nhu cầu của bạn.',
+        
         // Contact Section
         'contact.title': 'Liên hệ',
         'contact.subtitle': 'Hãy cùng xây dựng điều gì đó tuyệt vời',
@@ -430,9 +449,10 @@ const translations = {
         'contact.form.error.email': 'Vui lòng nhập địa chỉ email hợp lệ.',
         
         // Footer
-        'footer.tagline': 'Gemify Technology – từ ý tưởng đến sản phẩm',
+        'footer.tagline': 'Gemify Technology – Hãy cùng xây dựng điều gì đó tuyệt vời',
         'footer.quicklinks': 'Liên kết nhanh',
         'footer.follow': 'Theo dõi tôi',
+        'footer.contact': 'Liên hệ',
         'footer.copyright': '© 2025 Gemify. Tất cả quyền được bảo lưu.',
         
         // Language Switcher
