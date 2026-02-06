@@ -281,7 +281,7 @@ const translations = {
         
         // Hero Section
         'hero.title': 'Gemify Technology',
-        'hero.subtitle': 'Discover unique, custom-made technology devices crafted with passion and precision',
+        'hero.subtitle': 'Discover modern technology devices and AIoT systems, professionally customized for each customer with precision.',
         'hero.cta': 'View Products',
         
         // Products Section
@@ -326,10 +326,9 @@ const translations = {
         
         // About Section
         'about.title': 'About Gemify',
-        'about.desc1': 'I am passionate about creating unique technology devices that combine functionality with personalized design. Each product is custom-designed and tested to ensure the highest quality.',
-        'about.desc2': 'From simple LED controllers to complex robotic systems, every project is designed with the maker community in mind - easy to understand, modify, and expand upon.',
+        'about.desc1': 'We are passionate about creating modern technology products from hardware to software that combine functionality with customer-specific design. Each product is custom-designed and tested to ensure the highest quality.',
+        'about.desc2': 'From simple applications to complex AIoT systems, modern design that is easy to understand, easy to use, and expandable.',
         'about.stats.products': 'Products Created',
-        'about.stats.handcrafted': 'DIY',
         'about.stats.support': 'Support',
         
         // Contact Section
@@ -366,7 +365,7 @@ const translations = {
         
         // Hero Section
         'hero.title': 'Gemify Technology',
-        'hero.subtitle': 'Khám phá các thiết bị công nghệ độc đáo được thiết kế cá nhân hóa với niềm đam mê và độ chính xác cao',
+        'hero.subtitle': 'Khám phá các thiết bị công nghệ, hệ thống AIoT hiện đại được thiết kế chuyên môn hóa đối với từng khách hàng với độ tỉ mỉ, chính xác cao.',
         'hero.cta': 'Xem sản phẩm',
         
         // Products Section
@@ -411,10 +410,9 @@ const translations = {
         
         // About Section
         'about.title': 'Giới thiệu Gemify',
-        'about.desc1': 'Tôi đam mê tạo ra các thiết bị điện tử độc đáo kết hợp chức năng với thiết kế cá nhân hóa. Mỗi sản phẩm được thiết kế riêng và kiểm tra để đảm bảo chất lượng cao nhất.',
-        'about.desc2': 'Từ bộ điều khiển LED đơn giản đến hệ thống robot phức tạp, mọi dự án đều được thiết kế với cộng đồng maker trong tâm trí - dễ hiểu, dễ sửa đổi và mở rộng.',
+        'about.desc1': 'Chúng tôi đam mê tạo ra các sản phẩm công nghệ từ phần cứng đến phần mềm hiện đại kết hợp chức năng với thiết kế cụ thể hóa từng khách hàng. Mỗi sản phẩm được thiết kế riêng và kiểm tra để đảm bảo chất lượng cao nhất.',
+        'about.desc2': 'Từ các ứng dụng đơn giản đến hệ thống AIoT phức tạp, thiết kế hiện đại dễ hiểu dễ sử dụng và mở rộng.',
         'about.stats.products': 'Sản phẩm đã tạo',
-        'about.stats.handcrafted': 'DIY',
         'about.stats.support': 'Hỗ trợ',
         
         // Contact Section
