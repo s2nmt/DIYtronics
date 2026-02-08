@@ -97,6 +97,7 @@
         .article-meta {
             display: flex;
             align-items: center;
+            justify-content: flex-end;
             gap: 1rem;
             margin-bottom: 1rem;
             color: #666;
@@ -416,19 +417,7 @@
                     </aside>
 
                     <div class="article-main">
-                        <a href="../blog.html" class="back-to-blog">
-                            <i class="fas fa-arrow-left"></i>
-                            <span data-translate="article.back">Back to Blog</span>
-                        </a>
-                        
                         <header class="article-header">
-                            <div class="article-meta">
-                                <span class="article-category" data-translate="blog.category.tutorial">Tutorial</span>
-                                <span class="article-date">
-                                    <i class="far fa-calendar"></i>
-                                    <span data-translate="blog.post1.meta">by Gemify | Jan 20, 2025</span>
-                                </span>
-                            </div>
                             <h1 class="article-title" data-translate="blog.post1.title">How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu</h1>
                         </header>
 
@@ -515,7 +504,15 @@ client.on('connect', () => {
 
                     <p data-translate="article.post1.conclusion">Congratulations! Your MQTT broker is now set up and running on Ubuntu. You can now connect your IoT devices to this broker and start building your IoT applications.</p>
                         </div>
+                        <div class="article-meta">
+                            <span class="article-category" data-translate="blog.category.tutorial">Tutorial</span>
+                            <span class="article-date">
+                                <i class="far fa-calendar"></i>
+                                <span data-translate="blog.post1.meta">by Tuan Nguyen | Jan 20, 2025</span>
+                            </span>
+                        </div>
                     </div>
+                    
                 </div>
 
                 <footer class="article-footer">
