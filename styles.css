@@ -714,29 +714,6 @@ body {
     text-decoration: none;
 }
 
-.footer-contact {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.footer-contact-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    color: var(--muted);
-    font-size: 0.9rem;
-}
-
-.footer-contact-item i {
-    width: 20px;
-    color: var(--text);
-}
-
-.footer-contact-item span {
-    color: var(--muted);
-}
-
 .footer-bottom {
     text-align: center;
     padding-top: 2rem;
