@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Getting Started with Bilingual Reading Apps | Gemify Blog</title>
+    <title>How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu | Gemify Blog</title>
     <link rel="icon" type="image/png" href="../img/flagVN.png">
     <link rel="stylesheet" href="../styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,9 +17,79 @@
             padding: 100px 0 80px;
         }
         .article-container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 0;
+        }
+        .article-wrapper {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 2rem;
+            position: relative;
             padding: 0 20px;
+        }
+        .article-toc {
+            position: sticky;
+            top: 90px;
+            align-self: start;
+            height: fit-content;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding-right: 1rem;
+            margin-left: -20px;
+            padding-left: 20px;
+        }
+        .toc-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .toc-item {
+            margin-bottom: 0.4rem;
+        }
+        .toc-item a {
+            display: block;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.8rem;
+            padding: 0.3rem 0;
+            transition: color 0.3s ease;
+            border-left: 2px solid transparent;
+            padding-left: 0.5rem;
+            line-height: 1.4;
+        }
+        .toc-item a:hover,
+        .toc-item a.active {
+            color: #111;
+            border-left-color: #111;
+            font-weight: 600;
+        }
+        .toc-item.toc-level-2 a {
+            font-weight: 500;
+        }
+        .toc-item.toc-level-3 a {
+            font-size: 0.75rem;
+            padding-left: 1rem;
+            color: #888;
+        }
+        .article-main {
+            max-width: 100%;
+        }
+        @media (max-width: 1024px) {
+            .article-wrapper {
+                grid-template-columns: 1fr;
+            }
+            .article-toc {
+                display: none;
+            }
         }
         .article-header {
             margin-bottom: 3rem;
@@ -94,10 +164,116 @@
             border-radius: 8px;
             margin: 2rem 0;
         }
+        .article-content code {
+            background: #f5f5f5;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #d63384;
+        }
+        .article-content pre {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid #e5e5e5;
+        }
+        .article-content pre code {
+            background: none;
+            padding: 0;
+            color: #333;
+            font-size: 0.95em;
+        }
         .article-footer {
             margin-top: 3rem;
             padding-top: 2rem;
             border-top: 1px solid #e5e5e5;
+        }
+        .article-navigation {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        .nav-prev,
+        .nav-next {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid #e5e5e5;
+        }
+        .nav-prev:hover,
+        .nav-next:hover {
+            background: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .nav-prev {
+            text-align: left;
+        }
+        .nav-next {
+            text-align: right;
+            flex-direction: row-reverse;
+        }
+        .nav-arrow {
+            width: 40px;
+            height: 40px;
+            background: #111;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+        .nav-prev:hover .nav-arrow,
+        .nav-next:hover .nav-arrow {
+            transform: scale(1.1);
+        }
+        .nav-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .nav-label {
+            display: block;
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+        .nav-title {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #111;
+            line-height: 1.4;
+        }
+        @media (max-width: 768px) {
+            .article-navigation {
+                grid-template-columns: 1fr;
+            }
+            .nav-next {
+                flex-direction: row;
+                text-align: left;
+            }
+        }
+        .article-footer-section {
+            margin-bottom: 2.5rem;
+        }
+        .article-footer-section h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #111;
+            margin-bottom: 1rem;
         }
         .back-to-blog {
             display: inline-flex;
@@ -106,10 +282,101 @@
             color: #111;
             font-weight: 600;
             text-decoration: none;
-            margin-bottom: 2rem;
+            transition: gap 0.3s ease;
         }
         .back-to-blog:hover {
             gap: 0.8rem;
+        }
+        .related-articles-grid {
+            display: grid;
+            grid-template-columns: auto 1fr 1fr 1fr auto;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            align-items: stretch;
+        }
+        .nav-prev-card,
+        .nav-next-card {
+            background: transparent;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .nav-prev-card:hover,
+        .nav-next-card:hover {
+            opacity: 0.7;
+        }
+        .nav-prev-card .nav-arrow,
+        .nav-next-card .nav-arrow {
+            width: auto;
+            height: auto;
+            background: transparent;
+            color: #111;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            transition: all 0.3s ease;
+        }
+        .nav-prev-card:hover .nav-arrow,
+        .nav-next-card:hover .nav-arrow {
+            transform: scale(1.2);
+        }
+        .related-article-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid #e5e5e5;
+            display: flex;
+            flex-direction: column;
+        }
+        .related-article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .related-article-image {
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+            background: #f3f3f3;
+        }
+        .related-article-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .related-article-card:hover .related-article-image img {
+            transform: scale(1.05);
+        }
+        .related-article-content {
+            padding: 1.25rem;
+        }
+        .related-article-content h5 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #111;
+            margin: 0;
+            line-height: 1.4;
+        }
+        @media (max-width: 1024px) {
+            .related-articles-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+            .nav-prev-card,
+            .nav-next-card {
+                display: none;
+            }
+        }
+        @media (max-width: 768px) {
+            .related-articles-grid {
+                grid-template-columns: 1fr;
+            }
         }
         @media (max-width: 768px) {
             .article-title {
@@ -135,16 +402,6 @@
                     <li><a href="../index.html#contact" data-translate="nav.contact">Contact</a></li>
                     <li><a href="../blog.html" data-translate="nav.blog">Blog</a></li>
                 </ul>
-                <div class="language-switcher">
-                    <button class="lang-btn" data-lang="vi">
-                        <img src="../img/flagVN.png" alt="VN Flag" class="flag-icon" style="height: 20px; vertical-align: middle; margin-right: 4px;">
-                        <span class="lang-text">VI</span>
-                    </button>
-                    <button class="lang-btn" data-lang="en">
-                        <span class="flag"><i class="fas fa-globe"></i></span>
-                        <span class="lang-text">EN</span>
-                    </button>
-                </div>
             </div>
         </nav>
     </header>
@@ -152,55 +409,156 @@
     <main>
         <article class="article-page">
             <div class="article-container">
-                <a href="../blog.html" class="back-to-blog">
-                    <i class="fas fa-arrow-left"></i>
-                    <span data-translate="article.back">Back to Blog</span>
-                </a>
-                
-                <header class="article-header">
-                    <div class="article-meta">
-                        <span class="article-category" data-translate="blog.category.tutorial">Tutorial</span>
-                        <span class="article-date">
-                            <i class="far fa-calendar"></i>
-                            <span data-translate="blog.post1.meta">by Gemify | Jan 20, 2025</span>
-                        </span>
+                <div class="article-wrapper">
+                    <aside class="article-toc">
+                        <div class="toc-title">Table of Contents</div>
+                        <ul class="toc-list" id="toc-list"></ul>
+                    </aside>
+
+                    <div class="article-main">
+                        <a href="../blog.html" class="back-to-blog">
+                            <i class="fas fa-arrow-left"></i>
+                            <span data-translate="article.back">Back to Blog</span>
+                        </a>
+                        
+                        <header class="article-header">
+                            <div class="article-meta">
+                                <span class="article-category" data-translate="blog.category.tutorial">Tutorial</span>
+                                <span class="article-date">
+                                    <i class="far fa-calendar"></i>
+                                    <span data-translate="blog.post1.meta">by Gemify | Jan 20, 2025</span>
+                                </span>
+                            </div>
+                            <h1 class="article-title" data-translate="blog.post1.title">How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu</h1>
+                        </header>
+
+                        <img src="../img/post1/cover.png" alt="Article Image" class="article-featured-image">
+
+                        <div class="article-content">
+                    <p data-translate="article.post1.intro">MQTT (Message Queuing Telemetry Transport) is a lightweight messaging protocol designed for IoT devices. Setting up an MQTT broker on Ubuntu allows you to create a central hub for your IoT projects.</p>
+
+                    <h2 id="what-is-mqtt-broker" data-translate="article.post1.section1.title">What is MQTT Broker?</h2>
+                    <p data-translate="article.post1.section1.content">An MQTT broker is a server that receives messages from clients (publishers) and routes them to other clients (subscribers) based on topics. It acts as a central communication hub for IoT devices, enabling efficient and reliable message exchange with minimal overhead.</p>
+
+                    <h2 id="installing-aedes-mqtt-broker" data-translate="article.post1.section2.title">Installing Aedes MQTT Broker</h2>
+                    <p data-translate="article.post1.section2.content">First, update your package list and install nodejs 18.x:</p>
+
+                    <pre><code data-translate="article.post1.code1">sudo apt update
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -</code></pre>
+
+                    <p data-translate="article.post1.section2.content2">After installation, we are install nodejs to run aedes broker:</p>
+
+                    <pre><code data-translate="article.post1.code2">sudo apt install nodejs -y</code></pre>
+
+                    <p>Now, create a new directory for your MQTT broker project and install the required packages:</p>
+
+                    <pre><code>mkdir mqtt-broker
+cd mqtt-broker
+npm install aedes ws http net
+</code></pre>
+
+                    <h3 id="step-1-code-example" data-translate="article.post1.tip1.title">Step 1: Code example to run aedes broker</h3>
+                    <p data-translate="article.post1.tip1.content">Create a file named <code>broker.js</code> and add the following code:</p>
+
+                    <pre><code>const aedes = require('aedes')();
+const net = require('net');
+const http = require('http');
+const ws = require('ws');
+
+// ===== MQTT TCP =====
+const tcpPort = 1883;
+net.createServer(aedes.handle).listen(tcpPort, () => {
+  console.log('MQTT TCP running on port', tcpPort);
+});
+
+// ===== MQTT over WebSocket (WS) =====
+const wsPort = 8080;
+const httpServer = http.createServer();
+const wsServer = new ws.Server({ server: httpServer });
+
+wsServer.on('connection', (socket) => {
+  const stream = ws.createWebSocketStream(socket);
+  aedes.handle(stream);
+});
+
+httpServer.listen(wsPort, () => {
+  console.log('MQTT WS running on port', wsPort);
+});
+
+// ===== Log client & message =====
+aedes.on('client', (client) => {
+  console.log('Client connected:', client.id);
+});
+
+aedes.on('publish', (packet, client) => {
+  if (client) {
+    console.log(`[${client.id}] ${packet.topic}: ${packet.payload.toString()}`);
+  }
+});</code></pre>
+
+                    <h3 id="step-2-run-broker" data-translate="article.post1.tip2.title">Step 2: Run aedes broker</h3>
+                    <p data-translate="article.post1.tip2.content">Run the broker with the following command:</p>
+
+                    <pre><code data-translate="article.post1.code3">node broker.js</code></pre>
+                    <p>Output:</p>
+                    <pre><code>MQTT TCP running on port 1883
+MQTT WS running on port 8080</code></pre>
+                    <h2 id="testing-mqtt-broker" data-translate="article.post1.section3.title">Testing the MQTT Broker</h2>
+                    <p data-translate="article.post1.section3.content">After configuring, you can use the following code example to test the broker:</p>
+
+                    <pre><code data-translate="article.post1.code6">const mqtt = require('mqtt');
+const client = mqtt.connect('mqtt://localhost:1883');
+
+client.on('connect', () => {
+  console.log('Connected to MQTT broker');
+});</code></pre>
+
+                    <p data-translate="article.post1.conclusion">Congratulations! Your MQTT broker is now set up and running on Ubuntu. You can now connect your IoT devices to this broker and start building your IoT applications.</p>
+                        </div>
                     </div>
-                    <h1 class="article-title" data-translate="blog.post1.title">Getting Started with Bilingual Reading Apps</h1>
-                </header>
-
-                <img src="../img/blog-3.jpg" alt="Article Image" class="article-featured-image">
-
-                <div class="article-content">
-                    <p data-translate="article.post1.intro">Bilingual reading applications have revolutionized the way we learn languages. These innovative tools combine the power of technology with language learning, making it easier than ever to improve your reading comprehension and vocabulary in multiple languages.</p>
-
-                    <h2 data-translate="article.post1.section1.title">Why Use Bilingual Reading Apps?</h2>
-                    <p data-translate="article.post1.section1.content">Bilingual reading apps offer numerous advantages for language learners. They provide instant translations, context-aware definitions, and the ability to read in two languages simultaneously. This dual-language approach helps learners understand nuances and improve their comprehension skills.</p>
-
-                    <h2 data-translate="article.post1.section2.title">Getting Started</h2>
-                    <p data-translate="article.post1.section2.content">To begin using a bilingual reading app, first choose a book or article that matches your current language level. Start with simpler texts and gradually work your way up to more complex materials. Most apps allow you to adjust the difficulty level and customize your learning experience.</p>
-
-                    <h3 data-translate="article.post1.tip1.title">Tip 1: Start Small</h3>
-                    <p data-translate="article.post1.tip1.content">Begin with short articles or children's books. These simpler texts will help you build confidence and establish a reading routine.</p>
-
-                    <h3 data-translate="article.post1.tip2.title">Tip 2: Use Interactive Features</h3>
-                    <p data-translate="article.post1.tip2.content">Take advantage of features like word highlighting, audio pronunciation, and vocabulary lists. These tools can significantly enhance your learning experience.</p>
-
-                    <h2 data-translate="article.post1.section3.title">Best Practices</h2>
-                    <ul>
-                        <li data-translate="article.post1.practice1">Read daily, even if it's just for 15 minutes</li>
-                        <li data-translate="article.post1.practice2">Keep a vocabulary notebook</li>
-                        <li data-translate="article.post1.practice3">Review difficult words regularly</li>
-                        <li data-translate="article.post1.practice4">Join online reading communities</li>
-                    </ul>
-
-                    <p data-translate="article.post1.conclusion">With consistent practice and the right tools, bilingual reading apps can significantly improve your language skills. Start your journey today and discover the joy of reading in multiple languages!</p>
                 </div>
 
                 <footer class="article-footer">
-                    <a href="../blog.html" class="back-to-blog">
-                        <i class="fas fa-arrow-left"></i>
-                        <span data-translate="article.back">Back to Blog</span>
-                    </a>
+                    <div class="article-footer-section">
+                        <h4>Related Articles</h4>
+                        <div class="related-articles-grid">
+                            <a href="#" class="nav-prev-card">
+                                <div class="nav-arrow">
+                                    <i class="fas fa-arrow-left"></i>
+                                </div>
+                            </a>
+                            <a href="#" class="related-article-card">
+                                <div class="related-article-image">
+                                    <img src="../img/blog-3.jpg" alt="Building IoT Applications with MQTT">
+                                </div>
+                                <div class="related-article-content">
+                                    <h5>Building IoT Applications with MQTT</h5>
+                                </div>
+                            </a>
+                            <a href="#" class="related-article-card">
+                                <div class="related-article-image">
+                                    <img src="../img/blog-3.jpg" alt="Securing Your MQTT Broker">
+                                </div>
+                                <div class="related-article-content">
+                                    <h5>Securing Your MQTT Broker</h5>
+                                </div>
+                            </a>
+                            <a href="#" class="related-article-card">
+                                <div class="related-article-image">
+                                    <img src="../img/blog-3.jpg" alt="MQTT vs HTTP for IoT Communication">
+                                </div>
+                                <div class="related-article-content">
+                                    <h5>MQTT vs HTTP for IoT Communication</h5>
+                                </div>
+                            </a>
+                            <a href="#" class="nav-next-card">
+        
+                                <div class="nav-arrow">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
                 </footer>
             </div>
         </article>
@@ -231,94 +589,73 @@
     </footer>
 
     <script>
-const translations = {
-    en: {
-        'article.back': 'Back to Blog',
-        'blog.category.tutorial': 'Tutorial',
-        'blog.post1.title': 'Getting Started with Bilingual Reading Apps',
-        'blog.post1.meta': 'by Gemify | Jan 20, 2025',
-        'article.post1.intro': 'Bilingual reading applications have revolutionized the way we learn languages. These innovative tools combine the power of technology with language learning, making it easier than ever to improve your reading comprehension and vocabulary in multiple languages.',
-        'article.post1.section1.title': 'Why Use Bilingual Reading Apps?',
-        'article.post1.section1.content': 'Bilingual reading apps offer numerous advantages for language learners. They provide instant translations, context-aware definitions, and the ability to read in two languages simultaneously. This dual-language approach helps learners understand nuances and improve their comprehension skills.',
-        'article.post1.section2.title': 'Getting Started',
-        'article.post1.section2.content': 'To begin using a bilingual reading app, first choose a book or article that matches your current language level. Start with simpler texts and gradually work your way up to more complex materials. Most apps allow you to adjust the difficulty level and customize your learning experience.',
-        'article.post1.tip1.title': 'Tip 1: Start Small',
-        'article.post1.tip1.content': 'Begin with short articles or children\'s books. These simpler texts will help you build confidence and establish a reading routine.',
-        'article.post1.tip2.title': 'Tip 2: Use Interactive Features',
-        'article.post1.tip2.content': 'Take advantage of features like word highlighting, audio pronunciation, and vocabulary lists. These tools can significantly enhance your learning experience.',
-        'article.post1.section3.title': 'Best Practices',
-        'article.post1.practice1': 'Read daily, even if it\'s just for 15 minutes',
-        'article.post1.practice2': 'Keep a vocabulary notebook',
-        'article.post1.practice3': 'Review difficult words regularly',
-        'article.post1.practice4': 'Join online reading communities',
-        'article.post1.conclusion': 'With consistent practice and the right tools, bilingual reading apps can significantly improve your language skills. Start your journey today and discover the joy of reading in multiple languages!',
-        'nav.home': 'Home',
-        'nav.products': 'Products',
-        'nav.about': 'About',
-        'nav.contact': 'Contact',
-        'nav.blog': 'Blog',
-        'footer.tagline': 'Gemify Technology – Let\'s Build Something Amazing',
-        'footer.quicklinks': 'Quick Links',
-        'footer.follow': 'Follow Me',
-        'footer.copyright': '© 2025 Gemify. All rights reserved.',
-    },
-    vi: {
-        'article.back': 'Quay lại Blog',
-        'blog.category.tutorial': 'Hướng dẫn',
-        'blog.post1.title': 'Bắt đầu với ứng dụng đọc sách song ngữ',
-        'blog.post1.meta': 'bởi Gemify | 20 Tháng 1, 2025',
-        'article.post1.intro': 'Ứng dụng đọc sách song ngữ đã cách mạng hóa cách chúng ta học ngôn ngữ. Những công cụ sáng tạo này kết hợp sức mạnh của công nghệ với việc học ngôn ngữ, giúp cải thiện khả năng đọc hiểu và từ vựng của bạn trong nhiều ngôn ngữ dễ dàng hơn bao giờ hết.',
-        'article.post1.section1.title': 'Tại sao nên sử dụng ứng dụng đọc sách song ngữ?',
-        'article.post1.section1.content': 'Ứng dụng đọc sách song ngữ mang lại nhiều lợi ích cho người học ngôn ngữ. Chúng cung cấp bản dịch tức thì, định nghĩa theo ngữ cảnh và khả năng đọc bằng hai ngôn ngữ đồng thời. Cách tiếp cận song ngữ này giúp người học hiểu được sắc thái và cải thiện kỹ năng đọc hiểu.',
-        'article.post1.section2.title': 'Bắt đầu',
-        'article.post1.section2.content': 'Để bắt đầu sử dụng ứng dụng đọc sách song ngữ, trước tiên hãy chọn một cuốn sách hoặc bài viết phù hợp với trình độ ngôn ngữ hiện tại của bạn. Bắt đầu với các văn bản đơn giản hơn và dần dần nâng cao lên các tài liệu phức tạp hơn. Hầu hết các ứng dụng cho phép bạn điều chỉnh mức độ khó và tùy chỉnh trải nghiệm học tập.',
-        'article.post1.tip1.title': 'Mẹo 1: Bắt đầu từ những điều nhỏ',
-        'article.post1.tip1.content': 'Bắt đầu với các bài viết ngắn hoặc sách thiếu nhi. Những văn bản đơn giản hơn này sẽ giúp bạn xây dựng sự tự tin và thiết lập thói quen đọc sách.',
-        'article.post1.tip2.title': 'Mẹo 2: Sử dụng các tính năng tương tác',
-        'article.post1.tip2.content': 'Tận dụng các tính năng như làm nổi bật từ, phát âm audio và danh sách từ vựng. Những công cụ này có thể nâng cao đáng kể trải nghiệm học tập của bạn.',
-        'article.post1.section3.title': 'Thực hành tốt nhất',
-        'article.post1.practice1': 'Đọc hàng ngày, ngay cả khi chỉ 15 phút',
-        'article.post1.practice2': 'Giữ một cuốn sổ từ vựng',
-        'article.post1.practice3': 'Ôn tập các từ khó thường xuyên',
-        'article.post1.practice4': 'Tham gia các cộng đồng đọc sách trực tuyến',
-        'article.post1.conclusion': 'Với việc thực hành nhất quán và các công cụ phù hợp, ứng dụng đọc sách song ngữ có thể cải thiện đáng kể kỹ năng ngôn ngữ của bạn. Bắt đầu hành trình của bạn ngay hôm nay và khám phá niềm vui đọc sách bằng nhiều ngôn ngữ!',
-        'nav.home': 'Trang chủ',
-        'nav.products': 'Sản phẩm',
-        'nav.about': 'Giới thiệu',
-        'nav.contact': 'Liên hệ',
-        'nav.blog': 'Bài viết',
-        'footer.tagline': 'Gemify Technology – Hãy cùng xây dựng điều gì đó tuyệt vời',
-        'footer.quicklinks': 'Liên kết nhanh',
-        'footer.follow': 'Theo dõi tôi',
-        'footer.copyright': '© 2025 Gemify. Tất cả quyền được bảo lưu.',
-    }
-};
-
-let currentLanguage = localStorage.getItem('language') || 'en';
-
-function switchLanguage(lang) {
-    currentLanguage = lang;
-    localStorage.setItem('language', lang);
-    document.querySelectorAll('[data-translate]').forEach(element => {
-        const key = element.getAttribute('data-translate');
-        if (translations[lang] && translations[lang][key]) {
-            element.textContent = translations[lang][key];
-        }
-    });
-    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-    const activeBtn = document.querySelector('.lang-btn[data-lang="' + lang + '"]');
-    if (activeBtn) activeBtn.classList.add('active');
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            switchLanguage(btn.getAttribute('data-lang'));
+        // Generate Table of Contents
+        document.addEventListener('DOMContentLoaded', () => {
+            const tocList = document.getElementById('toc-list');
+            const articleContent = document.querySelector('.article-content');
+            const headings = articleContent.querySelectorAll('h2, h3');
+            
+            headings.forEach((heading, index) => {
+                // Generate ID if not exists
+                if (!heading.id) {
+                    heading.id = heading.textContent.toLowerCase()
+                        .replace(/[^a-z0-9]+/g, '-')
+                        .replace(/^-|-$/g, '');
+                }
+                
+                // Create TOC item
+                const tocItem = document.createElement('li');
+                tocItem.className = `toc-item toc-level-${heading.tagName.toLowerCase()}`;
+                
+                const tocLink = document.createElement('a');
+                tocLink.href = `#${heading.id}`;
+                tocLink.textContent = heading.textContent;
+                
+                // Smooth scroll with offset for header
+                tocLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = document.getElementById(heading.id);
+                    if (target) {
+                        const headerHeight = 70; // Height of sticky header
+                        const offset = 20; // Additional offset
+                        const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - offset;
+                        
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+                
+                tocItem.appendChild(tocLink);
+                tocList.appendChild(tocItem);
+            });
+            
+            // Highlight active TOC item on scroll
+            const observerOptions = {
+                root: null,
+                rootMargin: '-100px 0px -66%',
+                threshold: 0
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.id;
+                        const tocLink = tocList.querySelector(`a[href="#${id}"]`);
+                        if (tocLink) {
+                            // Remove active from all
+                            tocList.querySelectorAll('a').forEach(a => a.classList.remove('active'));
+                            // Add active to current
+                            tocLink.classList.add('active');
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            headings.forEach(heading => observer.observe(heading));
         });
-    });
-    switchLanguage(currentLanguage);
-});
-</script>
+    </script>
 </body>
 </html>
 
