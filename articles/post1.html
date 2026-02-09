@@ -444,46 +444,65 @@ curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -</code></pre>
                     <pre><code>mkdir mqtt-broker
 cd mqtt-broker
 npm install aedes ws http net
+
+openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 365
+</code></pre>
+
+<p>Answer quesion when create certificate:</p>
+
+<pre><code>Country Name (2 letter code) [AU]: VN
+State or Province Name (full name): Hanoi
+Locality Name (eg, city): Hanoi
+Organization Name (eg, company): MyCompany
+Organizational Unit Name (eg, section): IoT
+Common Name (e.g. server FQDN or YOUR name): your_domain_or_ip
+Email Address: your@email.com
 </code></pre>
 
                     <h3 id="step-1-code-example" data-translate="article.post1.tip1.title">Step 1: Code example to run aedes broker</h3>
                     <p data-translate="article.post1.tip1.content">Create a file named <code>broker.js</code> and add the following code:</p>
 
-                    <pre><code>const aedes = require('aedes')();
-const net = require('net');
-const http = require('http');
-const ws = require('ws');
+                    <pre><code>const aedes = require('aedes')()
+const tls = require('tls')
+const fs = require('fs')
+const https = require('https')
+const ws = require('ws')
 
-// ===== MQTT TCP =====
-const tcpPort = 1883;
-net.createServer(aedes.handle).listen(tcpPort, () => {
-  console.log('MQTT TCP running on port', tcpPort);
-});
+// ===== Load cert =====
+const options = {
+    key: fs.readFileSync('./key.pem'),
+    cert: fs.readFileSync('./cert.pem')
+}
 
-// ===== MQTT over WebSocket (WS) =====
-const wsPort = 8080;
-const httpServer = http.createServer();
-const wsServer = new ws.Server({ server: httpServer });
+// ===== MQTTs (TLS) =====
+tls.createServer(options, aedes.handle).listen(8883, () => {
+    console.log('MQTTS broker running on port 8883')
+})
+
+// ===== WSS (WebSocket Secure) =====
+const httpsServer = https.createServer(options)
+const wsServer = new ws.Server({ server: httpsServer })
 
 wsServer.on('connection', (socket) => {
-  const stream = ws.createWebSocketStream(socket);
-  aedes.handle(stream);
-});
+    const stream = ws.createWebSocketStream(socket)
+    aedes.handle(stream)
+})
 
-httpServer.listen(wsPort, () => {
-  console.log('MQTT WS running on port', wsPort);
-});
+httpsServer.listen(8084, () => {
+    console.log('MQTT WSS running on port 8084')
+})
 
-// ===== Log client & message =====
+// ===== Logs =====
 aedes.on('client', (client) => {
-  console.log('Client connected:', client.id);
-});
+    console.log('Client connected:', client.id)
+})
 
 aedes.on('publish', (packet, client) => {
-  if (client) {
-    console.log(`[${client.id}] ${packet.topic}: ${packet.payload.toString()}`);
-  }
-});</code></pre>
+    if (client) {
+    console.log(`[${client.id}] ${packet.topic}: ${packet.payload.toString()}`)
+    }
+})
+</code></pre>
 
                     <h3 id="step-2-run-broker" data-translate="article.post1.tip2.title">Step 2: Run aedes broker</h3>
                     <p data-translate="article.post1.tip2.content">Run the broker with the following command:</p>
@@ -493,14 +512,76 @@ aedes.on('publish', (packet, client) => {
                     <pre><code>MQTT TCP running on port 1883
 MQTT WS running on port 8080</code></pre>
                     <h2 id="testing-mqtt-broker" data-translate="article.post1.section3.title">Testing the MQTT Broker</h2>
-                    <p data-translate="article.post1.section3.content">After configuring, you can use the following code example to test the broker:</p>
+                    <p data-translate="article.post1.section3.content">After configuring, you can use the following code example to test the broker. File cert.pem you have to download from server.</p>
+                    <p data-translate="article.post1.section3.content2">Python code port 8883:</p>
+                    <pre><code data-translate="article.post1.code6">import ssl
+import paho.mqtt.client as mqtt
 
-                    <pre><code data-translate="article.post1.code6">const mqtt = require('mqtt');
-const client = mqtt.connect('mqtt://localhost:1883');
+BROKER = "Your IP"
+PORT = 8883
+TOPIC = "test/topic"
 
-client.on('connect', () => {
-  console.log('Connected to MQTT broker');
-});</code></pre>
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code", rc)
+    client.publish(TOPIC, "Hello from Python MQTTs")
+    client.subscribe(TOPIC)
+
+def on_message(client, userdata, msg):
+    print(f"Received: {msg.topic} -> {msg.payload.decode()}")
+
+client = mqtt.Client(client_id="python_mqtts")
+
+client.on_connect = on_connect
+client.on_message = on_message
+
+# TLS config
+client.tls_set(
+    ca_certs="cert.pem",
+    certfile=None,
+    keyfile=None,
+    tls_version=ssl.PROTOCOL_TLSv1_2
+)
+
+client.tls_insecure_set(True)
+
+client.connect(BROKER, PORT, 60)
+client.loop_forever()
+</code></pre>
+
+<p data-translate="article.post1.section3.content2">Python code port 8084:</p>
+<pre><code data-translate="article.post1.code6">import ssl
+import paho.mqtt.client as mqtt
+
+BROKER = "Your IP"
+PORT = 8084
+TOPIC = "test/topic"
+
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code", rc)
+    client.publish(TOPIC, "Hello from Python WSS")
+    client.subscribe(TOPIC)
+
+def on_message(client, userdata, msg):
+    print(f"Received: {msg.topic} -> {msg.payload.decode()}")
+
+client = mqtt.Client(
+    client_id="python_wss",
+    transport="websockets"
+)
+
+client.on_connect = on_connect
+client.on_message = on_message
+
+client.tls_set(
+    ca_certs="cert.pem",
+    tls_version=ssl.PROTOCOL_TLSv1_2
+)
+
+client.tls_insecure_set(True)
+
+client.connect(BROKER, PORT, 60)
+client.loop_forever()
+</code></pre>
 
                     <p data-translate="article.post1.conclusion">Congratulations! Your MQTT broker is now set up and running on Ubuntu. You can now connect your IoT devices to this broker and start building your IoT applications.</p>
                         </div>
