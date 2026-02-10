@@ -445,19 +445,9 @@ curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -</code></pre>
 cd mqtt-broker
 npm install aedes ws http net
 
-openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 365
+certbot certonly --standalone -d mqtt.example.com
 </code></pre>
 
-<p>Answer quesion when create certificate:</p>
-
-<pre><code>Country Name (2 letter code) [AU]: VN
-State or Province Name (full name): Hanoi
-Locality Name (eg, city): Hanoi
-Organization Name (eg, company): MyCompany
-Organizational Unit Name (eg, section): IoT
-Common Name (e.g. server FQDN or YOUR name): your_domain_or_ip
-Email Address: your@email.com
-</code></pre>
 
                     <h3 id="step-1-code-example" data-translate="article.post1.tip1.title">Step 1: Code example to run aedes broker</h3>
                     <p data-translate="article.post1.tip1.content">Create a file named <code>broker.js</code> and add the following code:</p>
@@ -470,8 +460,8 @@ const ws = require('ws')
 
 // ===== Load cert =====
 const options = {
-    key: fs.readFileSync('./key.pem'),
-    cert: fs.readFileSync('./cert.pem')
+    key: fs.readFileSync('/etc/letsencrypt/live/mqtt.example.com/fullchain.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/mqtt.example.com/privkey.pem')
 }
 
 // ===== MQTTs (TLS) =====
@@ -509,75 +499,36 @@ aedes.on('publish', (packet, client) => {
 
                     <pre><code data-translate="article.post1.code3">node broker.js</code></pre>
                     <p>Output:</p>
-                    <pre><code>MQTT TCP running on port 1883
-MQTT WS running on port 8080</code></pre>
+                    <pre><code>MQTTS running on  port 8883
+MQTT WSS running on port 8084</code></pre>
                     <h2 id="testing-mqtt-broker" data-translate="article.post1.section3.title">Testing the MQTT Broker</h2>
                     <p data-translate="article.post1.section3.content">After configuring, you can use the following code example to test the broker. File cert.pem you have to download from server.</p>
-                    <p data-translate="article.post1.section3.content2">Python code port 8883:</p>
-                    <pre><code data-translate="article.post1.code6">import ssl
-import paho.mqtt.client as mqtt
-
-BROKER = "Your IP"
-PORT = 8883
-TOPIC = "test/topic"
-
-def on_connect(client, userdata, flags, rc):
-    print("Connected with result code", rc)
-    client.publish(TOPIC, "Hello from Python MQTTs")
-    client.subscribe(TOPIC)
-
-def on_message(client, userdata, msg):
-    print(f"Received: {msg.topic} -> {msg.payload.decode()}")
-
-client = mqtt.Client(client_id="python_mqtts")
-
-client.on_connect = on_connect
-client.on_message = on_message
-
-# TLS config
-client.tls_set(
-    ca_certs="cert.pem",
-    certfile=None,
-    keyfile=None,
-    tls_version=ssl.PROTOCOL_TLSv1_2
-)
-
-client.tls_insecure_set(True)
-
-client.connect(BROKER, PORT, 60)
-client.loop_forever()
-</code></pre>
 
 <p data-translate="article.post1.section3.content2">Python code port 8084:</p>
 <pre><code data-translate="article.post1.code6">import ssl
+import certifi
 import paho.mqtt.client as mqtt
 
-BROKER = "Your IP"
+BROKER = "your IP"
 PORT = 8084
 TOPIC = "test/topic"
 
 def on_connect(client, userdata, flags, rc):
-    print("Connected with result code", rc)
-    client.publish(TOPIC, "Hello from Python WSS")
+    print("Connected:", rc)
     client.subscribe(TOPIC)
+    client.publish(TOPIC, "Hello from Python WSS")
 
 def on_message(client, userdata, msg):
-    print(f"Received: {msg.topic} -> {msg.payload.decode()}")
+    print(msg.topic, msg.payload.decode())
 
-client = mqtt.Client(
-    client_id="python_wss",
-    transport="websockets"
-)
-
+client = mqtt.Client(transport="websockets")
 client.on_connect = on_connect
 client.on_message = on_message
 
 client.tls_set(
-    ca_certs="cert.pem",
-    tls_version=ssl.PROTOCOL_TLSv1_2
+    ca_certs=certifi.where(),
+    tls_version=ssl.PROTOCOL_TLS_CLIENT
 )
-
-client.tls_insecure_set(True)
 
 client.connect(BROKER, PORT, 60)
 client.loop_forever()
@@ -647,7 +598,7 @@ client.loop_forever()
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>Gemify</h3>
-                    <p data-translate="footer.tagline">Giải công nghệ DIY – từ ý tưởng đến sản phẩm</p>
+                    <p data-translate="footer.tagline">Gemify Technology – Hãy cùng xây dựng điều gì đó tuyệt vời</p>
                 </div>
                 <div class="footer-section">
                     <h4 data-translate="footer.follow">Follow Me</h4>
