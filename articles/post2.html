@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu | Gemify Blog</title>
+    <title>How to Send Email Using Node.js | Gemify Blog</title>
     <link rel="icon" type="image/png" href="../img/flagVN.png">
     <link rel="stylesheet" href="../styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -477,129 +477,115 @@
 
                     <div class="article-main">
                         <header class="article-header">
-                            <h1 class="article-title" data-translate="blog.post1.title">How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu</h1>
+                            <h1 class="article-title">How to Send Email Using Node.js</h1>
                         </header>
 
-                        <img src="../img/post1/cover.png" alt="Article Image" class="article-featured-image">
+                        <img src="../img/post2/cover.png" alt="How to Send Email Using Node.js" class="article-featured-image">
 
                         <div class="article-content">
-                    <p data-translate="article.post1.intro">MQTT (Message Queuing Telemetry Transport) is a lightweight messaging protocol designed for IoT devices. Setting up an MQTT broker on Ubuntu allows you to create a central hub for your IoT projects.</p>
+                            <p>Sending emails programmatically is a common requirement in modern web applications. Whether you need to send welcome emails, password reset links, or notifications, Node.js provides excellent libraries to handle email functionality. In this tutorial, we'll explore how to send emails using Node.js with the popular Nodemailer library.</p>
 
-                    <h2 id="what-is-mqtt-broker" data-translate="article.post1.section1.title">What is MQTT Broker?</h2>
-                    <p data-translate="article.post1.section1.content">An MQTT broker is a server that receives messages from clients (publishers) and routes them to other clients (subscribers) based on topics. It acts as a central communication hub for IoT devices, enabling efficient and reliable message exchange with minimal overhead.</p>
+                            <h2 id="what-is-nodemailer">What is Nodemailer?</h2>
+                            <p>Nodemailer is a module for Node.js applications that allows you to send emails easily. It supports various transport methods including SMTP, sendmail, and more. It's one of the most popular and reliable email libraries for Node.js, with support for HTML emails, attachments, and embedded images.</p>
 
-                    <h2 id="installing-aedes-mqtt-broker" data-translate="article.post1.section2.title">Installing Aedes MQTT Broker</h2>
-                    <p data-translate="article.post1.section2.content">First, update your package list and install nodejs 18.x:</p>
+                            <h2 id="installing-nodemailer">Installing Nodemailer</h2>
+                            <p>First, create a new Node.js project and install Nodemailer:</p>
 
-                    <pre><code data-translate="article.post1.code1">sudo apt update
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -</code></pre>
+                            <pre><code>npm init -y
+npm install nodemailer</code></pre>
+ 
+                            <h3 id="step-1-code-example">Step 1: Code example to send email</h3>
+                            <p>Create a file named <code>sendEmail.js</code> and add the following code:</p>
 
-                    <p data-translate="article.post1.section2.content2">After installation, we are install nodejs to run aedes broker:</p>
+                            <pre><code>const nodemailer = require('nodemailer')
 
-                    <pre><code data-translate="article.post1.code2">sudo apt install nodejs -y</code></pre>
-
-                    <p>Now, create a new directory for your MQTT broker project and install the required packages:</p>
-
-                    <pre><code>mkdir mqtt-broker
-cd mqtt-broker
-npm install aedes ws http net
-
-certbot certonly --standalone -d mqtt.example.com
-</code></pre>
-
-
-                    <h3 id="step-1-code-example" data-translate="article.post1.tip1.title">Step 1: Code example to run aedes broker</h3>
-                    <p data-translate="article.post1.tip1.content">Create a file named <code>broker.js</code> and add the following code:</p>
-
-                    <pre><code>const aedes = require('aedes')()
-const tls = require('tls')
-const fs = require('fs')
-const https = require('https')
-const ws = require('ws')
-
-// ===== Load cert =====
-const options = {
-    key: fs.readFileSync('/etc/letsencrypt/live/mqtt.example.com/fullchain.pem'),
-    cert: fs.readFileSync('/etc/letsencrypt/live/mqtt.example.com/privkey.pem')
-}
-
-// ===== MQTTs (TLS) =====
-tls.createServer(options, aedes.handle).listen(8883, () => {
-    console.log('MQTTS broker running on port 8883')
-})
-
-// ===== WSS (WebSocket Secure) =====
-const httpsServer = https.createServer(options)
-const wsServer = new ws.Server({ server: httpsServer })
-
-wsServer.on('connection', (socket) => {
-    const stream = ws.createWebSocketStream(socket)
-    aedes.handle(stream)
-})
-
-httpsServer.listen(8084, () => {
-    console.log('MQTT WSS running on port 8084')
-})
-
-// ===== Logs =====
-aedes.on('client', (client) => {
-    console.log('Client connected:', client.id)
-})
-
-aedes.on('publish', (packet, client) => {
-    if (client) {
-    console.log(`[${client.id}] ${packet.topic}: ${packet.payload.toString()}`)
+// ===== Create transporter =====
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+        user: 'your-email@gmail.com',
+        pass: 'your-app-password' // Use App Password for Gmail
     }
 })
-</code></pre>
 
-                    <h3 id="step-2-run-broker" data-translate="article.post1.tip2.title">Step 2: Run aedes broker</h3>
-                    <p data-translate="article.post1.tip2.content">Run the broker with the following command:</p>
+// ===== Email options =====
+const mailOptions = {
+    from: 'your-email@gmail.com',
+    to: 'recipient@example.com',
+    subject: 'Hello from Node.js',
+    text: 'This is a plain text email sent from Node.js using Nodemailer!',
+    html: '&lt;p&gt;Hello from Node.js!&lt;/p&gt;&lt;p&gt;This is an HTML email sent from Node.js using Nodemailer!&lt;/p&gt;'
+}
 
-                    <pre><code data-translate="article.post1.code3">node broker.js</code></pre>
-                    <p>Output:</p>
-                    <pre><code>MQTTS running on  port 8883
-MQTT WSS running on port 8084</code></pre>
-                    <h2 id="testing-mqtt-broker" data-translate="article.post1.section3.title">Testing the MQTT Broker</h2>
-                    <p data-translate="article.post1.section3.content">After configuring, you can use the following code example to test the broker. File cert.pem you have to download from server.</p>
+// ===== Send email =====
+transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+        console.log('Error occurred:', error.message)
+    } else {
+        console.log('Email sent successfully!')
+        console.log('Message ID:', info.messageId)
+    }
+})</code></pre>
 
-<p data-translate="article.post1.section3.content2">Python code port 8084:</p>
-<pre><code data-translate="article.post1.code6">import ssl
-import certifi
-import paho.mqtt.client as mqtt
+                            <h3 id="step-2-gmail-setup">Step 2: Setting up Gmail</h3>
+                            <p>If you're using Gmail, you need to enable 2-Step Verification and generate an App Password:</p>
+                            <ol>
+                                <li>Go to your Google Account settings</li>
+                                <li>Navigate to Security → 2-Step Verification → App passwords</li>
+                                <li>Generate a new app password for "Mail"</li>
+                                <li>Use this 16-character password in your code</li>
+                            </ol>
 
-BROKER = "your IP"
-PORT = 8084
-TOPIC = "test/topic"
+                            <h2 id="testing-email">Testing the Email</h2>
+                            <p>Run the script with the following command:</p>
 
-def on_connect(client, userdata, flags, rc):
-    print("Connected:", rc)
-    client.subscribe(TOPIC)
-    client.publish(TOPIC, "Hello from Python WSS")
+                            <pre><code>node sendEmail.js</code></pre>
+                            <p>Output:</p>
+                            <pre><code>Email sent successfully!
+Message ID: &lt;message-id&gt;</code></pre>
 
-def on_message(client, userdata, msg):
-    print(msg.topic, msg.payload.decode())
+                            <h2 id="async-await-example">Using Async/Await</h2>
+                            <p>Here's a more modern approach using async/await:</p>
 
-client = mqtt.Client(transport="websockets")
-client.on_connect = on_connect
-client.on_message = on_message
+                            <pre><code>const nodemailer = require('nodemailer')
 
-client.tls_set(
-    ca_certs=certifi.where(),
-    tls_version=ssl.PROTOCOL_TLS_CLIENT
-)
+async function sendEmail() {
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+            user: 'your-email@gmail.com',
+            pass: 'your-app-password'
+        }
+    })
 
-client.connect(BROKER, PORT, 60)
-client.loop_forever()
-</code></pre>
+    const mailOptions = {
+        from: 'your-email@gmail.com',
+        to: 'recipient@example.com',
+        subject: 'Test Email',
+        html: '&lt;h2&gt;Welcome!&lt;/h2&gt;&lt;p&gt;Thank you for signing up.&lt;/p&gt;'
+    }
 
-                    <p data-translate="article.post1.conclusion">Congratulations! Your MQTT broker is now set up and running on Ubuntu. You can now connect your IoT devices to this broker and start building your IoT applications.</p>
+    try {
+        const info = await transporter.sendMail(mailOptions)
+        console.log('Email sent:', info.messageId)
+    } catch (error) {
+        console.error('Error sending email:', error)
+    }
+}
+
+sendEmail()</code></pre>
+
+                            <p>Congratulations! You can now send emails using Node.js with Nodemailer. This library makes it easy to implement email functionality in your Node.js applications for notifications, welcome messages, and more.</p>
                         </div>
                         <div class="article-meta">
-                            <span class="article-category" data-translate="blog.category.tutorial">Tutorial</span>
+                            <span class="article-category">Tutorial</span>
                             <span class="article-date">
                                 <i class="far fa-calendar"></i>
-                                <span data-translate="blog.post1.meta">by Tuan Nguyen | Jan 20, 2025</span>
+                                <span>by Tuan Nguyen | Jan 21, 2025</span>
                             </span>
                         </div>
                     </div>
@@ -608,12 +594,12 @@ client.loop_forever()
                         <div class="article-footer-section">
                             <h4>Related Articles</h4>
                             <div class="related-articles-grid" style="grid-template-columns: 1fr; gap: 1rem;">
-                            <a href="post2.html" class="related-article-card">
+                            <a href="post1.html" class="related-article-card">
                                 <div class="related-article-image">
-                                    <img src="../img/post2/cover.png" alt="How to Send Email Using Node.js">
+                                    <img src="../img/post1/cover.png" alt="How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu">
                                 </div>
                                 <div class="related-article-content">
-                                    <h5>How to Send Email Using Node.js</h5>
+                                    <h5>How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu</h5>
                                 </div>
                             </a>
                             <a href="post3.html" class="related-article-card">
@@ -624,12 +610,12 @@ client.loop_forever()
                                     <h5>Public MQTTS on ESP32</h5>
                                 </div>
                             </a>
-                            <a href="post1.html" class="related-article-card">
+                            <a href="post2.html" class="related-article-card">
                                 <div class="related-article-image">
-                                    <img src="../img/post1/cover.png" alt="How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu">
+                                    <img src="../img/post2/cover.png" alt="How to Send Email Using Node.js">
                                 </div>
                                 <div class="related-article-content">
-                                    <h5>How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu</h5>
+                                    <h5>How to Send Email Using Node.js</h5>
                                 </div>
                             </a>
                             </div>

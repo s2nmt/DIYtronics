@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu | Gemify Blog</title>
+    <title>Public MQTTS on ESP32 | Gemify Blog</title>
     <link rel="icon" type="image/png" href="../img/flagVN.png">
     <link rel="stylesheet" href="../styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -23,7 +23,7 @@
         }
         .article-wrapper {
             display: grid;
-            grid-template-columns: 200px 1fr 250px;
+            grid-template-columns: 200px 1fr 200px;
             gap: 2rem;
             position: relative;
             padding: 0 20px;
@@ -290,7 +290,7 @@
             }
         }
         .article-footer-section {
-            margin-bottom: 2.5rem;
+            margin-bottom: 1.5rem;
         }
         .article-footer-section h4 {
             font-size: 1.1rem;
@@ -312,45 +312,14 @@
         }
         .related-articles-grid {
             display: grid;
-            grid-template-columns: auto 1fr 1fr 1fr auto;
-            gap: 1.5rem;
-            margin-top: 1rem;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
             align-items: stretch;
-        }
-        .nav-prev-card,
-        .nav-next-card {
-            background: transparent;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-        }
-        .nav-prev-card:hover,
-        .nav-next-card:hover {
-            opacity: 0.7;
-        }
-        .nav-prev-card .nav-arrow,
-        .nav-next-card .nav-arrow {
-            width: auto;
-            height: auto;
-            background: transparent;
-            color: #111;
-            border-radius: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            transition: all 0.3s ease;
-        }
-        .nav-prev-card:hover .nav-arrow,
-        .nav-next-card:hover .nav-arrow {
-            transform: scale(1.2);
         }
         .related-article-card {
             background: white;
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
             text-decoration: none;
             transition: all 0.3s ease;
@@ -364,7 +333,7 @@
         }
         .related-article-image {
             width: 100%;
-            height: 180px;
+            height: 80px;
             overflow: hidden;
             background: #f3f3f3;
         }
@@ -378,30 +347,13 @@
             transform: scale(1.05);
         }
         .related-article-content {
-            padding: 1.25rem;
+            padding: 0.5rem;
         }
         .related-article-content h5 {
-            font-size: 1rem;
+            font-size: 0.75rem;
             font-weight: 600;
             color: #111;
             margin: 0;
-            line-height: 1.4;
-        }
-        .article-sidebar .related-articles-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-            align-items: stretch;
-        }
-        .article-sidebar .related-article-image {
-            height: 80px;
-        }
-        .article-sidebar .related-article-content {
-            padding: 0.5rem;
-        }
-        .article-sidebar .related-article-content h5 {
-            font-size: 0.75rem;
             line-height: 1.2;
         }
         .sidebar-ad {
@@ -423,20 +375,6 @@
             line-height: 1.4;
             color: #666;
             text-align: left;
-        }
-        @media (max-width: 1024px) {
-            .related-articles-grid {
-                grid-template-columns: 1fr 1fr 1fr;
-            }
-            .nav-prev-card,
-            .nav-next-card {
-                display: none;
-            }
-        }
-        @media (max-width: 768px) {
-            .related-articles-grid {
-                grid-template-columns: 1fr;
-            }
         }
         @media (max-width: 768px) {
             .article-title {
@@ -477,129 +415,255 @@
 
                     <div class="article-main">
                         <header class="article-header">
-                            <h1 class="article-title" data-translate="blog.post1.title">How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu</h1>
+                            <h1 class="article-title">Public MQTTS on ESP32</h1>
                         </header>
 
-                        <img src="../img/post1/cover.png" alt="Article Image" class="article-featured-image">
+                        <img src="../img/post3/cover.png" alt="Public MQTTS on ESP32" class="article-featured-image">
 
                         <div class="article-content">
-                    <p data-translate="article.post1.intro">MQTT (Message Queuing Telemetry Transport) is a lightweight messaging protocol designed for IoT devices. Setting up an MQTT broker on Ubuntu allows you to create a central hub for your IoT projects.</p>
+                            <p>MQTTS (MQTT over TLS/SSL) is a secure version of the MQTT protocol, perfect for IoT devices that need encrypted communication. ESP32 can easily connect to public MQTT brokers using MQTTS to publish sensor data and subscribe to commands securely. In this tutorial, we'll learn how to implement MQTTS publish and subscribe on ESP32 with TLS/SSL encryption.</p>
 
-                    <h2 id="what-is-mqtt-broker" data-translate="article.post1.section1.title">What is MQTT Broker?</h2>
-                    <p data-translate="article.post1.section1.content">An MQTT broker is a server that receives messages from clients (publishers) and routes them to other clients (subscribers) based on topics. It acts as a central communication hub for IoT devices, enabling efficient and reliable message exchange with minimal overhead.</p>
+                            <h2 id="what-is-mqtt-esp32">What is MQTTS on ESP32?</h2>
+                            <p>MQTTS on ESP32 allows your device to communicate securely with other devices and servers over the internet using TLS/SSL encryption. You can publish sensor data to topics and subscribe to command topics to control your device remotely with encrypted connections. This is essential for IoT applications where security is important.</p>
 
-                    <h2 id="installing-aedes-mqtt-broker" data-translate="article.post1.section2.title">Installing Aedes MQTT Broker</h2>
-                    <p data-translate="article.post1.section2.content">First, update your package list and install nodejs 18.x:</p>
+                            <h2 id="installing-libraries">Installing Required Libraries</h2>
+                            <p>First, install the required libraries in Arduino IDE:</p>
 
-                    <pre><code data-translate="article.post1.code1">sudo apt update
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -</code></pre>
+                            <pre><code>PubSubClient</code></pre>
 
-                    <p data-translate="article.post1.section2.content2">After installation, we are install nodejs to run aedes broker:</p>
+                            <p>You can install these from the Library Manager in Arduino IDE (Sketch → Include Library → Manage Libraries).</p>
 
-                    <pre><code data-translate="article.post1.code2">sudo apt install nodejs -y</code></pre>
+                            <h3 id="step-1-wifi-connection">Step 1: WiFi Connection Setup</h3>
+                            <p>Create a file and add the WiFi connection function:</p>
 
-                    <p>Now, create a new directory for your MQTT broker project and install the required packages:</p>
+                            <pre><code>#include &lt;WiFi.h&gt;
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
 
-                    <pre><code>mkdir mqtt-broker
-cd mqtt-broker
-npm install aedes ws http net
+void setup_wifi() {
+  Serial.print("Connecting WiFi");
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.print(".");
+  }
+  Serial.println(" connected");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+}</code></pre>
 
-certbot certonly --standalone -d mqtt.example.com
-</code></pre>
+                            <h3 id="step-2-mqtts-setup">Step 2: MQTTS Setup with Increased Buffer</h3>
+                            <p>Configure MQTTS client with increased buffer size for larger messages:</p>
 
+                            <pre><code>#include &lt;WiFiClientSecure.h&gt;
+#include &lt;PubSubClient.h&gt;
 
-                    <h3 id="step-1-code-example" data-translate="article.post1.tip1.title">Step 1: Code example to run aedes broker</h3>
-                    <p data-translate="article.post1.tip1.content">Create a file named <code>broker.js</code> and add the following code:</p>
+const char* mqtt_host = "your-mqtt-broker.com";
+const int mqtt_port = 8883; // MQTTS port (8883 for TLS/SSL)
+const char* deviceId = "esp32_device_01";
 
-                    <pre><code>const aedes = require('aedes')()
-const tls = require('tls')
-const fs = require('fs')
-const https = require('https')
-const ws = require('ws')
+WiFiClientSecure net;
+PubSubClient mqtt(net);
 
-// ===== Load cert =====
-const options = {
-    key: fs.readFileSync('/etc/letsencrypt/live/mqtt.example.com/fullchain.pem'),
-    cert: fs.readFileSync('/etc/letsencrypt/live/mqtt.example.com/privkey.pem')
+void setup() {
+  Serial.begin(115200);
+  
+  setup_wifi();
+  
+  // Set insecure for self-signed certificates
+  net.setInsecure();
+  
+  // Configure MQTTS with increased buffer
+  mqtt.setServer(mqtt_host, mqtt_port);
+  mqtt.setCallback(callback);
+  mqtt.setBufferSize(2048); // Increase buffer to 2048 bytes for larger messages
+}</code></pre>
+
+                            <h3 id="step-3-mqtts-reconnect">Step 3: MQTTS Reconnect Function with LWT</h3>
+                            <p>Create a reconnect function with Last Will and Testament (LWT) to publish status when device disconnects:</p>
+
+                            <pre><code>void reconnect() {
+  while (!mqtt.connected()) {
+    Serial.print("Connecting MQTTS...");
+    
+    // LWT JSON string
+    const char* lwtPayload = "lwtPayload";
+    if (mqtt.connect(
+        deviceId,              // clientId
+        nullptr,               // user
+        nullptr,               // pass
+        "/data/esp32_device_01", // LWT topic
+        0,                     // QoS
+        true,                  // retain
+        lwtPayload             // LWT message
+    )) {
+      Serial.println(" connected");
+      mqtt.subscribe("/cmd/esp32_device_01");
+    } else {
+      Serial.print(" failed, rc=");
+      Serial.println(mqtt.state());
+      delay(2000);
+    }
+  }
+}</code></pre>
+
+                            <h3 id="step-4-publish-data">Step 4: Publish Data Function</h3>
+                            <p>Create a function to publish simple message to MQTTS topic:</p>
+
+                            <pre><code>void publishData() {
+  // Simple message to publish
+  const char* message = "hello world";
+  const char* topic = "/data/esp32_device_01";
+  
+  // Publish to data topic
+  bool published = mqtt.publish(topic, message, true); // true = retain message
+  
+  if (published) {
+    Serial.print("Published: ");
+    Serial.println(message);
+  } else {
+    Serial.println("Publish failed");
+  }
+}</code></pre>
+
+                            <h3 id="step-5-subscribe-callback">Step 5: Subscribe Callback with Last Message</h3>
+                            <p>Create callback function to handle incoming messages and store last message:</p>
+
+                            <pre><code>void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("]: ");
+  
+  char message[length + 1];
+  for (int i = 0; i &lt; length; i++) {
+    message[i] = (char)payload[i];
+  }
+  message[length] = '\0';
+  
+  Serial.println(message);
+}</code></pre>
+
+                            <h3 id="step-6-main-loop">Step 6: Main Loop</h3>
+                            <p>Implement the main loop to maintain connection and publish data periodically:</p>
+
+                            <pre><code>void loop() {
+  // Maintain MQTTS connection
+  if (!mqtt.connected()) {
+    reconnect();
+  }
+  mqtt.loop();
+}</code></pre>
+
+                            <h2 id="complete-example">Complete Example</h2>
+                            <p>Here's the complete code combining all parts:</p>
+
+                            <pre><code>#include &lt;WiFi.h&gt;
+#include &lt;WiFiClientSecure.h&gt;
+#include &lt;PubSubClient.h&gt;
+
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
+
+const char* mqtt_host = "your-mqtt-broker.com";
+const int mqtt_port = 8883;
+const char* deviceId = "esp32_device_01";
+
+WiFiClientSecure net;
+PubSubClient mqtt(net);
+
+void setup_wifi() {
+  Serial.print("Connecting WiFi");
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.print(".");
+  }
+  Serial.println(" connected");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
 }
 
-// ===== MQTTs (TLS) =====
-tls.createServer(options, aedes.handle).listen(8883, () => {
-    console.log('MQTTS broker running on port 8883')
-})
-
-// ===== WSS (WebSocket Secure) =====
-const httpsServer = https.createServer(options)
-const wsServer = new ws.Server({ server: httpsServer })
-
-wsServer.on('connection', (socket) => {
-    const stream = ws.createWebSocketStream(socket)
-    aedes.handle(stream)
-})
-
-httpsServer.listen(8084, () => {
-    console.log('MQTT WSS running on port 8084')
-})
-
-// ===== Logs =====
-aedes.on('client', (client) => {
-    console.log('Client connected:', client.id)
-})
-
-aedes.on('publish', (packet, client) => {
-    if (client) {
-    console.log(`[${client.id}] ${packet.topic}: ${packet.payload.toString()}`)
+void reconnect() {
+  while (!mqtt.connected()) {
+    Serial.print("Connecting MQTTS...");
+    
+    const char* lwtPayload = "lwtPayload";
+    if (mqtt.connect(
+        deviceId,
+        nullptr,
+        nullptr,
+        "/data/esp32_device_01",
+        0,
+        true,
+        lwtPayload
+    )) {
+      Serial.println(" connected");
+      mqtt.subscribe("/cmd/esp32_device_01");
+    } else {
+      Serial.print(" failed, rc=");
+      Serial.println(mqtt.state());
+      delay(2000);
     }
-})
-</code></pre>
+  }
+}
 
-                    <h3 id="step-2-run-broker" data-translate="article.post1.tip2.title">Step 2: Run aedes broker</h3>
-                    <p data-translate="article.post1.tip2.content">Run the broker with the following command:</p>
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("]: ");
+  
+  char message[length + 1];
+  for (int i = 0; i &lt; length; i++) {
+    message[i] = (char)payload[i];
+  }
+  message[length] = '\0';
+  
+  Serial.println(message);
+}
 
-                    <pre><code data-translate="article.post1.code3">node broker.js</code></pre>
-                    <p>Output:</p>
-                    <pre><code>MQTTS running on  port 8883
-MQTT WSS running on port 8084</code></pre>
-                    <h2 id="testing-mqtt-broker" data-translate="article.post1.section3.title">Testing the MQTT Broker</h2>
-                    <p data-translate="article.post1.section3.content">After configuring, you can use the following code example to test the broker. File cert.pem you have to download from server.</p>
+void publishData() {
+  const char* message = "hello world";
+  const char* topic = "/data/esp32_device_01";
+  mqtt.publish(topic, message, true);
+  Serial.print("Published: ");
+  Serial.println(message);
+}
 
-<p data-translate="article.post1.section3.content2">Python code port 8084:</p>
-<pre><code data-translate="article.post1.code6">import ssl
-import certifi
-import paho.mqtt.client as mqtt
+void setup() {
+  Serial.begin(115200);
+  
+  setup_wifi();
+  net.setInsecure();
+  
+  mqtt.setServer(mqtt_host, mqtt_port);
+  mqtt.setCallback(callback);
+  mqtt.setBufferSize(2048);
+}
 
-BROKER = "your IP"
-PORT = 8084
-TOPIC = "test/topic"
+void loop() {
+  if (!mqtt.connected()) {
+    reconnect();
+  }
+  mqtt.loop();
+}</code></pre>
 
-def on_connect(client, userdata, flags, rc):
-    print("Connected:", rc)
-    client.subscribe(TOPIC)
-    client.publish(TOPIC, "Hello from Python WSS")
+                            <h2 id="key-features">Key Features</h2>
+                            <ul>
+                                <li><strong>MQTTS Secure Connection:</strong> Using WiFiClientSecure with TLS/SSL encryption on port 8883</li>
+                                <li><strong>Increased Buffer Size:</strong> Set buffer to 2048 bytes using <code>mqtt.setBufferSize(2048)</code> to handle larger messages</li>
+                                <li><strong>LWT (Last Will and Testament):</strong> When device disconnects, automatically publish JSON status message <code>lwtPayload</code> to notify the broker</li>
+                                <li><strong>Simple Publish:</strong> Publish "hello world" message to MQTTS topic</li>
+                                <li><strong>Retained Messages:</strong> Using <code>true</code> parameter in publish to retain messages on the broker</li>
+                                <li><strong>Automatic Reconnection:</strong> The reconnect function ensures the device stays connected to the MQTTS broker</li>
+                            </ul>
 
-def on_message(client, userdata, msg):
-    print(msg.topic, msg.payload.decode())
-
-client = mqtt.Client(transport="websockets")
-client.on_connect = on_connect
-client.on_message = on_message
-
-client.tls_set(
-    ca_certs=certifi.where(),
-    tls_version=ssl.PROTOCOL_TLS_CLIENT
-)
-
-client.connect(BROKER, PORT, 60)
-client.loop_forever()
-</code></pre>
-
-                    <p data-translate="article.post1.conclusion">Congratulations! Your MQTT broker is now set up and running on Ubuntu. You can now connect your IoT devices to this broker and start building your IoT applications.</p>
+                            <p>Congratulations! Your ESP32 can now publish "hello world" messages and subscribe to commands using MQTTS. The secure TLS/SSL connection ensures encrypted communication, and the LWT feature automatically notifies the broker when the device disconnects.</p>
                         </div>
                         <div class="article-meta">
-                            <span class="article-category" data-translate="blog.category.tutorial">Tutorial</span>
+                            <span class="article-category">Tutorial</span>
                             <span class="article-date">
                                 <i class="far fa-calendar"></i>
-                                <span data-translate="blog.post1.meta">by Tuan Nguyen | Jan 20, 2025</span>
+                                <span>by Tuan Nguyen | Jan 22, 2025</span>
                             </span>
                         </div>
                     </div>
@@ -616,14 +680,6 @@ client.loop_forever()
                                     <h5>How to Send Email Using Node.js</h5>
                                 </div>
                             </a>
-                            <a href="post3.html" class="related-article-card">
-                                <div class="related-article-image">
-                                    <img src="../img/post3/cover.png" alt="Public MQTTS on ESP32">
-                                </div>
-                                <div class="related-article-content">
-                                    <h5>Public MQTTS on ESP32</h5>
-                                </div>
-                            </a>
                             <a href="post1.html" class="related-article-card">
                                 <div class="related-article-image">
                                     <img src="../img/post1/cover.png" alt="How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu">
@@ -632,17 +688,24 @@ client.loop_forever()
                                     <h5>How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu</h5>
                                 </div>
                             </a>
-                            </div>
-                        </div>
-                        
-                        <div class="sidebar-ad">
-                            <h4>Our Services</h4>
-                            <p>Gemify provides embedded systems and IoT solutions.</p>
-                        </div>
-                    </aside>
+                            <a href="post3.html" class="related-article-card">
+                                <div class="related-article-image">
+                                    <img src="../img/post3/cover.png" alt="Public MQTTS on ESP32">
+                                </div>
+                                <div class="related-article-content">
+                                    <h5>Public MQTTS on ESP32</h5>
+                                </div>
+                            </a>
+                             </div>
+                         </div>
+                         
+                         <div class="sidebar-ad">
+                             <h4>Our Services</h4>
+                             <p>Gemify provides embedded systems and IoT solutions.</p>
+                         </div>
+                     </aside>
                     
                 </div>
-
             </div>
         </article>
     </main>
