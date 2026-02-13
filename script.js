@@ -276,7 +276,7 @@ const translations = {
         'nav.home': 'Home',
         'nav.products': 'Products',
         'nav.about': 'About',
-        'nav.contact': 'Contact',
+        'nav.services': 'Services',
         'nav.blog': 'Blog',
         
         // Hero Section
@@ -370,7 +370,7 @@ const translations = {
         'nav.home': 'Trang chủ',
         'nav.products': 'Sản phẩm',
         'nav.about': 'Giới thiệu',
-        'nav.contact': 'Liên hệ',
+        'nav.services': 'Dịch vụ',
         'nav.blog': 'Bài viết',
         
         // Hero Section
