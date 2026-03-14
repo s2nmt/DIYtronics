@@ -216,6 +216,24 @@ body {
     color: var(--black);
 }
 
+.hero-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.cta-button-secondary {
+    background: var(--white);
+    color: var(--black);
+    border: 1px solid var(--black);
+}
+
+.cta-button-secondary:hover {
+    background: var(--black);
+    color: var(--white);
+}
+
 .hero-image {
     display: flex;
     justify-content: center;
@@ -515,6 +533,152 @@ body {
     transition: color 0.3s ease;
 }
 
+.services-cta {
+    text-align: center;
+    margin-top: 2.5rem;
+}
+
+.services-projects-btn {
+    display: inline-block;
+    padding: 0.85rem 1.75rem;
+    background: var(--black);
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.services-projects-btn:hover {
+    background: #333;
+    transform: translateY(-2px);
+}
+
+/* Outsource Projects Section */
+.outsource {
+    padding: 80px 0;
+    background: var(--bg);
+}
+
+.outsource-label {
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+    background: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.outsource-title {
+    text-align: center;
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--text);
+    background: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.outsource-subtitle {
+    text-align: center;
+    font-size: 1rem;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 3rem;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    background: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.outsource-grid {
+    display: flex;
+    justify-content: center;
+    max-width: 320px;
+    margin: 0 auto;
+}
+
+.outsource-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.outsource-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--black);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.outsource-card:hover::before {
+    transform: scaleX(1);
+}
+
+.outsource-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.outsource-icon {
+    width: 64px;
+    height: 64px;
+    background: #f0f0f0;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.outsource-card:hover .outsource-icon {
+    background-color: var(--black);
+    transform: scale(1.05);
+}
+
+.outsource-icon i {
+    font-size: 1.5rem;
+    color: var(--text);
+    transition: color 0.3s ease;
+}
+
+.outsource-card:hover .outsource-icon i {
+    color: var(--white);
+}
+
+.outsource-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text);
+    line-height: 1.35;
+}
+
+.outsource-card p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.55;
+    margin: 0;
+}
+
 .service-card:hover .service-icon i {
     color: var(--white) !important;
 }
@@ -799,7 +963,8 @@ body {
     }
 
     .products-grid,
-    .services-grid {
+    .services-grid,
+    .outsource-grid {
         grid-template-columns: 1fr;
     }
 

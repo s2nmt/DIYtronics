@@ -277,6 +277,7 @@ const translations = {
         'nav.products': 'Products',
         'nav.about': 'About',
         'nav.services': 'Services',
+        'nav.outsource': 'Outsource',
         'nav.blog': 'Blog',
         
         // Hero Section
@@ -338,8 +339,23 @@ const translations = {
         'services.software.title': 'IoT Software Design',
         'services.software.desc': 'Outsource IoT software solutions including app, website, and server development.',
         'services.products.title': 'Technology Products & IoT Platforms',
-        'services.products.desc': 'Providing technology products and IoT platforms for your business needs.',
-        
+'services.products.desc': 'Providing technology products and IoT platforms for your business needs.',
+        'services.viewProjects': "View the projects we've completed",
+
+        // Projects page
+        'projects.pageTitle': 'Completed Projects',
+        'projects.subtitle': "Projects we've delivered for our clients.",
+        'projects.readMore': 'Read more →',
+
+        // Outsource Projects
+        'outsource.label': 'Projects',
+        'outsource.title': 'Outsource Projects',
+        'outsource.subtitle': 'Projects delivered for clients — hardware, firmware & software.',
+'outsource.project1.title': 'Remote Temperature & Humidity Monitoring & Control',
+        'outsource.project1.desc': 'System for monitoring and controlling temperature and humidity remotely via mobile app and web dashboard. Real-time data, alerts and remote control.',
+        'outsource.project2.title': 'Smart Access Control System',
+        'outsource.project2.desc': 'Mobile app and RFID/NFC readers for door access, visitor logs and remote management for offices and buildings.',
+
         // Contact Section
         'contact.title': 'Get In Touch',
         'contact.subtitle': 'Let\'s Build Something Amazing',
@@ -371,6 +387,7 @@ const translations = {
         'nav.products': 'Sản phẩm',
         'nav.about': 'Giới thiệu',
         'nav.services': 'Dịch vụ',
+        'nav.outsource': 'Dự án Outsource',
         'nav.blog': 'Bài viết',
         
         // Hero Section
@@ -432,8 +449,23 @@ const translations = {
         'services.software.title': 'Thiết kế phần mềm IoT',
         'services.software.desc': 'Giải pháp thiết kế, phát triển phần mềm IoT bao gồm app, website và server,..',
         'services.products.title': 'Sản phẩm công nghệ & Platform IoT',
-        'services.products.desc': 'Cung cấp các sản phẩm công nghệ và các platform IoT cho nhu cầu của bạn.',
-        
+'services.products.desc': 'Cung cấp các sản phẩm công nghệ và các platform IoT cho nhu cầu của bạn.',
+        'services.viewProjects': 'Xem các dự án đã hoàn thành',
+
+        // Projects page
+        'projects.pageTitle': 'Dự án đã hoàn thành',
+        'projects.subtitle': 'Các dự án chúng tôi đã bàn giao cho khách hàng.',
+        'projects.readMore': 'Xem thêm →',
+
+        // Outsource Projects
+        'outsource.label': 'Dự án',
+        'outsource.title': 'Dự án Outsource đã làm',
+        'outsource.subtitle': 'Các dự án đã bàn giao cho khách hàng — phần cứng, firmware & phần mềm.',
+'outsource.project1.title': 'Giám sát & điều khiển nhiệt độ, độ ẩm từ xa qua App & Website',
+        'outsource.project1.desc': 'Hệ thống giám sát và điều khiển nhiệt độ, độ ẩm từ xa thông qua app di động và website. Dữ liệu thời gian thực, cảnh báo và điều khiển từ xa.',
+        'outsource.project2.title': 'Hệ thống kiểm soát ra vào thông minh',
+        'outsource.project2.desc': 'App di động và đầu đọc RFID/NFC cho cửa ra vào, nhật ký khách và quản lý từ xa cho văn phòng, tòa nhà.',
+
         // Contact Section
         'contact.title': 'Liên hệ',
         'contact.subtitle': 'Hãy cùng xây dựng điều gì đó tuyệt vời',
@@ -471,7 +503,7 @@ function createLanguageSwitcher() {
     languageSwitcher.className = 'language-switcher';
     languageSwitcher.innerHTML = `
         <button class="lang-btn" data-lang="vi">
-            <img src="img/flagVN.png" alt="VN Flag" class="flag-icon" style="height: 20px; vertical-align: middle; margin-right: 4px;">
+            <img src="/img/flagVN.png" alt="VN Flag" class="flag-icon" style="height: 20px; vertical-align: middle; margin-right: 4px;">
             <span class="lang-text">VI</span>
         </button>
         <button class="lang-btn" data-lang="en">
@@ -506,7 +538,7 @@ function updateLanguageButtons() {
     const viBtn = languageSwitcher.querySelector('[data-lang="vi"]');
     if (viBtn) {
         viBtn.innerHTML = `
-            <img src="img/flagVN.png" alt="VN Flag" class="flag-icon" style="height: 20px; vertical-align: middle; margin-right: 4px;">
+            <img src="/img/flagVN.png" alt="VN Flag" class="flag-icon" style="height: 20px; vertical-align: middle; margin-right: 4px;">
             <span class="lang-text">VI</span>
         `;
     }
