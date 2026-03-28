@@ -1,0 +1,566 @@
+/* Admin React section (Layout already provides site header/footer) */
+.admin-app {
+  background: #f5f5f5;
+  color: #111;
+  font-size: 0.9rem;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+}
+
+.admin-app * {
+  font-size: inherit;
+}
+
+.admin-app h1 {
+  font-size: 1.6rem !important;
+}
+.admin-app h2 {
+  font-size: 1.4rem !important;
+}
+.admin-app h3 {
+  font-size: 1.2rem !important;
+}
+.admin-app h4 {
+  font-size: 1.1rem !important;
+}
+.admin-app p,
+.admin-app li,
+.admin-app td,
+.admin-app th {
+  font-size: 0.9rem !important;
+}
+
+.admin-app .admin-page {
+  padding: 40px 0 80px;
+  min-height: calc(100vh - 120px);
+}
+
+.admin-app .admin-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.admin-app .admin-header {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid #e5e5e5;
+}
+
+.admin-app .admin-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #111;
+  margin-bottom: 0.5rem;
+}
+
+.admin-app .admin-header p {
+  color: #666;
+}
+
+.admin-app .admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.admin-app .admin-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid #e5e5e5;
+  transition: all 0.3s;
+}
+
+.admin-app .admin-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.admin-app .admin-card-icon {
+  width: 60px;
+  height: 60px;
+  background: #111;
+  color: #fff;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.admin-app .admin-card h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.admin-app .admin-card p {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.admin-app .admin-btn {
+  display: inline-block;
+  padding: 0.7rem 1.5rem;
+  background: #111;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.admin-app .admin-btn:hover {
+  background: #333;
+}
+
+.admin-app .back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #111;
+  font-weight: 600;
+  text-decoration: none;
+  margin-bottom: 1rem;
+}
+
+.admin-app .back-link:hover {
+  gap: 0.8rem;
+}
+
+/* Design gallery */
+.admin-app.design-gallery-page .admin-page {
+  padding: 40px 0 80px;
+}
+
+.admin-app .admin-container-wide {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.admin-app .content-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e5e5e5;
+  margin-bottom: 2rem;
+}
+
+.admin-app .design-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.admin-app .design-item {
+  text-align: center;
+}
+
+.admin-app .design-item img {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 0.75rem;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.admin-app .design-item img:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.admin-app .section-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e5e5e5;
+}
+
+.admin-app .back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #111;
+  font-weight: 600;
+  text-decoration: none;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  background: #f0f0f0;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.admin-app .back-button:hover {
+  background: #e0e0e0;
+  gap: 0.8rem;
+}
+
+/* Pricing layout */
+.admin-app.admin-pricing .admin-page {
+  padding: 40px 0 80px;
+}
+
+.admin-app.admin-pricing .admin-container {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-app.admin-pricing .sidebar-toc {
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+}
+
+.admin-app.admin-pricing .toc-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e5e5e5;
+}
+
+.admin-app.admin-pricing .toc-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #111;
+}
+
+.admin-app.admin-pricing .toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.admin-app.admin-pricing .toc-list li {
+  margin-bottom: 0.5rem;
+}
+
+.admin-app.admin-pricing .toc-list a {
+  color: #666;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s;
+  display: block;
+  padding: 0.3rem 0;
+}
+
+.admin-app.admin-pricing .toc-list a:hover {
+  color: #111;
+}
+
+.admin-app.admin-pricing .toc-list a.active {
+  color: #111;
+  font-weight: 600;
+}
+
+.admin-app.admin-pricing .content-wrapper {
+  min-width: 0;
+}
+
+.admin-app.admin-pricing .content-card {
+  padding: 2rem;
+  margin-bottom: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.admin-app.admin-pricing .content-card h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #111;
+}
+
+.admin-app.admin-pricing .content-card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.8rem;
+  color: #111;
+}
+
+.admin-app.admin-pricing .content-card p {
+  line-height: 1.8;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.admin-app.admin-pricing .content-card ul,
+.admin-app.admin-pricing .content-card ol {
+  margin-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+.admin-app.admin-pricing .content-card li {
+  margin-bottom: 0.5rem;
+  line-height: 1.8;
+}
+
+.admin-app.admin-pricing .pricing-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+.admin-app.admin-pricing .pricing-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0;
+}
+
+.admin-app.admin-pricing .pricing-table th,
+.admin-app.admin-pricing .pricing-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.admin-app.admin-pricing .pricing-table th {
+  background: #f5f5f5;
+  font-weight: 600;
+  color: #111;
+}
+
+.admin-app.admin-pricing .pricing-table tr:hover {
+  background: #f9f9f9;
+}
+
+.admin-app.admin-pricing .pricing-table td {
+  vertical-align: top;
+  line-height: 1.6;
+}
+
+.admin-app.admin-pricing .detailed-table {
+  table-layout: fixed;
+}
+
+.admin-app.admin-pricing .detailed-table th:nth-child(1),
+.admin-app.admin-pricing .detailed-table td:nth-child(1) {
+  width: 15%;
+}
+
+.admin-app.admin-pricing .detailed-table th:nth-child(2),
+.admin-app.admin-pricing .detailed-table td:nth-child(2) {
+  width: 25%;
+}
+
+.admin-app.admin-pricing .detailed-table th:nth-child(3),
+.admin-app.admin-pricing .detailed-table td:nth-child(3) {
+  width: 45%;
+}
+
+.admin-app.admin-pricing .detailed-table th:nth-child(4),
+.admin-app.admin-pricing .detailed-table td:nth-child(4) {
+  width: 15%;
+  text-align: center;
+}
+
+.admin-app.admin-pricing .detailed-table tr td:last-child {
+  width: 15% !important;
+  text-align: center !important;
+  min-width: 15%;
+}
+
+.admin-app.admin-pricing .detailed-table td[rowspan] {
+  vertical-align: middle;
+}
+
+.admin-app.admin-pricing .detailed-table td {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.admin-app.admin-pricing .detailed-table td strong {
+  color: #111;
+  font-weight: 600;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.admin-app.admin-pricing h2[id],
+.admin-app.admin-pricing h3[id] {
+  scroll-margin-top: 100px;
+}
+
+/* Carousel (pricing) */
+.admin-app.admin-pricing .carousel-item {
+  flex-shrink: 0;
+  transition:
+    opacity 0.3s ease,
+    width 0.3s ease;
+  cursor: pointer;
+  display: none;
+}
+
+.admin-app.admin-pricing .carousel-item.active {
+  display: block;
+  opacity: 1;
+  z-index: 2;
+}
+
+.admin-app.admin-pricing .carousel-item.prev,
+.admin-app.admin-pricing .carousel-item.next {
+  display: none;
+}
+
+.admin-app.admin-pricing .carousel-item img {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: block;
+  pointer-events: none;
+  transition:
+    width 0.3s ease,
+    opacity 0.3s ease;
+}
+
+.admin-app.admin-pricing .carousel-item.active img {
+  width: 220px;
+  height: auto;
+}
+
+.admin-app.admin-pricing #carousel-container:active {
+  cursor: grabbing;
+}
+
+.admin-app.admin-pricing .pricing-carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ccc;
+  cursor: pointer;
+  transition:
+    background 0.3s ease,
+    transform 0.3s ease;
+  border: none;
+  padding: 0;
+}
+
+.admin-app.admin-pricing .pricing-carousel-dot:hover {
+  background: #999;
+  transform: scale(1.2);
+}
+
+.admin-app.admin-pricing .pricing-carousel-dot.active {
+  background: #111;
+  transform: scale(1.3);
+}
+
+@media (max-width: 968px) {
+  .admin-app.admin-pricing .admin-container {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-app.admin-pricing .sidebar-toc {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-app.admin-pricing .admin-page {
+    padding: 24px 0 60px;
+    overflow-x: hidden;
+  }
+
+  .admin-app.admin-pricing .admin-container {
+    padding: 0 15px;
+    gap: 1.5rem;
+  }
+
+  .admin-app.admin-pricing .content-card {
+    padding: 1.5rem;
+    overflow-x: hidden;
+  }
+
+  .admin-app.admin-pricing .pricing-table {
+    font-size: 0.85rem;
+    min-width: 600px;
+  }
+
+  .admin-app.admin-pricing .pricing-table th,
+  .admin-app.admin-pricing .pricing-table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .admin-app.admin-pricing #image-carousel {
+    max-width: 100%;
+    padding: 10px;
+  }
+
+  .admin-app.admin-pricing .carousel-item.active img {
+    width: 180px;
+  }
+
+  .admin-app.admin-pricing #carousel-container {
+    gap: 10px;
+  }
+
+  .admin-app.admin-pricing #prev-arrow,
+  .admin-app.admin-pricing #next-arrow {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 16px !important;
+  }
+
+  .admin-app.admin-pricing .section-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+  }
+
+  .admin-app.admin-pricing .section-header a {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-app.admin-pricing .admin-page {
+    padding: 16px 0 40px;
+  }
+
+  .admin-app.admin-pricing .admin-container {
+    padding: 0 10px;
+  }
+
+  .admin-app.admin-pricing .content-card {
+    padding: 1rem;
+  }
+
+  .admin-app.admin-pricing .pricing-table {
+    font-size: 0.8rem;
+    min-width: 500px;
+  }
+
+  .admin-app.admin-pricing .carousel-item.active img {
+    width: 150px;
+  }
+
+  .admin-app.admin-pricing #prev-arrow,
+  .admin-app.admin-pricing #next-arrow {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 14px !important;
+  }
+}

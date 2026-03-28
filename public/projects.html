@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Redirect…</title>
+  <script>
+    var path = location.pathname.replace(/\/?projects\.html$/i, '/projects');
+    if (path === location.pathname) path = location.pathname.replace(/\/$/, '') + '/projects';
+    location.replace(location.origin + path + location.search + location.hash);
+  </script>
+</head>
+<body>
+  <p><a href="projects">Continue to Projects</a></p>
+</body>
+</html>

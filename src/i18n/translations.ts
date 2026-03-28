@@ -1,6 +1,6 @@
 export type Lang = 'en' | 'vi';
 
-/** Strings used by the React app only (legacy HTML keeps its own copy in script.js where needed). */
+/** Strings used by the React app (`LanguageContext` / `t()`). */
 export const translations: Record<Lang, Record<string, string>> = {
   en: {
     'nav.home': 'Home',
@@ -8,6 +8,21 @@ export const translations: Record<Lang, Record<string, string>> = {
     'nav.about': 'About',
     'nav.services': 'Services',
     'nav.blog': 'Blog',
+    'blog.documentTitle': 'Blog | Gemify',
+    'blog.heroTitle': 'Blog & Technology News',
+    'blog.heroSubtitle': 'Discover amazing technology projects and tutorials',
+    'blog.welcomeTitle': 'Welcome to our Blog',
+    'blog.welcomeBody':
+      'Explore our latest articles, tutorials, and updates about technology, IoT devices, IoT solutions and more.',
+    'blog.readMore': 'Read More →',
+    'blog.by': 'by',
+    'blog.recentPosts': 'Recent Posts',
+    'blog.search': 'Search',
+    'blog.searchPlaceholder': 'Search...',
+    'blog.categories': 'Categories',
+    'blog.tags': 'Tags',
+    'blog.categoryTutorial': 'Tutorial (6)',
+    'blog.categoryTechnology': 'Technology (6)',
     'hero.title': 'Gemify Technology',
     'hero.subtitle':
       'Discover modern technology devices and AIoT systems, professionally customized for each customer with precision.',
@@ -84,6 +99,21 @@ export const translations: Record<Lang, Record<string, string>> = {
     'nav.about': 'Giới thiệu',
     'nav.services': 'Dịch vụ',
     'nav.blog': 'Bài viết',
+    'blog.documentTitle': 'Bài viết | Gemify',
+    'blog.heroTitle': 'Blog & tin công nghệ',
+    'blog.heroSubtitle': 'Khám phá dự án công nghệ và hướng dẫn thú vị',
+    'blog.welcomeTitle': 'Chào mừng đến blog',
+    'blog.welcomeBody':
+      'Đọc bài mới, hướng dẫn và cập nhật về công nghệ, thiết bị IoT, giải pháp IoT và hơn thế nữa.',
+    'blog.readMore': 'Đọc thêm →',
+    'blog.by': 'bởi',
+    'blog.recentPosts': 'Bài gần đây',
+    'blog.search': 'Tìm kiếm',
+    'blog.searchPlaceholder': 'Tìm kiếm...',
+    'blog.categories': 'Danh mục',
+    'blog.tags': 'Thẻ',
+    'blog.categoryTutorial': 'Hướng dẫn (6)',
+    'blog.categoryTechnology': 'Công nghệ (6)',
     'hero.title': 'Gemify Technology',
     'hero.subtitle':
       'Khám phá các thiết bị công nghệ, hệ thống AIoT hiện đại được thiết kế chuyên môn hóa đối với từng khách hàng với độ tỉ mỉ, chính xác cao.',

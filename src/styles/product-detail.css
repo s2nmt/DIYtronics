@@ -129,6 +129,36 @@ main.product-detail-page {
   border: 1px solid #e5e5e5;
 }
 
+.product-detail-page .intro-img--half {
+  width: 50%;
+  max-width: 50%;
+}
+
+.product-detail-page .intro-img--third {
+  width: 30%;
+  max-width: 30%;
+}
+
+.product-detail-page .product-detail-video {
+  width: 30%;
+  max-width: 100%;
+  display: block;
+  margin: 0 auto 1rem;
+  border-radius: 12px;
+}
+
+@media (max-width: 700px) {
+  .product-detail-page .intro-img--half,
+  .product-detail-page .intro-img--third {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .product-detail-page .product-detail-video {
+    width: 100%;
+  }
+}
+
 .product-detail-page .product-title {
   font-size: 2rem;
   font-weight: 800;

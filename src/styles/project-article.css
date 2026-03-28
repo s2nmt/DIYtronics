@@ -1,0 +1,79 @@
+main.project-article-page {
+  background: #fff;
+  color: #111;
+  padding: 100px 0 80px;
+}
+
+.project-article-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.project-article-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.project-article-meta {
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+}
+
+.project-article-content {
+  line-height: 1.8;
+  font-size: 1.05rem;
+  color: #333;
+}
+
+.project-article-content h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  color: #111;
+}
+
+.project-article-content p {
+  margin-bottom: 1.25rem;
+}
+
+.project-article-content ul {
+  margin-left: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.project-article-content li {
+  margin-bottom: 0.5rem;
+}
+
+.project-article-back {
+  display: inline-block;
+  margin-bottom: 2rem;
+  color: #111;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.project-article-back:hover {
+  text-decoration: underline;
+}
+
+.tech-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.tech-tag {
+  background: #f0f0f0;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #333;
+}

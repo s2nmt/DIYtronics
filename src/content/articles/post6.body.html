@@ -1,0 +1,88 @@
+<p>Updating ESP32 firmware over the air (OTA) lets you push new versions to devices without USB or physical access. This post walks through a simple OTA flow: the device checks a secure HTTPS URL for a new firmware binary, downloads it if the server says an update is available, writes it with the Arduino <code>Update</code> library, and reboots. We use a Root CA certificate so the ESP32 can verify your server over TLS.</p>   <h2 id="what-is-ota">What is OTA (Over-The-Air) Update?</h2> <p>OTA update means sending new firmware to a device over the network (Wi‑Fi, Ethernet, or cellular) instead of flashing via USB or a programmer. For ESP32, the device downloads a <code>.bin</code> file, writes it to the next app partition (or a dedicated OTA partition), and restarts to run the new code. That’s ideal for deployed or hard-to-reach devices.</p>   <h2 id="overview">Overview of the Code</h2> <p>The sketch does the following:</p> <ul>     <li>Connects to Wi‑Fi using your SSID and password.</li>     <li>Uses <code>WiFiClientSecure</code> with a Root CA certificate so the HTTPS connection is verified.</li>     <li>Sends a GET request to a firmware URL and passes the current version in a custom header <code>X-Current-Version</code>.</li>     <li>If the server returns <strong>200 OK</strong>, treats the response body as the new firmware: streams it into <code>Update</code>, then reboots on success.</li>     <li>If the server returns <strong>304 Not Modified</strong>, considers the device up to date and skips the update.</li>     <li>Runs the update check periodically in <code>loop()</code> (e.g. every 2 minutes in the example).</li> </ul>   <h2 id="full-sketch">Full Sketch</h2> <p>Here is the complete ESP32 sketch for OTA over HTTPS with version checking:</p>
+
+<pre><code>#include &lt;WiFi.h&gt;
+#include &lt;HTTPClient.h&gt;
+#include &lt;Update.h&gt;
+#include &lt;WiFiClientSecure.h&gt;
+
+const char* ssid = "your wifi";
+const char* password = "your password";
+const char* firmwareUrl = "https://your_domain/firmware/device_v3.bin";
+const char* currentVersion = "1.0.0";
+
+// Root CA certificate for your server (PEM format)
+// Extract with: openssl s_client -connect your-server.com:443 -showcerts
+const char* rootCACert = R"EOF(
+-----BEGIN CERTIFICATE-----
+-----END CERTIFICATE-----
+)EOF";
+
+void checkForUpdate() {
+    WiFiClientSecure client;
+    client.setCACert(rootCACert);
+
+    HTTPClient https;
+    https.begin(client, firmwareUrl);
+    https.addHeader("X-Current-Version", currentVersion);
+
+    int httpCode = https.GET();
+
+    if (httpCode == HTTP_CODE_OK) {
+        int contentLength = https.getSize();
+        if (contentLength &lt;= 0) {
+            Serial.println("Invalid content length");
+            return;
+        }
+
+        if (!Update.begin(contentLength)) {
+            Serial.println("Not enough space for OTA");
+            return;
+        }
+
+        WiFiClient* stream = https.getStreamPtr();
+        size_t written = Update.writeStream(*stream);
+
+        if (written == contentLength) {
+            Serial.println("Firmware written successfully");
+        } else {
+            Serial.printf("Only wrote %d of %d bytes\n", written, contentLength);
+        }
+
+        if (Update.end()) {
+            if (Update.isFinished()) {
+                Serial.println("Update successful. Rebooting...");
+                ESP.restart();
+            }
+        } else {
+            Serial.printf("Update error: %s\n", Update.errorString());
+        }
+    } else if (httpCode == 304) {
+        Serial.println("Firmware is up to date");
+    } else {
+        Serial.printf("HTTP error: %d\n", httpCode);
+    }
+
+    https.end();
+}
+
+void setup() {
+    Serial.begin(115200);
+    pinMode(2, OUTPUT);
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+    }
+    // checkForUpdate();  // optional: check once at boot
+}
+
+void loop() {
+    static uint32_t lastCheck = 0;
+    if (millis() - lastCheck &gt; 120000) {
+        checkForUpdate();
+        lastCheck = millis();
+    }
+    digitalWrite(2, HIGH);
+    delay(2000);
+    digitalWrite(2, LOW);
+    delay(2000);
+}</code></pre>   <h2 id="configuration">What You Need to Configure</h2> <ul>     <li><strong>ssid / password</strong> — Your Wi‑Fi credentials.</li>     <li><strong>firmwareUrl</strong> — Full HTTPS URL to the firmware binary (e.g. <code>https://your_domain/firmware/device_v3.bin</code>).</li>     <li><strong>currentVersion</strong> — Version string reported to the server in <code>X-Current-Version</code>. The server can compare this and return 304 when no update is needed.</li>     <li><strong>rootCACert</strong> — PEM of the CA that signed your server’s certificate. You can get it with: <code>openssl s_client -connect your-server.com:443 -showcerts</code> and copy the “BEGIN CERTIFICATE” block (usually the server cert or the CA that signed it).</li> </ul>   <h2 id="server-side">Server-Side Behavior</h2> <p>Your server should:</p> <ol>     <li>Accept GET requests to the firmware URL.</li>     <li>Read the <code>X-Current-Version</code> header.</li>     <li>If that version is already the latest, respond with <strong>304 Not Modified</strong> and no body (saves bandwidth and flash wear).</li>     <li>If a newer build exists, respond with <strong>200 OK</strong>, <code>Content-Length</code> set to the binary size, and the <code>.bin</code> file as the body.</li> </ol> <p>That way the ESP32 only downloads and flashes when there is actually a new version.</p>   <h2 id="building-firmware">Building the Firmware Binary</h2> <p>In Arduino IDE: <strong>Sketch → Export compiled Binary</strong>. The <code>.bin</code> is created in the sketch folder. Upload this file to your server at the path used in <code>firmwareUrl</code>. For PlatformIO, the built binary is typically under <code>.pio/build/&lt;env&gt;/firmware.bin</code>; use the same file (or a renamed copy) on the server.</p>   <h2 id="security-notes">Security and Best Practices</h2> <ul>     <li><strong>HTTPS and Root CA</strong> — Using <code>setCACert(rootCACert)</code> ensures the ESP32 only talks to a server that presents a certificate signed by your CA, which reduces man-in-the-middle risk.</li>     <li><strong>Version header</strong> — Sending <code>X-Current-Version</code> and having the server return 304 when up to date avoids unnecessary downloads and flash writes.</li>     <li><strong>Check interval</strong> — The example checks every 2 minutes (<code>120000</code> ms). For production you might use a longer interval (e.g. 24 hours) or trigger updates via a message (e.g. MQTT) instead of polling.</li>     <li><strong>First flash</strong> — The first time you flash the device you must use USB/serial; after that, OTA can deliver all future updates.</li> </ul>   <p>With this setup, your ESP32 can securely check for and install firmware updates over HTTPS without physical access.</p>

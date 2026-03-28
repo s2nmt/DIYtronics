@@ -39,7 +39,7 @@ export function Header() {
               <a href={hashLink('services')}>{t('nav.services')}</a>
             </li>
             <li>
-              <a href={assetPath('blog.html')}>{t('nav.blog')}</a>
+              <Link to="/blog">{t('nav.blog')}</Link>
             </li>
           </ul>
           <div className="language-switcher">

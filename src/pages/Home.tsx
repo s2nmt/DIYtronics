@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
-import { assetPath } from '../utils/assetPath';
-
 export function Home() {
   const { t } = useLanguage();
 
@@ -36,11 +34,11 @@ export function Home() {
           <h2>{t('products.title')}</h2>
           <div className="products-grid">
             <div className="product-card" data-product="micromouse">
-              <a href={assetPath('micromouse.html')} className="product-image-link">
+              <Link to="/products/micromouse" className="product-image-link">
                 <div className="product-image">
                   <i className="fas fa-robot icon-micromouse" />
                 </div>
-              </a>
+              </Link>
               <div className="product-info">
                 <h3>{t('products.micromouse.title')}</h3>
                 <p>{t('products.micromouse.desc')}</p>
@@ -84,11 +82,11 @@ export function Home() {
             </div>
 
             <div className="product-card" data-product="translate-mini">
-              <a href={assetPath('translate.html')} className="product-image-link">
+              <Link to="/products/translate" className="product-image-link">
                 <div className="product-image">
                   <i className="fas fa-language" />
                 </div>
-              </a>
+              </Link>
               <div className="product-info">
                 <h3>{t('products.translate.title')}</h3>
                 <p>{t('products.translate.desc')}</p>

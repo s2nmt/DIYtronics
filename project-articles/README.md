@@ -1,6 +1,12 @@
-# Project Articles
+# Project articles
 
-This folder is for storing detailed article pages for each completed project (e.g. temperature/humidity monitoring, smart access control).
+Long-form case studies live in **React** (see `src/pages/`, `src/content/`). The blog lists them from `ProjectsPage`.
 
-- Add one HTML file per project article (e.g. `project1-temperature-humidity.html`, `project2-access-control.html`).
-- You can link to these from the project cards on `projects.html` using "Read more" or "Xem thêm".
+**Example-1** (temperature / humidity monitoring):
+
+- **URL:** `/projects/example-1`
+- **Source:** `src/pages/ProjectArticleExample1Page.tsx`, `src/content/projectArticleExample1.ts`
+
+`public/project-articles/example-1/index.html` is a **redirect** only so old URLs keep working after deploy.
+
+Add more case studies: new route + content module, then link from `ProjectsPage`.

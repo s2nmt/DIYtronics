@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
-import { assetPath } from '../utils/assetPath';
 import '../styles/projects-page.css';
 
 export function ProjectsPage() {
@@ -27,9 +27,9 @@ export function ProjectsPage() {
               </div>
               <h3>{t('outsource.project1.title')}</h3>
               <p>{t('outsource.project1.desc')}</p>
-              <a href={assetPath('project-articles/example-1/index.html')} className="project-read-more">
+              <Link to="/projects/example-1" className="project-read-more">
                 {t('projects.readMore')}
-              </a>
+              </Link>
             </div>
             <div className="project-card">
               <div className="service-icon">
