@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { ProjectArticleGallerySection } from '../components/ProjectArticleGallerySection';
 import { projectArticleExample1 } from '../content/projectArticleExample1';
 import '../styles/project-article.css';
 
@@ -50,6 +51,18 @@ export function ProjectArticleExample1Page() {
 
             <h2>{c.uiTitle}</h2>
             <p>{c.uiBody}</p>
+            <div className="project-article-ui-galleries">
+              {c.uiGallerySections.map((section) => (
+                <ProjectArticleGallerySection
+                  key={`${section.id}-${language}`}
+                  sectionId={section.id}
+                  title={section.sectionTitle}
+                  images={section.images}
+                  prevAria={c.uiCarouselPrevAria}
+                  nextAria={c.uiCarouselNextAria}
+                />
+              ))}
+            </div>
 
             <h2>{c.outcomeTitle}</h2>
             <p>{c.outcomeBody}</p>
