@@ -1,7 +1,7 @@
 /**
  * One-off / maintenance: extracts `<div class="article-content">` from full HTML
- * files. After migration, `public/articles/post2.html`–`post6.html` are redirects only;
- * keep a backup of the original HTML if you need to run this again.
+ * files. Keep full HTML backups outside `public/articles/` (no `postN.html` there—GitHub Pages
+ * would serve them for `/articles/postN` and hide the SPA).
  */
 import fs from 'fs';
 import path from 'path';
