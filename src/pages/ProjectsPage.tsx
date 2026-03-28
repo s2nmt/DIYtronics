@@ -33,10 +33,13 @@ export function ProjectsPage() {
             </div>
             <div className="project-card">
               <div className="service-icon">
-                <i className="fas fa-door-open" />
+                <i className="fas fa-bolt" />
               </div>
               <h3>{t('outsource.project2.title')}</h3>
               <p>{t('outsource.project2.desc')}</p>
+              <Link to="/projects/energy-monitoring" className="project-read-more">
+                {t('projects.readMore')}
+              </Link>
             </div>
           </div>
         </div>

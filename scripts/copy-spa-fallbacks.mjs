@@ -24,6 +24,7 @@ const routes = [
   'blog',
   'projects',
   'projects/example-1',
+  'projects/energy-monitoring',
   'products/micromouse',
   'products/translate',
   'products/rfid',

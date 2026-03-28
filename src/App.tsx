@@ -4,6 +4,7 @@ import { Home } from './pages/Home';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { RfidProductPage } from './pages/RfidProductPage';
 import { ProjectArticleExample1Page } from './pages/ProjectArticleExample1Page';
+import { ProjectArticleEnergyPage } from './pages/ProjectArticleEnergyPage';
 import { MicromouseProductPage } from './pages/MicromouseProductPage';
 import { TranslateProductPage } from './pages/TranslateProductPage';
 import { BlogPage } from './pages/BlogPage';
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/admin/design-gallery" element={<AdminDesignGalleryPage />} />
         <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/projects/example-1" element={<ProjectArticleExample1Page />} />
+        <Route path="/projects/energy-monitoring" element={<ProjectArticleEnergyPage />} />
         <Route path="/products/micromouse" element={<MicromouseProductPage />} />
         <Route path="/products/translate" element={<TranslateProductPage />} />
         <Route path="/products/rfid" element={<RfidProductPage />} />
