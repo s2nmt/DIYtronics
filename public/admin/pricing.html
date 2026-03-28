@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Process | Gemify Admin</title>
+    <link rel="icon" type="image/png" href="../img/flagVN.png">
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: #f5f5f5;
+            color: #111;
+            font-size: 0.9rem;
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        html {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        * {
+            font-size: inherit;
+        }
+        h1 { font-size: 1.6rem !important; }
+        h2 { font-size: 1.4rem !important; }
+        h3 { font-size: 1.2rem !important; }
+        h4 { font-size: 1.1rem !important; }
+        p, li, td, th { font-size: 0.9rem !important; }
+        .admin-header h1 { font-size: 1.6rem !important; }
+        .admin-page {
+            padding: 100px 0 80px;
+            min-height: 100vh;
+        }
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .sidebar-toc {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+        .toc-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #e5e5e5;
+        }
+        .toc-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #111;
+        }
+        .toc-list {
+            list-style: none;
+        }
+        .toc-list li {
+            margin-bottom: 0.5rem;
+        }
+        .toc-list a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+            display: block;
+            padding: 0.3rem 0;
+        }
+        .toc-list a:hover {
+            color: #111;
+        }
+        .toc-list a.active {
+            color: #111;
+            font-weight: 600;
+        }
+        .content-wrapper {
+            min-width: 0;
+        }
+        .admin-header {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e5e5e5;
+        }
+        .admin-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #111;
+            margin-bottom: 0.5rem;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #111;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+        .back-link:hover {
+            gap: 0.8rem;
+        }
+        .content-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid #e5e5e5;
+            margin-bottom: 2rem;
+            width: 100%;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+        .content-card h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #111;
+        }
+        .content-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: #111;
+        }
+        .content-card p {
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        .content-card ul, .content-card ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        .content-card li {
+            margin-bottom: 0.5rem;
+            line-height: 1.8;
+        }
+        .pricing-table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 1rem;
+            width: 100%;
+            max-width: 100%;
+        }
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0;
+        }
+        .pricing-table th,
+        .pricing-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .pricing-table th {
+            background: #f5f5f5;
+            font-weight: 600;
+            color: #111;
+        }
+        .pricing-table tr:hover {
+            background: #f9f9f9;
+        }
+        .pricing-table td {
+            vertical-align: top;
+            line-height: 1.6;
+        }
+        /* Chỉ áp dụng kích thước cố định cho các bảng trong Giai đoạn 2 (có class detailed-table) */
+        .detailed-table {
+            table-layout: fixed;
+        }
+        .detailed-table th:nth-child(1),
+        .detailed-table td:nth-child(1) {
+            width: 15%;
+        }
+        .detailed-table th:nth-child(2),
+        .detailed-table td:nth-child(2) {
+            width: 25%;
+        }
+        .detailed-table th:nth-child(3),
+        .detailed-table td:nth-child(3) {
+            width: 45%;
+        }
+        .detailed-table th:nth-child(4),
+        .detailed-table td:nth-child(4) {
+            width: 15%;
+            text-align: center;
+        }
+        .detailed-table tr td:last-child {
+            width: 15% !important;
+            text-align: center !important;
+            min-width: 15%;
+        }
+        .detailed-table td[rowspan] {
+            vertical-align: middle;
+        }
+        .detailed-table td {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .detailed-table td strong {
+            color: #111;
+            font-weight: 600;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        h2[id], h3[id] {
+            scroll-margin-top: 100px;
+        }
+        @media (max-width: 968px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar-toc {
+                position: static;
+            }
+        }
+        @media (max-width: 768px) {
+            .admin-page {
+                padding: 80px 0 60px;
+                overflow-x: hidden;
+            }
+            .admin-container {
+                padding: 0 15px;
+                gap: 1.5rem;
+                width: 100%;
+                max-width: 100%;
+            }
+            .content-card {
+                padding: 1.5rem;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            .pricing-table {
+                font-size: 0.85rem;
+            }
+            .pricing-table th,
+            .pricing-table td {
+                padding: 0.75rem 0.5rem;
+            }
+            .pricing-table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .pricing-table {
+                min-width: 600px;
+            }
+            #image-carousel {
+                max-width: 100%;
+                padding: 10px;
+            }
+            .carousel-item.active img {
+                width: 180px;
+            }
+            #carousel-container {
+                gap: 10px;
+            }
+            #prev-arrow, #next-arrow {
+                width: 32px !important;
+                height: 32px !important;
+                font-size: 16px !important;
+            }
+            .admin-header {
+                padding: 1.5rem;
+            }
+            h3 {
+                font-size: 1.1rem !important;
+            }
+            .section-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 1rem !important;
+            }
+            .section-header a {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        @media (max-width: 480px) {
+            .admin-page {
+                padding: 60px 0 40px;
+                overflow-x: hidden;
+            }
+            .admin-container {
+                padding: 0 10px;
+                width: 100%;
+                max-width: 100%;
+            }
+            .content-card {
+                padding: 1rem;
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            .pricing-table {
+                font-size: 0.8rem;
+                min-width: 500px;
+            }
+            .pricing-table th,
+            .pricing-table td {
+                padding: 0.5rem 0.4rem;
+            }
+            .carousel-item.active img {
+                width: 150px;
+            }
+            #prev-arrow, #next-arrow {
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 14px !important;
+            }
+            h1 { font-size: 1.4rem !important; }
+            h2 { font-size: 1.2rem !important; }
+            h3 { font-size: 1rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="../index.html"><h1>Gemify</h1></a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="../index.html#home">Home</a></li>
+                    <li><a href="../index.html#products">Products</a></li>
+                    <li><a href="../index.html#about">About</a></li>
+                    <li><a href="../index.html#services">Services</a></li>
+                    <li><a href="../blog.html">Blog</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="admin-page">
+            <div class="admin-container">
+                <aside class="sidebar-toc">
+                    <div class="toc-card">
+                        <h3>Table of Contents</h3>
+                        <ul class="toc-list">
+                            <li><a href="#overview">Tổng Quan</a></li>
+                            <li><a href="#payment-stages">Quy Trình Báo Giá</a></li>
+                            <li><a href="#requirement-analysis">Giai Đoạn 1: Triển Khai - Làm Rõ Yêu Cầu</a></li>
+                            <li><a href="#detailed-breakdown">Giai đoạn 2: Phân Tích Chi Tiết Theo Từng Phần</a></li>
+                            <li><a href="#design-layout">Giai đoạn 3: Design layout và mô tả các tính năng hệ thống.</a></li>
+                            <li><a href="#demo-product">Giai đoạn 4: Code sản phẩm, demo sản phẩm thực tế</a></li>
+                            <li><a href="#release-product">Giai đoạn 5: Release sản phẩm chính thức</a></li>
+                        </ul>
+                    </div>
+                </aside>
+                
+                <div class="content-wrapper">
+                    <div class="content-card">
+                        <h1>Quy Trình Báo Giá</h1>
+                        <h3 id="overview">Tổng Quan</h2>
+                        <p>Tài liệu này mô tả quy trình báo giá cho khách hàng và định giá sản phẩm tại Gemify. Làm theo các quy trình này để đảm bảo báo giá chính xác và nhất quán cho tất cả khách hàng.</p>
+
+                        <h3 id="payment-stages">Quy Trình Báo Giá</h3>
+                        <h4>Lưu ý: Hoàn thiện giai đoạn nào thu giai đoạn đó.</h4>
+                        <div class="pricing-table-wrapper">
+                        <table class="pricing-table">
+                            <thead>
+                                <tr>
+                                    <th>Giai Đoạn</th>
+                                    <th>Tỷ Lệ</th>
+                                    <th>Nội Dung</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Giai đoạn 1</td>
+                                    <td>Free</td>
+                                    <td>Tiếp nhận yêu cầu khách hàng - Nhận và xem xét yêu cầu của khách hàng, đánh giá khả năng thực hiện của dự án.</td>
+                                </tr>
+                                <tr>
+                                    <td>Giai đoạn 2</td>
+                                    <td>15%</td>
+                                    <td>Báo cáo chi tiết nội dung khách hàng yêu cầu. Mô tả cách hoạt động của từng yêu cầu. Báo giá toàn bộ chi phí</td>
+                                </tr>
+                                <tr>
+                                    <td>Giai đoạn 3</td>
+                                    <td>30%</td>
+                                    <td>Làm layout demo sản phẩm. Mô tả cách sản phẩm sẽ hoạt động như thế nào,</td>
+                                </tr>
+                                <tr>
+                                    <td>Giai đoạn 4</td>
+                                    <td>35%</td>
+                                    <td>Code sản phẩm, demo sản phẩm thực tế. </td>
+                                </tr>
+                                <tr>
+                                    <td>Giai đoạn 5</td>
+                                    <td>20%</td>
+                                    <td>Release sản phẩm chính thức, bàn giao layout, source code, tài liệu ...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                        
+                        <h3 id="requirement-analysis">Giai Đoạn 1: Triển Khai - Làm Rõ Yêu Cầu</h3>
+                        <p><strong>Ví dụ:</strong> Khách hàng yêu cầu 1 website và ứng dụng hiển thị nhiệt độ, độ ẩm. Đây là các yêu cầu khách hàng đưa ra:</p>
+                        <div class="pricing-table-wrapper">
+                        <table class="pricing-table">
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Yêu Cầu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Giám sát và điều khiển nhiệt độ độ ẩm ở app và website</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Cảnh báo tối đa 10 alarm qua app, lưu cảnh báo và giá trị theo thời gian thực, có thể xem trên app và website</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Mỗi thiết bị được quản lý id riêng ứng với user riêng</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>Khai báo user và add id esp</td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>Lưu dữ liệu 3 tháng trên server. Lưu theo cảnh báo và timeout setup</td>
+                                </tr>
+                                <tr>
+                                    <td>6</td>
+                                    <td>1 user chính giám sát 1 device A, vài user phụ có thể cùng giám sát</td>
+                                </tr>
+                                <tr>
+                                    <td>7</td>
+                                    <td>Chức năng gửi mail khi có alarm (có thể set alarm, nội dung) và set tối đa 5 email, trên 1 user</td>
+                                </tr>
+                                <tr>
+                                    <td>8</td>
+                                    <td>Hỗ trợ kết nối MQTT cho wifi và sim</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                        <p><h4>Đánh giá:</h4> Dự án có thể làm được, chưa có vấn đề phức tạp.</p>
+
+                        <h3 id="detailed-breakdown">Giai đoạn 2: Phân Tích Chi Tiết Theo Từng Phần</h3>
+                        
+                        <h4>Yêu Cầu 1: Giám sát và điều khiển nhiệt độ độ ẩm ở app và website</h4>
+                        <div class="pricing-table-wrapper">
+                        <table class="pricing-table detailed-table">
+                            <thead>
+                                <tr>
+                                    <th>Hạng Mục</th>
+                                    <th>Câu Hỏi Cần Làm Rõ</th>
+                                    <th>Mô Tả</th>
+                                    <th>Báo Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td rowspan="2">Đăng nhập/Đăng ký</td>
+                                    <td>APP và website cần đăng ký đăng nhập tài khoản không?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Cần có 1 màn hình đăng nhập bao gồm tài khoản, mật khẩu, quên mật khẩu, đăng kí.<br>
+                                        <strong>Backend:</strong> API đăng nhập, đăng ký, xác thực token
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td>Có cần lấy OTP không? phương thức từ email hay số điện thoại ,..?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Màn hình nhập OTP, đếm ngược thời gian<br>
+                                        <strong>Backend:</strong> Triển khai OTP qua Zalo, lưu trữ và xác thực OTP
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+
+                                <tr>
+                                    <td rowspan="2">Giao diện chính</td>
+                                    <td>Hiển thị giá trị nhiệt độ độ ẩm (số lượng giá trị cần hiển thị, cố định hay linh hoạt?)</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Thiết kế màn hình hiển thị dữ liệu nhiệt độ và độ ẩm theo thời gian thực<br>
+                                        <strong>Backend:</strong> API lấy dữ liệu real-time, WebSocket hoặc polling
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td>Hiển thị biểu đồ (số lượng biểu đồ, biểu đồ dạng nào, bao nhiêu giá trị?)</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Phát triển biểu đồ hiển thị dữ liệu lịch sử với các tùy chọn loại biểu đồ<br>
+                                        <strong>Backend:</strong> API lấy dữ liệu lịch sử theo khoảng thời gian
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td>Điều khiển</td>
+                                    <td>Điều khiển đèn (hỏi bao nhiêu đèn, cố định hay thêm sửa xóa, phương pháp thêm đèn ntn?)</td>
+                                    <td>
+                                        <strong>Frontend:</strong> 1 màn hình có thể điều khiển on/off, thêm sửa xóa đèn<br>
+                                        <strong>Backend:</strong> API điều khiển thiết bị, quản lý danh sách đèn
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td>Cảnh báo</td>
+                                    <td>Hiển thị trạng thái cảnh báo, hiển thị như thế nào? Trong app hay khi tắt app vẫn?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Thiết kế hệ thống cảnh báo với thông báo push notification, và thông báo trong giao diện home<br>
+                                        <strong>Backend:</strong> Xử lý logic cảnh báo, gửi push notification, lưu trữ lịch sử cảnh báo
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+
+                        <h4>Yêu Cầu 2: Cảnh báo tối đa 10 alarm qua app, lưu cảnh báo và giá trị theo thời gian thực</h4>
+                        <div class="pricing-table-wrapper">
+                        <table class="pricing-table detailed-table">
+                            <thead>
+                                <tr>
+                                    <th>Hạng Mục</th>
+                                    <th>Câu Hỏi Cần Làm Rõ</th>
+                                    <th>Mô Tả</th>
+                                    <th>Báo Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Xuất file Excel</td>
+                                    <td>Định dạng file Excel như thế nào? Có cần filter, sort không?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Thiết kế 1 màn hình có thể xuất dữ liệu lịch sử ra file Excel với đầy đủ thông tin và có thể filter<br>
+                                        <strong>Backend:</strong> API xuất file Excel, xử lý dữ liệu và format Excel
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td>Lịch sử cảnh báo</td>
+                                    <td>Hiển thị bao nhiêu bản ghi? Có phân trang không?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Thiết kế 1 màn hình hiển thị lịch sử cảnh báo với tìm kiếm và lọc<br>
+                                        <strong>Backend:</strong> API lấy lịch sử cảnh báo với phân trang, filter, search
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+
+                        <h4>Yêu Cầu 3: Mỗi thiết bị được quản lý id riêng ứng với user riêng</h4>
+                        <div class="pricing-table-wrapper">
+                        <table class="pricing-table detailed-table">
+                            <thead>
+                                <tr>
+                                    <th>Hạng Mục</th>
+                                    <th>Câu Hỏi Cần Làm Rõ</th>
+                                    <th>Mô Tả</th>
+                                    <th>Báo Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Khai báo user và add ESP ID</td>
+                                    <td>Cần API nào để quản lý user và device? Có cần phân quyền không?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Màn hình quản lý user, màn hình thêm/sửa/xóa device<br>
+                                        <strong>Backend:</strong> Phát triển hệ thống backend quản lý user và device với authentication và authorization
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+
+                        <h4>Yêu Cầu 4: Khai báo user và add id esp</h4>
+                        <div class="pricing-table-wrapper">
+                        <table class="pricing-table detailed-table">
+                            <thead>
+                                <tr>
+                                    <th>Hạng Mục</th>
+                                    <th>Câu Hỏi Cần Làm Rõ</th>
+                                    <th>Mô Tả</th>
+                                    <th>Báo Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Thêm thiết bị</td>
+                                    <td>Quét QR hay nhập ID thiết bị. Thiết bị gồm những thông tin gì?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Màn hình quét QR code, màn hình nhập thủ công thông tin thiết bị<br>
+                                        <strong>Backend:</strong> API thêm thiết bị mới, validate thông tin thiết bị
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="3">Kết nối WiFi</td>
+                                    <td>Theo phương pháp nào, gồm phần bluetooth, truyền nhận data bao gồm ssid password?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Màn hình cấu hình WiFi, nhập SSID và password<br>
+                                        <strong>Backend:</strong> API gửi cấu hình WiFi đến thiết bị qua Bluetooth hoặc WiFi AP mode
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td>Có cần check thiết bị kết nối thành công không?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Hiển thị trạng thái kết nối, thông báo kết quả<br>
+                                        <strong>Backend:</strong> API kiểm tra trạng thái kết nối thiết bị
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td>Có WiFi static không?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Màn hình cấu hình IP tĩnh (IP, Subnet, Gateway, DNS)<br>
+                                        <strong>Backend:</strong> API lưu và gửi cấu hình IP tĩnh đến thiết bị
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+
+                        <h4>Yêu Cầu 5: Lưu dữ liệu 3 tháng trên server. Lưu theo cảnh báo và timeout setup</h4>
+                        <div class="pricing-table-wrapper">
+                        <table class="pricing-table detailed-table">
+                            <thead>
+                                <tr>
+                                    <th>Hạng Mục</th>
+                                    <th>Câu Hỏi Cần Làm Rõ</th>
+                                    <th>Mô Tả</th>
+                                    <th>Báo Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Timeout setup</td>
+                                    <td>Timeout cho từng loại dữ liệu là bao nhiêu? Có thể tùy chỉnh không?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Thiết kế màn hình cấu hình timeout cho việc lưu trữ dữ liệu và cảnh báo<br>
+                                        <strong>Backend:</strong> API lưu cấu hình timeout, xử lý logic timeout cho từng loại dữ liệu
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+
+                        <h4>Yêu Cầu 6: 1 user chính giám sát 1 device A, vài user phụ có thể cùng giám sát</h4>
+                        <div class="pricing-table-wrapper">
+                        <table class="pricing-table detailed-table">
+                            <thead>
+                                <tr>
+                                    <th>Hạng Mục</th>
+                                    <th>Câu Hỏi Cần Làm Rõ</th>
+                                    <th>Mô Tả</th>
+                                    <th>Báo Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Chia sẻ thiết bị</td>
+                                    <td>1 màn hình chia sẻ thiết bị cho user phụ. Cách share như thế nào? Ví dụ share qua email hoặc QR</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Màn hình chia sẻ thiết bị, hiển thị QR code, nhập email để share<br>
+                                        <strong>Backend:</strong> API tạo link/QR code chia sẻ, gửi email mời, quản lý quyền truy cập user phụ
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+
+                        <h4>Yêu Cầu 7: Chức năng gửi mail khi có alarm (có thể set alarm, nội dung) và set tối đa 5 email, trên 1 user</h4>
+                        <div class="pricing-table-wrapper">
+                        <table class="pricing-table detailed-table">
+                            <thead>
+                                <tr>
+                                    <th>Hạng Mục</th>
+                                    <th>Câu Hỏi Cần Làm Rõ</th>
+                                    <th>Mô Tả</th>
+                                    <th>Báo Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Màn hình set email</td>
+                                    <td>Có thể tùy chỉnh nội dung email không? Template email như thế nào?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> Thiết kế màn hình quản lý danh sách email nhận cảnh báo với tối đa 5 email, tùy chỉnh nội dung email<br>
+                                        <strong>Backend:</strong> API lưu danh sách email, lưu template email
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                                <tr>
+                                    <td>Server gửi email</td>
+                                    <td>Dùng email service nào? SMTP server riêng hay third-party?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> -<br>
+                                        <strong>Backend:</strong> Phát triển hệ thống gửi email tự động từ server khi có cảnh báo, tích hợp SMTP hoặc email service
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+
+                        <h4>Yêu Cầu 8: Hỗ trợ kết nối MQTT cho wifi và sim</h4>
+                        <div class="pricing-table-wrapper">
+                        <table class="pricing-table detailed-table">
+                            <thead>
+                                <tr>
+                                    <th>Hạng Mục</th>
+                                    <th>Câu Hỏi Cần Làm Rõ</th>
+                                    <th>Mô Tả</th>
+                                    <th>Báo Giá</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Firmware</td>
+                                    <td>MQTT broker nào? QoS level? Có cần retain message không?</td>
+                                    <td>
+                                        <strong>Frontend:</strong> -<br>
+                                        <strong>Backend/Firmware:</strong> Phát triển firmware ESP32 hỗ trợ MQTT qua WiFi và SIM với các tính năng: connect, disconnect, publish, subscribe, reconnect, QoS handling
+                                    </td>
+                                    <td>✓</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                        <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+
+                            <h3 id="design-layout" style="margin: 0;">Giai đoạn 3: Design layout và mô tả các tính năng hệ thống.</h3>
+                            <a href="design-gallery.html" style="display: inline-flex; align-items: center; gap: 0.5rem; color: #111; font-weight: 600; text-decoration: none; padding: 0.6rem 1.2rem; background: #f0f0f0; border-radius: 8px; transition: background 0.3s; white-space: nowrap; font-size: 0.85rem;" onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='#f0f0f0'">
+                                <i class="fas fa-images"></i> Xem toàn bộ design
+                            </a>
+                        </div>
+                        
+                        <div id="image-carousel" style="max-width: 800px; margin: 1.5rem auto; padding: 15px;">
+                            <div id="carousel-container" style="display: flex; align-items: center; justify-content: center; gap: 15px; position: relative; cursor: grab; user-select: none;">
+                                <button id="prev-arrow" style="background: rgba(0,0,0,0.6); color: white; border: none; width: 36px; height: 36px; padding: 0; border-radius: 50%; cursor: pointer; font-size: 18px; transition: background 0.3s; z-index: 10; position: relative; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='rgba(0,0,0,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.6)'">‹</button>
+                                <div id="carousel-track" style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+                                </div>
+                                <button id="next-arrow" style="background: rgba(0,0,0,0.6); color: white; border: none; width: 36px; height: 36px; padding: 0; border-radius: 50%; cursor: pointer; font-size: 18px; transition: background 0.3s; z-index: 10; position: relative; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='rgba(0,0,0,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.6)'">›</button>
+                            </div>
+                            <p id="image-caption" style="margin-top: 1.5rem; color: #666; font-size: 0.85rem; text-align: center; font-weight: 500;">Home Layout</p>
+                            <div style="margin-top: 1rem; text-align: center;">
+                                <div id="dots-indicator" style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <style>
+                            .carousel-item {
+                                flex-shrink: 0;
+                                transition: opacity 0.3s ease, width 0.3s ease;
+                                cursor: pointer;
+                                display: none;
+                            }
+                            .carousel-item.active {
+                                display: block;
+                                opacity: 1;
+                                z-index: 2;
+                            }
+                            .carousel-item.prev, .carousel-item.next {
+                                display: none;
+                            }
+                            .carousel-item img {
+                                border-radius: 8px;
+                                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                                display: block;
+                                pointer-events: none;
+                                transition: width 0.3s ease, opacity 0.3s ease;
+                            }
+                            .carousel-item.active img {
+                                width: 220px;
+                                height: auto;
+                            }
+                            #carousel-container:active {
+                                cursor: grabbing;
+                            }
+                            .dot {
+                                width: 8px;
+                                height: 8px;
+                                border-radius: 50%;
+                                background: #ccc;
+                                cursor: pointer;
+                                transition: background 0.3s ease, transform 0.3s ease;
+                                border: none;
+                                padding: 0;
+                            }
+                            .dot:hover {
+                                background: #999;
+                                transform: scale(1.2);
+                            }
+                            .dot.active {
+                                background: #111;
+                                transform: scale(1.3);
+                            }
+                        </style>
+                        <h3 id="demo-product" style="margin: 0;">Giai đoạn 4: Code sản phẩm, demo sản phẩm thực tế</h3>
+                        <p style="margin-top: 1rem; line-height: 1.6; color: #333;">
+                            Giai đoạn này tập trung vào việc triển khai và kiểm thử sản phẩm thực tế. Chúng tôi sẽ:
+                        </p>
+                        <ul style="margin-top: 0.75rem; margin-left: 1.5rem; line-height: 1.8; color: #333;">
+                            <li><strong>Triển khai lên môi trường test:</strong> Website, APP và hệ thống backend sẽ được deploy lên test environment để khách hàng có thể truy cập và kiểm tra.</li>
+                            <li><strong>Cung cấp hardware đã được nạp code:</strong> Board mạch (ESP32) đã được nạp firmware sẵn, sẵn sàng để kết nối và test ngay.</li>
+                            <li><strong>Tài liệu hướng dẫn sử dụng:</strong> Cung cấp tài liệu hướng dẫn chi tiết về cách sử dụng hệ thống, kết nối thiết bị và các tính năng cho khách hàng.</li>
+                            <li><strong>Hỗ trợ test và feedback:</strong> Đồng hành cùng khách hàng trong quá trình test, thu thập phản hồi và điều chỉnh nếu cần thiết.</li>
+                        </ul>
+                        <p style="margin-top: 1rem; line-height: 1.6; color: #333;">
+                            Sau khi khách hàng xác nhận hoàn tất và hài lòng với sản phẩm, chúng tôi sẽ tiến hành <strong>release sản phẩm chính thức</strong> lên production environment.
+                        </p>
+                        <h3 id="release-product" style="margin: 0;">Giai đoạn 5: Release sản phẩm chính thức</h3>
+                        <p style="margin-top: 1rem; line-height: 1.6; color: #333;">
+                            Giai đoạn này tập trung vào việc release sản phẩm chính thức. Chúng tôi sẽ:
+                        </p>
+                        <ul style="margin-top: 0.75rem; margin-left: 1.5rem; line-height: 1.8; color: #333;">
+                            <li><strong>Release sản phẩm chính thức:</strong> Release sản phẩm chính thức lên production environment.</li>
+                            <li><strong>Bàn giao layout, source code, tài liệu:</strong> Bàn giao layout, source code, tài liệu cho khách hàng.</li>
+                            <li><strong>Hỗ trợ test và feedback:</strong> Đồng hành cùng khách hàng thu thập phản hồi và hỗ trợ bảo hành.</li>
+                            <li><strong>Hỗ trợ thêm: </strong>Bàn giao những thứ khách hàng yêu cầu thêm nếu có (yêu cầu từ ban đầu và được duyệt).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Gemify</h3>
+                    <p>Gemify Technology – Let's Build Something Amazing</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="../index.html#home">Home</a></li>
+                        <li><a href="../index.html#products">Products</a></li>
+                        <li><a href="../index.html#about">About</a></li>
+                        <li><a href="../index.html#services">Services</a></li>
+                        <li><a href="../blog.html">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Follow Me</h4>
+                    <div class="social-links">
+                        <a href="https://github.com/s2nmt"><i class="fab fa-github"></i></a>
+                        <a href="https://www.youtube.com/@yourchannel"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.linkedin.com/in/yourprofile"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.tiktok.com/@gemify_technology"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Gemify. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('.toc-list a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    const headerOffset = 100;
+                    const elementPosition = targetElement.offsetTop;
+                    const offsetPosition = elementPosition - headerOffset;
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Highlight active section in TOC when scrolling
+        const sections = document.querySelectorAll('h2[id], h3[id]');
+        const tocLinks = document.querySelectorAll('.toc-list a');
+
+        function updateActiveLink() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveLink);
+        updateActiveLink();
+
+        // Image carousel functionality with drag/swipe
+        const images = [
+            { src: '../img/price_processing/home.png', caption: 'Home Layout' },
+            { src: '../img/price_processing/temperature.png', caption: 'Temperature Feature' },
+            { src: '../img/price_processing/humidity.png', caption: 'Humidity Feature' },
+            { src: '../img/price_processing/warning.png', caption: 'Warning Feature' }
+        ];
+        
+        let currentImageIndex = 0;
+        const carouselTrack = document.getElementById('carousel-track');
+        const imageCaption = document.getElementById('image-caption');
+        const carouselContainer = document.getElementById('carousel-container');
+        
+        let isDragging = false;
+        let startX = 0;
+        let currentX = 0;
+        let offsetX = 0;
+
+        // Create carousel items
+        function createCarouselItems() {
+            carouselTrack.innerHTML = '';
+            images.forEach((image, index) => {
+                const item = document.createElement('div');
+                item.className = 'carousel-item';
+                item.dataset.index = index;
+                
+                const img = document.createElement('img');
+                img.src = image.src;
+                img.alt = image.caption;
+                
+                item.appendChild(img);
+                carouselTrack.appendChild(item);
+            });
+            createDots();
+            updateCarousel();
+        }
+
+        function createDots() {
+            const dotsContainer = document.getElementById('dots-indicator');
+            dotsContainer.innerHTML = '';
+            images.forEach((image, index) => {
+                const dot = document.createElement('button');
+                dot.className = 'dot';
+                if (index === currentImageIndex) {
+                    dot.classList.add('active');
+                }
+                dot.setAttribute('aria-label', `Go to ${image.caption}`);
+                dot.addEventListener('click', () => goToImage(index));
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        function updateCarousel() {
+            const items = carouselTrack.querySelectorAll('.carousel-item');
+            const prevIndex = (currentImageIndex - 1 + images.length) % images.length;
+            const nextIndex = (currentImageIndex + 1) % images.length;
+            
+            items.forEach((item) => {
+                item.classList.remove('active', 'prev', 'next');
+                
+                const itemIndex = parseInt(item.dataset.index);
+                
+                if (itemIndex === currentImageIndex) {
+                    item.classList.add('active');
+                } else if (itemIndex === prevIndex) {
+                    item.classList.add('prev');
+                } else if (itemIndex === nextIndex) {
+                    item.classList.add('next');
+                }
+            });
+            
+            imageCaption.textContent = images[currentImageIndex].caption;
+            
+            // Update dots
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentImageIndex);
+            });
+        }
+
+        function goToImage(index) {
+            currentImageIndex = (index + images.length) % images.length;
+            updateCarousel();
+        }
+
+        function goToNext() {
+            goToImage(currentImageIndex + 1);
+        }
+
+        function goToPrev() {
+            goToImage(currentImageIndex - 1);
+        }
+
+        // Arrow button navigation
+        const prevArrow = document.getElementById('prev-arrow');
+        const nextArrow = document.getElementById('next-arrow');
+        
+        prevArrow.addEventListener('click', function(e) {
+            e.stopPropagation();
+            goToPrev();
+        });
+        
+        nextArrow.addEventListener('click', function(e) {
+            e.stopPropagation();
+            goToNext();
+        });
+
+        // Click on side images
+        carouselTrack.addEventListener('click', function(e) {
+            const item = e.target.closest('.carousel-item');
+            if (item && !item.classList.contains('active')) {
+                const index = parseInt(item.dataset.index);
+                goToImage(index);
+            }
+        });
+
+        // Drag functionality
+        carouselContainer.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            startX = e.clientX;
+            carouselContainer.style.cursor = 'grabbing';
+        });
+
+        carouselContainer.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            currentX = e.clientX;
+            offsetX = currentX - startX;
+        });
+
+        carouselContainer.addEventListener('mouseup', function() {
+            if (!isDragging) return;
+            isDragging = false;
+            carouselContainer.style.cursor = 'grab';
+            
+            const threshold = 50;
+            if (Math.abs(offsetX) > threshold) {
+                if (offsetX > 0) {
+                    goToPrev();
+                } else {
+                    goToNext();
+                }
+            }
+            offsetX = 0;
+        });
+
+        carouselContainer.addEventListener('mouseleave', function() {
+            if (isDragging) {
+                isDragging = false;
+                carouselContainer.style.cursor = 'grab';
+                offsetX = 0;
+            }
+        });
+
+        // Touch support for mobile
+        carouselContainer.addEventListener('touchstart', function(e) {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+        });
+
+        carouselContainer.addEventListener('touchmove', function(e) {
+            if (!isDragging) return;
+            currentX = e.touches[0].clientX;
+            offsetX = currentX - startX;
+        });
+
+        carouselContainer.addEventListener('touchend', function() {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            const threshold = 50;
+            if (Math.abs(offsetX) > threshold) {
+                if (offsetX > 0) {
+                    goToPrev();
+                } else {
+                    goToNext();
+                }
+            }
+            offsetX = 0;
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                goToPrev();
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                goToNext();
+            }
+        });
+
+        // Initialize carousel
+        createCarouselItems();
+    </script>
+</body>
+</html>
+

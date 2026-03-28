@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public MQTTS on ESP32 | Gemify Blog</title>
+    <link rel="icon" type="image/png" href="../img/flagVN.png">
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: #fff;
+            color: #111;
+        }
+        .article-page {
+            padding: 100px 0 80px;
+        }
+        .article-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+        }
+        .article-wrapper {
+            display: grid;
+            grid-template-columns: 200px 1fr 200px;
+            gap: 2rem;
+            position: relative;
+            padding: 0 20px;
+        }
+        .article-toc {
+            position: sticky;
+            top: 90px;
+            align-self: start;
+            height: fit-content;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding-right: 1rem;
+            margin-left: -20px;
+            padding-left: 20px;
+        }
+        .toc-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .toc-item {
+            margin-bottom: 0.4rem;
+        }
+        .toc-item a {
+            display: block;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.8rem;
+            padding: 0.3rem 0;
+            transition: color 0.3s ease;
+            border-left: 2px solid transparent;
+            padding-left: 0.5rem;
+            line-height: 1.4;
+        }
+        .toc-item a:hover,
+        .toc-item a.active {
+            color: #111;
+            border-left-color: #111;
+            font-weight: 600;
+        }
+        .toc-item.toc-level-2 a {
+            font-weight: 500;
+        }
+        .toc-item.toc-level-3 a {
+            font-size: 0.75rem;
+            padding-left: 1rem;
+            color: #888;
+        }
+        .article-main {
+            max-width: 100%;
+            padding: 0;
+        }
+        .article-sidebar {
+            position: sticky;
+            top: 90px;
+            align-self: start;
+            height: fit-content;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+            display: flex;
+            flex-direction: column;
+        }
+        .article-sidebar::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        .article-sidebar .article-footer-section h4 {
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+        @media (max-width: 1024px) {
+            .article-wrapper {
+                grid-template-columns: 1fr;
+            }
+            .article-toc {
+                display: none;
+            }
+            .article-sidebar {
+                display: none;
+            }
+        }
+        .article-header {
+            margin-bottom: 3rem;
+        }
+        .article-meta {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .article-category {
+            background: #111;
+            color: #fff;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .article-date {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .article-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #111;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+        .article-featured-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        .article-content {
+            line-height: 1.8;
+            font-size: 1.05rem;
+            color: #333;
+        }
+        .article-content h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            color: #111;
+        }
+        .article-content h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 0.8rem;
+            color: #111;
+        }
+        .article-content p {
+            margin-bottom: 1.5rem;
+        }
+        .article-content ul, .article-content ol {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        .article-content li {
+            margin-bottom: 0.5rem;
+        }
+        .article-content img {
+            width: 100%;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+        .article-content code {
+            background: #f5f5f5;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #d63384;
+        }
+        .article-content pre {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid #e5e5e5;
+        }
+        .article-content pre code {
+            background: none;
+            padding: 0;
+            color: #333;
+            font-size: 0.95em;
+        }
+        .article-footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e5e5;
+        }
+        .article-navigation {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        .nav-prev,
+        .nav-next {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid #e5e5e5;
+        }
+        .nav-prev:hover,
+        .nav-next:hover {
+            background: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .nav-prev {
+            text-align: left;
+        }
+        .nav-next {
+            text-align: right;
+            flex-direction: row-reverse;
+        }
+        .nav-arrow {
+            width: 40px;
+            height: 40px;
+            background: #111;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+        .nav-prev:hover .nav-arrow,
+        .nav-next:hover .nav-arrow {
+            transform: scale(1.1);
+        }
+        .nav-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .nav-label {
+            display: block;
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+        .nav-title {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #111;
+            line-height: 1.4;
+        }
+        @media (max-width: 768px) {
+            .article-navigation {
+                grid-template-columns: 1fr;
+            }
+            .nav-next {
+                flex-direction: row;
+                text-align: left;
+            }
+        }
+        .article-footer-section {
+            margin-bottom: 1.5rem;
+        }
+        .article-footer-section h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #111;
+            margin-bottom: 1rem;
+        }
+        .back-to-blog {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #111;
+            font-weight: 600;
+            text-decoration: none;
+            transition: gap 0.3s ease;
+        }
+        .back-to-blog:hover {
+            gap: 0.8rem;
+        }
+        .related-articles-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            align-items: stretch;
+        }
+        .related-article-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid #e5e5e5;
+            display: flex;
+            flex-direction: column;
+        }
+        .related-article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .related-article-image {
+            width: 100%;
+            height: 80px;
+            overflow: hidden;
+            background: #f3f3f3;
+        }
+        .related-article-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .related-article-card:hover .related-article-image img {
+            transform: scale(1.05);
+        }
+        .related-article-content {
+            padding: 0.5rem;
+        }
+        .related-article-content h5 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #111;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .sidebar-ad {
+            margin-top: auto;
+            padding: 0;
+            background: transparent;
+            color: #111;
+            text-align: left;
+        }
+        .sidebar-ad h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            color: #111;
+        }
+        .sidebar-ad p {
+            font-size: 0.85rem;
+            margin: 0;
+            line-height: 1.4;
+            color: #666;
+            text-align: left;
+        }
+        @media (max-width: 768px) {
+            .article-title {
+                font-size: 2rem;
+            }
+            .article-featured-image {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-container">
+                <div class="logo">
+                    <a href="../index.html"><h1>Gemify</h1></a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="../index.html#home" data-translate="nav.home">Home</a></li>
+                    <li><a href="../index.html#products" data-translate="nav.products">Products</a></li>
+                    <li><a href="../index.html#about" data-translate="nav.about">About</a></li>
+                    <li><a href="../index.html#services" data-translate="nav.services">Services</a></li>
+                    <li><a href="../blog.html" data-translate="nav.blog">Blog</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <article class="article-page">
+            <div class="article-container">
+                <div class="article-wrapper">
+                    <aside class="article-toc">
+                        <div class="toc-title">Table of Contents</div>
+                        <ul class="toc-list" id="toc-list"></ul>
+                    </aside>
+
+                    <div class="article-main">
+                        <header class="article-header">
+                            <h1 class="article-title">Public MQTTS on ESP32</h1>
+                        </header>
+
+                        <img src="../img/post3/cover.png" alt="Public MQTTS on ESP32" class="article-featured-image">
+
+                        <div class="article-content">
+                            <p>MQTTS (MQTT over TLS/SSL) is a secure version of the MQTT protocol, perfect for IoT devices that need encrypted communication. ESP32 can easily connect to public MQTT brokers using MQTTS to publish sensor data and subscribe to commands securely. In this tutorial, we'll learn how to implement MQTTS publish and subscribe on ESP32 with TLS/SSL encryption.</p>
+
+                            <h2 id="what-is-mqtt-esp32">What is MQTTS on ESP32?</h2>
+                            <p>MQTTS on ESP32 allows your device to communicate securely with other devices and servers over the internet using TLS/SSL encryption. You can publish sensor data to topics and subscribe to command topics to control your device remotely with encrypted connections. This is essential for IoT applications where security is important.</p>
+
+                            <h2 id="installing-libraries">Installing Required Libraries</h2>
+                            <p>First, install the required libraries in Arduino IDE:</p>
+
+                            <pre><code>PubSubClient</code></pre>
+
+                            <p>You can install these from the Library Manager in Arduino IDE (Sketch → Include Library → Manage Libraries).</p>
+
+                            <h3 id="step-1-wifi-connection">Step 1: WiFi Connection Setup</h3>
+                            <p>Create a file and add the WiFi connection function:</p>
+
+                            <pre><code>#include &lt;WiFi.h&gt;
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
+
+void setup_wifi() {
+  Serial.print("Connecting WiFi");
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.print(".");
+  }
+  Serial.println(" connected");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+}</code></pre>
+
+                            <h3 id="step-2-mqtts-setup">Step 2: MQTTS Setup with Increased Buffer</h3>
+                            <p>Configure MQTTS client with increased buffer size for larger messages:</p>
+
+                            <pre><code>#include &lt;WiFiClientSecure.h&gt;
+#include &lt;PubSubClient.h&gt;
+
+const char* mqtt_host = "your-mqtt-broker.com";
+const int mqtt_port = 8883; // MQTTS port (8883 for TLS/SSL)
+const char* deviceId = "esp32_device_01";
+
+WiFiClientSecure net;
+PubSubClient mqtt(net);
+
+void setup() {
+  Serial.begin(115200);
+  
+  setup_wifi();
+  
+  // Set insecure for self-signed certificates
+  net.setInsecure();
+  
+  // Configure MQTTS with increased buffer
+  mqtt.setServer(mqtt_host, mqtt_port);
+  mqtt.setCallback(callback);
+  mqtt.setBufferSize(2048); // Increase buffer to 2048 bytes for larger messages
+}</code></pre>
+
+                            <h3 id="step-3-mqtts-reconnect">Step 3: MQTTS Reconnect Function with LWT</h3>
+                            <p>Create a reconnect function with Last Will and Testament (LWT) to publish status when device disconnects:</p>
+
+                            <pre><code>void reconnect() {
+  while (!mqtt.connected()) {
+    Serial.print("Connecting MQTTS...");
+    
+    // LWT JSON string
+    const char* lwtPayload = "lwtPayload";
+    if (mqtt.connect(
+        deviceId,              // clientId
+        nullptr,               // user
+        nullptr,               // pass
+        "/data/esp32_device_01", // LWT topic
+        0,                     // QoS
+        true,                  // retain
+        lwtPayload             // LWT message
+    )) {
+      Serial.println(" connected");
+      mqtt.subscribe("/cmd/esp32_device_01");
+    } else {
+      Serial.print(" failed, rc=");
+      Serial.println(mqtt.state());
+      delay(2000);
+    }
+  }
+}</code></pre>
+
+                            <h3 id="step-4-publish-data">Step 4: Publish Data Function</h3>
+                            <p>Create a function to publish simple message to MQTTS topic:</p>
+
+                            <pre><code>void publishData() {
+  // Simple message to publish
+  const char* message = "hello world";
+  const char* topic = "/data/esp32_device_01";
+  
+  // Publish to data topic
+  bool published = mqtt.publish(topic, message, true); // true = retain message
+  
+  if (published) {
+    Serial.print("Published: ");
+    Serial.println(message);
+  } else {
+    Serial.println("Publish failed");
+  }
+}</code></pre>
+
+                            <h3 id="step-5-subscribe-callback">Step 5: Subscribe Callback with Last Message</h3>
+                            <p>Create callback function to handle incoming messages and store last message:</p>
+
+                            <pre><code>void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("]: ");
+  
+  char message[length + 1];
+  for (int i = 0; i &lt; length; i++) {
+    message[i] = (char)payload[i];
+  }
+  message[length] = '\0';
+  
+  Serial.println(message);
+}</code></pre>
+
+                            <h3 id="step-6-main-loop">Step 6: Main Loop</h3>
+                            <p>Implement the main loop to maintain connection and publish data periodically:</p>
+
+                            <pre><code>void loop() {
+  // Maintain MQTTS connection
+  if (!mqtt.connected()) {
+    reconnect();
+  }
+  mqtt.loop();
+}</code></pre>
+
+                            <h2 id="complete-example">Complete Example</h2>
+                            <p>Here's the complete code combining all parts:</p>
+
+                            <pre><code>#include &lt;WiFi.h&gt;
+#include &lt;WiFiClientSecure.h&gt;
+#include &lt;PubSubClient.h&gt;
+
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
+
+const char* mqtt_host = "your-mqtt-broker.com";
+const int mqtt_port = 8883;
+const char* deviceId = "esp32_device_01";
+
+WiFiClientSecure net;
+PubSubClient mqtt(net);
+
+void setup_wifi() {
+  Serial.print("Connecting WiFi");
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.print(".");
+  }
+  Serial.println(" connected");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
+void reconnect() {
+  while (!mqtt.connected()) {
+    Serial.print("Connecting MQTTS...");
+    
+    const char* lwtPayload = "lwtPayload";
+    if (mqtt.connect(
+        deviceId,
+        nullptr,
+        nullptr,
+        "/data/esp32_device_01",
+        0,
+        true,
+        lwtPayload
+    )) {
+      Serial.println(" connected");
+      mqtt.subscribe("/cmd/esp32_device_01");
+    } else {
+      Serial.print(" failed, rc=");
+      Serial.println(mqtt.state());
+      delay(2000);
+    }
+  }
+}
+
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("]: ");
+  
+  char message[length + 1];
+  for (int i = 0; i &lt; length; i++) {
+    message[i] = (char)payload[i];
+  }
+  message[length] = '\0';
+  
+  Serial.println(message);
+}
+
+void publishData() {
+  const char* message = "hello world";
+  const char* topic = "/data/esp32_device_01";
+  mqtt.publish(topic, message, true);
+  Serial.print("Published: ");
+  Serial.println(message);
+}
+
+void setup() {
+  Serial.begin(115200);
+  
+  setup_wifi();
+  net.setInsecure();
+  
+  mqtt.setServer(mqtt_host, mqtt_port);
+  mqtt.setCallback(callback);
+  mqtt.setBufferSize(2048);
+}
+
+void loop() {
+  if (!mqtt.connected()) {
+    reconnect();
+  }
+  mqtt.loop();
+}</code></pre>
+
+                            <h2 id="key-features">Key Features</h2>
+                            <ul>
+                                <li><strong>MQTTS Secure Connection:</strong> Using WiFiClientSecure with TLS/SSL encryption on port 8883</li>
+                                <li><strong>Increased Buffer Size:</strong> Set buffer to 2048 bytes using <code>mqtt.setBufferSize(2048)</code> to handle larger messages</li>
+                                <li><strong>LWT (Last Will and Testament):</strong> When device disconnects, automatically publish JSON status message <code>lwtPayload</code> to notify the broker</li>
+                                <li><strong>Simple Publish:</strong> Publish "hello world" message to MQTTS topic</li>
+                                <li><strong>Retained Messages:</strong> Using <code>true</code> parameter in publish to retain messages on the broker</li>
+                                <li><strong>Automatic Reconnection:</strong> The reconnect function ensures the device stays connected to the MQTTS broker</li>
+                            </ul>
+
+                            <p>Congratulations! Your ESP32 can now publish "hello world" messages and subscribe to commands using MQTTS. The secure TLS/SSL connection ensures encrypted communication, and the LWT feature automatically notifies the broker when the device disconnects.</p>
+                        </div>
+                        <div class="article-meta">
+                            <span class="article-category">Tutorial</span>
+                            <span class="article-date">
+                                <i class="far fa-calendar"></i>
+                                <span>by Tuan Nguyen | Jan 22, 2025</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <aside class="article-sidebar">
+                        <div class="article-footer-section">
+                            <h4>Related Articles</h4>
+                            <div class="related-articles-grid" style="grid-template-columns: 1fr; gap: 1rem;">
+                            <a href="post5.html" class="related-article-card">
+                                <div class="related-article-image">
+                                    <img src="../img/post5/cover.png" alt="MQTTS in A76xx">
+                                </div>
+                                <div class="related-article-content">
+                                    <h5>MQTTS in A76xx</h5>
+                                </div>
+                            </a>
+                            <a href="post4.html" class="related-article-card">
+                                <div class="related-article-image">
+                                    <img src="../img/post4/cover.png" alt="MQTTS on W5500 and ESP32">
+                                </div>
+                                <div class="related-article-content">
+                                    <h5>MQTTS on W5500 and ESP32</h5>
+                                </div>
+                            </a>
+                            <a href="post2.html" class="related-article-card">
+                                <div class="related-article-image">
+                                    <img src="../img/post2/cover.png" alt="How to Send Email Using Node.js">
+                                </div>
+                                <div class="related-article-content">
+                                    <h5>How to Send Email Using Node.js</h5>
+                                </div>
+                            </a>
+                             </div>
+                         </div>
+                         
+                         <div class="sidebar-ad">
+                             <h4>Our Services</h4>
+                             <p>Gemify provides embedded systems and IoT solutions.</p>
+                         </div>
+                     </aside>
+                    
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Gemify</h3>
+                    <p data-translate="footer.tagline">Gemify Technology – Let's Build Something Amazing</p>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.follow">Follow Me</h4>
+                    <div class="social-links">
+                        <a href="https://github.com/s2nmt"><i class="fab fa-github"></i></a>
+                        <a href="https://www.youtube.com/@yourchannel"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.linkedin.com/in/yourprofile"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.tiktok.com/@gemify_technology"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.contact">Contact</h4>
+                    <p data-translate="contact.desc" style="color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem; font-size: 0.9rem;">Interested in a custom project or have questions about my products? I'd love to hear from you!</p>
+                    <div class="footer-contact">
+                        <div class="footer-contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>Gemifyvn@gmail.com</span>
+                        </div>
+                        <div class="footer-contact-item">
+                            <i class="fas fa-phone"></i>
+                            <span>+84 123-4567</span>
+                        </div>
+                        <div class="footer-contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Ho Chi Minh City, Viet Nam</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p data-translate="footer.copyright">&copy; 2025 Gemify. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Generate Table of Contents
+        document.addEventListener('DOMContentLoaded', () => {
+            const tocList = document.getElementById('toc-list');
+            const articleContent = document.querySelector('.article-content');
+            const headings = articleContent.querySelectorAll('h2, h3');
+            
+            headings.forEach((heading, index) => {
+                // Generate ID if not exists
+                if (!heading.id) {
+                    heading.id = heading.textContent.toLowerCase()
+                        .replace(/[^a-z0-9]+/g, '-')
+                        .replace(/^-|-$/g, '');
+                }
+                
+                // Create TOC item
+                const tocItem = document.createElement('li');
+                tocItem.className = `toc-item toc-level-${heading.tagName.toLowerCase()}`;
+                
+                const tocLink = document.createElement('a');
+                tocLink.href = `#${heading.id}`;
+                tocLink.textContent = heading.textContent;
+                
+                // Smooth scroll with offset for header
+                tocLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = document.getElementById(heading.id);
+                    if (target) {
+                        const headerHeight = 70; // Height of sticky header
+                        const offset = 20; // Additional offset
+                        const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - offset;
+                        
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+                
+                tocItem.appendChild(tocLink);
+                tocList.appendChild(tocItem);
+            });
+            
+            // Highlight active TOC item on scroll
+            const observerOptions = {
+                root: null,
+                rootMargin: '-100px 0px -66%',
+                threshold: 0
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.id;
+                        const tocLink = tocList.querySelector(`a[href="#${id}"]`);
+                        if (tocLink) {
+                            // Remove active from all
+                            tocList.querySelectorAll('a').forEach(a => a.classList.remove('active'));
+                            // Add active to current
+                            tocLink.classList.add('active');
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            headings.forEach(heading => observer.observe(heading));
+        });
+    </script>
+</body>
+</html>
+

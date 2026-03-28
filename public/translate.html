@@ -221,6 +221,7 @@
                     <li><a href="index.html#products" data-translate="nav.products">Products</a></li>
                     <li><a href="index.html#about" data-translate="nav.about">About</a></li>
                     <li><a href="index.html#services" data-translate="nav.services">Services</a></li>
+                    <li><a href="blog.html" data-translate="nav.blog">Blog</a></li>
                 </ul>
                 <div class="language-switcher">
                     <button class="lang-btn" data-lang="vi">
@@ -254,17 +255,18 @@
             <div class="main-content">
                 <section class="product-section">
                     <h1 class="product-title" data-translate="product.smartclock.title">Smart Desk Clock</h1>
-                    <img src="img/case_cover_smart_parking.png" alt="Product Main Image" class="intro-img">
+                    <img src="img/translate.jpg" alt="Product Main Image" class="intro-img" style="width: 30%; max-width: 30%;">
                     <h2 data-translate="product.intro">Introduction</h2>
                     <p data-translate="product.intro.desc">Introduce your product in detail. What problem does it solve? Who is it for? What makes it special?</p>
                 </section>
                 <section class="product-section">
                     <h2 data-translate="product.specs">Technical Specifications</h2>
                     <ul>
-                        <li><span data-translate="product.specs.processor">Processor</span>: STM32F103, BW16 </li>
-                        <li><span data-translate="product.specs.connectivity">Connectivity</span>: WiFi, RS485</li>
+                        <li><span data-translate="product.specs.processor">Processor</span>: ESP32 </li>
+                        <li><span data-translate="product.specs.connectivity">Connectivity</span>: WiFi, Bluetooth</li>
+                        <li><span data-translate="product.specs.display">Display</span>: fb7789</li>
                         <li><span data-translate="product.specs.power">Power</span>: <span data-translate="product.specs.battery">Rechargeable LiPo battery</span></li>
-                        <li><span data-translate="product.specs.dimensions">Dimensions</span>: 100x80x30mm</li>
+                        <li><span data-translate="product.specs.dimensions">Dimensions</span>: 50x50x20mm</li>
                     </ul>
                 </section>
                 <section class="product-section">
@@ -273,8 +275,10 @@
                 </section>
                 <section class="product-section">
                     <h2 data-translate="product.gallery">Gallery</h2>
-                    <img src="img/case_smart_parking.jpg" alt="Gallery Image 1" style="max-width:100%;border-radius:12px;margin-bottom:1rem;">
-                    <!-- <img src="img/product-detail-2.jpg" alt="Gallery Image 2" style="max-width:100%;border-radius:12px;"> -->
+                    <video controls style="width:30%; height:30%; display:block; margin:0 auto; border-radius:12px; margin-bottom:1rem;">
+                        <source src="img/translatevideo.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
                 </section>
             </div>
         </div>
@@ -304,19 +308,20 @@
     <script>
 const translations = {
     en: {
-        'product.smartclock.title': 'Smart RFID/NFC reader device',
+        'product.smartclock.title': 'Bilingual Book Reader (Android)',
         'product.intro': 'Introduction',
-        'product.intro.desc': 'This is the smart RFID/NFC reader device send data through WiFi and RS485 fit for many applications',
+        'product.intro.desc': 'Introduce your product in detail. What problem does it solve? Who is it for? What makes it special?',
         'product.specs': 'Technical Specifications',
         'product.specs.processor': 'Processor',
         'product.specs.connectivity': 'Connectivity',
         'product.specs.display': 'Display',
         'product.specs.power': 'Power',
-        'product.specs.battery': 'Adapter 12-24V',
+        'product.specs.battery': 'Rechargeable LiPo battery',
         'product.specs.dimensions': 'Dimensions',
         'product.details': 'Project Details',
-        'product.details.desc': 'This is the smart RFID/NFC reader device sned data through WIFI and RS485. The device include reader,\
-         buzzer and signal led. User can integrate into their system easily.',
+        'product.details.desc': 'This is a product created for decorating work/study corners. The device displays information about current time\
+        and weather based on your location. Users can modify the interface as desired. Moreover, we provide open-source code for developers\
+        to develop on Arduino IDE.',
         'product.gallery': 'Gallery',
         'sidebar.title': 'Gemify',
         'sidebar.desc': 'Handcrafted electronics, IoT & embedded systems for makers and engineers. Sharing open-source projects and tutorials.',
@@ -329,21 +334,24 @@ const translations = {
         'nav.products': 'Products',
         'nav.about': 'About',
         'nav.services': 'Services',
+        'nav.blog': 'Blog',
     },
     vi: {
-        'product.smartclock.title': 'Thiết bị đọc thẻ RFID/NFC thông minh',
+        'product.smartclock.title': 'Ứng dụng dịch thông minh trên điện thoại android',
         'product.intro': 'Giới thiệu',
-        'product.intro.desc': 'Đây là thiết bị đọc thẻ RFID/NFC thông minh gửi dữ liệu theo 2 giao thức MQTT và RS485 phù hợp cho nhiều ứng dụng.',
+        'product.intro.desc': 'Đây là một đồng hồ để bàn mini dùng để trang trí cho góc làm việc / học tập trên nên đẹp hơn. Sản phẩm dành cho người dùng thông thường hoặc có thể phát triển tùy ý với mã nguồn mở.',
         'product.specs': 'Thông số kỹ thuật',
         'product.specs.processor': 'Vi xử lý',
         'product.specs.connectivity': 'Kết nối',
         'product.specs.display': 'Màn hình',
         'product.specs.power': 'Nguồn điện',
-        'product.specs.battery': 'Adapter 12-24V',
+        'product.specs.battery': 'Pin LiPo sạc lại được',
         'product.specs.dimensions': 'Kích thước',
         'product.details': 'Chi tiết dự án',
-        'product.details.desc': 'Đây là là thiết bị đọc thẻ RFID/NFC thông minh gửi dữ liệu thông qua WiFi và RS485.\
-         Thiết bị gồm đầu đọc, buzzer và led tín hiệu. Người dùng có thể tích hợp vào hệ thống của mình một cách dễ dàng',
+        'product.details.desc': 'Đây là một sản phẩm được tạo ra với mục đích trang trí góc làm việc/học tập.\
+         Thiết bị hiển thị thông tin về thời gian hiện tại và thời tiết theo khu vực bạn sinh sống.\
+         Người dùng có thể tùy chỉnh giao diện theo ý muốn. Ngoài ra, chúng tôi cung cấp mã nguồn mở\
+         để các nhà phát triển có thể sử dụng và phát triển trên nền tảng Arduino IDE.',
         'product.gallery': 'Thư viện ảnh',
         'sidebar.title': 'Gemify',
         'sidebar.desc': 'Gemify Technology, IoT & hệ thống nhúng cho người dùng và developer. Chia sẻ dự án mã nguồn mở và hướng dẫn sử dụng.',
@@ -356,7 +364,7 @@ const translations = {
         'nav.products': 'Sản phẩm',
         'nav.about': 'Giới thiệu',
         'nav.services': 'Dịch vụ',
-        // Thêm các key khác...
+        'nav.blog': 'Bài viết',
     }
 };
 

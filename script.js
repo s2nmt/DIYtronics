@@ -566,9 +566,20 @@ function switchLanguage(lang) {
             }
         }
     });
-    
-    // Update page title
-    document.title = lang === 'vi' ? 'Gemify - Technology' : 'Gemify - Technology';
+
+    // Bilingual article blocks (e.g. project-articles)
+    document.querySelectorAll('[data-article-lang]').forEach(el => {
+        el.hidden = el.getAttribute('data-article-lang') !== lang;
+    });
+
+    document.documentElement.lang = lang;
+
+    const htmlEl = document.documentElement;
+    if (htmlEl.dataset.pageTitleVi && htmlEl.dataset.pageTitleEn) {
+        document.title = lang === 'vi' ? htmlEl.dataset.pageTitleVi : htmlEl.dataset.pageTitleEn;
+    } else {
+        document.title = 'Gemify - Technology';
+    }
     
     // Update active state of language buttons
     const languageSwitcher = document.querySelector('.language-switcher');

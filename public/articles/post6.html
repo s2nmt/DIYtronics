@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 OTA Firmware Update over HTTPS | Gemify Blog</title>
+    <link rel="icon" type="image/png" href="../img/flagVN.png">
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background: #fff; color: #111; }
+        .article-page { padding: 100px 0 80px; }
+        .article-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+        .article-wrapper { display: grid; grid-template-columns: 200px 1fr 200px; gap: 2rem; position: relative; padding: 0 20px; }
+        .article-toc { position: sticky; top: 90px; align-self: start; height: fit-content; max-height: calc(100vh - 120px); overflow-y: auto; padding-right: 1rem; margin-left: -20px; padding-left: 20px; }
+        .toc-title { font-size: 0.75rem; font-weight: 700; color: #111; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .toc-list { list-style: none; padding: 0; margin: 0; }
+        .toc-item { margin-bottom: 0.4rem; }
+        .toc-item a { display: block; color: #666; text-decoration: none; font-size: 0.8rem; padding: 0.3rem 0; transition: color 0.3s ease; border-left: 2px solid transparent; padding-left: 0.5rem; line-height: 1.4; }
+        .toc-item a:hover, .toc-item a.active { color: #111; border-left-color: #111; font-weight: 600; }
+        .toc-item.toc-level-2 a { font-weight: 500; }
+        .toc-item.toc-level-3 a { font-size: 0.75rem; padding-left: 1rem; color: #888; }
+        .article-main { max-width: 100%; min-width: 0; padding: 0; }
+        .article-sidebar { position: sticky; top: 90px; align-self: start; height: fit-content; max-height: calc(100vh - 120px); overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; display: flex; flex-direction: column; }
+        .article-sidebar::-webkit-scrollbar { display: none; }
+        .article-sidebar .article-footer-section h4 { font-size: 0.8rem; margin-bottom: 0.5rem; }
+        @media (max-width: 1024px) { .article-wrapper { grid-template-columns: 1fr; } .article-toc, .article-sidebar { display: none; } }
+        .article-header { margin-bottom: 3rem; }
+        .article-meta { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; margin-bottom: 1rem; color: #666; font-size: 0.9rem; }
+        .article-category { background: #111; color: #fff; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
+        .article-date { display: flex; align-items: center; gap: 0.5rem; }
+        .article-title { font-size: 2.5rem; font-weight: 800; color: #111; margin-bottom: 1.5rem; line-height: 1.2; }
+        .article-featured-image { width: 100%; height: 400px; object-fit: cover; border-radius: 12px; margin-bottom: 2rem; }
+        .article-content { line-height: 1.8; font-size: 1.05rem; color: #333; }
+        .article-content h2 { font-size: 1.8rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 1rem; color: #111; }
+        .article-content h3 { font-size: 1.4rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.8rem; color: #111; }
+        .article-content p { margin-bottom: 1.5rem; }
+        .article-content ul, .article-content ol { margin-left: 2rem; margin-bottom: 1.5rem; }
+        .article-content li { margin-bottom: 0.5rem; }
+        .article-content img { width: 100%; border-radius: 8px; margin: 2rem 0; }
+        .article-content code { background: #f5f5f5; padding: 0.2rem 0.5rem; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.9em; color: #d63384; }
+        .article-content pre { background: #f8f9fa; padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin: 1.5rem 0; border: 1px solid #e5e5e5; }
+        .article-content pre code { background: none; padding: 0; color: #333; font-size: 0.9em; white-space: pre; }
+        .article-footer-section { margin-bottom: 1.5rem; }
+        .article-footer-section h4 { font-size: 1.1rem; font-weight: 600; color: #111; margin-bottom: 1rem; }
+        .related-articles-grid { display: grid; grid-template-columns: 1fr; gap: 0.5rem; margin-top: 0.5rem; align-items: stretch; }
+        .related-article-card { background: white; border-radius: 8px; overflow: hidden; text-decoration: none; transition: all 0.3s ease; border: 1px solid #e5e5e5; display: flex; flex-direction: column; }
+        .related-article-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); }
+        .related-article-image { width: 100%; height: 80px; overflow: hidden; background: #f3f3f3; }
+        .related-article-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+        .related-article-card:hover .related-article-image img { transform: scale(1.05); }
+        .related-article-content { padding: 0.5rem; }
+        .related-article-content h5 { font-size: 0.75rem; font-weight: 600; color: #111; margin: 0; line-height: 1.2; }
+        .sidebar-ad { margin-top: auto; padding: 0; background: transparent; color: #111; text-align: left; }
+        .sidebar-ad h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.4rem; color: #111; }
+        .sidebar-ad p { font-size: 0.85rem; margin: 0; line-height: 1.4; color: #666; text-align: left; }
+        @media (max-width: 768px) { .article-title { font-size: 2rem; } .article-featured-image { height: 250px; } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-container">
+                <div class="logo"><a href="../index.html"><h1>Gemify</h1></a></div>
+                <ul class="nav-menu">
+                    <li><a href="../index.html#home">Home</a></li>
+                    <li><a href="../index.html#products">Products</a></li>
+                    <li><a href="../index.html#about">About</a></li>
+                    <li><a href="../index.html#services">Services</a></li>
+                    <li><a href="../blog.html">Blog</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <article class="article-page">
+            <div class="article-container">
+                <div class="article-wrapper">
+                    <aside class="article-toc">
+                        <div class="toc-title">Table of Contents</div>
+                        <ul class="toc-list" id="toc-list"></ul>
+                    </aside>
+
+                    <div class="article-main">
+                        <header class="article-header">
+                            <h1 class="article-title">ESP32 OTA Firmware Update over HTTPS</h1>
+                        </header>
+
+                        <img src="../img/post3/cover.png" alt="ESP32 OTA firmware update" class="article-featured-image">
+
+                        <div class="article-content">
+                            <p>Updating ESP32 firmware over the air (OTA) lets you push new versions to devices without USB or physical access. This post walks through a simple OTA flow: the device checks a secure HTTPS URL for a new firmware binary, downloads it if the server says an update is available, writes it with the Arduino <code>Update</code> library, and reboots. We use a Root CA certificate so the ESP32 can verify your server over TLS.</p>
+
+                            <h2 id="what-is-ota">What is OTA (Over-The-Air) Update?</h2>
+                            <p>OTA update means sending new firmware to a device over the network (Wi‑Fi, Ethernet, or cellular) instead of flashing via USB or a programmer. For ESP32, the device downloads a <code>.bin</code> file, writes it to the next app partition (or a dedicated OTA partition), and restarts to run the new code. That’s ideal for deployed or hard-to-reach devices.</p>
+
+                            <h2 id="overview">Overview of the Code</h2>
+                            <p>The sketch does the following:</p>
+                            <ul>
+                                <li>Connects to Wi‑Fi using your SSID and password.</li>
+                                <li>Uses <code>WiFiClientSecure</code> with a Root CA certificate so the HTTPS connection is verified.</li>
+                                <li>Sends a GET request to a firmware URL and passes the current version in a custom header <code>X-Current-Version</code>.</li>
+                                <li>If the server returns <strong>200 OK</strong>, treats the response body as the new firmware: streams it into <code>Update</code>, then reboots on success.</li>
+                                <li>If the server returns <strong>304 Not Modified</strong>, considers the device up to date and skips the update.</li>
+                                <li>Runs the update check periodically in <code>loop()</code> (e.g. every 2 minutes in the example).</li>
+                            </ul>
+
+                            <h2 id="full-sketch">Full Sketch</h2>
+                            <p>Here is the complete ESP32 sketch for OTA over HTTPS with version checking:</p>
+
+<pre><code>#include &lt;WiFi.h&gt;
+#include &lt;HTTPClient.h&gt;
+#include &lt;Update.h&gt;
+#include &lt;WiFiClientSecure.h&gt;
+
+const char* ssid = "your wifi";
+const char* password = "your password";
+const char* firmwareUrl = "https://your_domain/firmware/device_v3.bin";
+const char* currentVersion = "1.0.0";
+
+// Root CA certificate for your server (PEM format)
+// Extract with: openssl s_client -connect your-server.com:443 -showcerts
+const char* rootCACert = R"EOF(
+-----BEGIN CERTIFICATE-----
+-----END CERTIFICATE-----
+)EOF";
+
+void checkForUpdate() {
+    WiFiClientSecure client;
+    client.setCACert(rootCACert);
+
+    HTTPClient https;
+    https.begin(client, firmwareUrl);
+    https.addHeader("X-Current-Version", currentVersion);
+
+    int httpCode = https.GET();
+
+    if (httpCode == HTTP_CODE_OK) {
+        int contentLength = https.getSize();
+        if (contentLength &lt;= 0) {
+            Serial.println("Invalid content length");
+            return;
+        }
+
+        if (!Update.begin(contentLength)) {
+            Serial.println("Not enough space for OTA");
+            return;
+        }
+
+        WiFiClient* stream = https.getStreamPtr();
+        size_t written = Update.writeStream(*stream);
+
+        if (written == contentLength) {
+            Serial.println("Firmware written successfully");
+        } else {
+            Serial.printf("Only wrote %d of %d bytes\n", written, contentLength);
+        }
+
+        if (Update.end()) {
+            if (Update.isFinished()) {
+                Serial.println("Update successful. Rebooting...");
+                ESP.restart();
+            }
+        } else {
+            Serial.printf("Update error: %s\n", Update.errorString());
+        }
+    } else if (httpCode == 304) {
+        Serial.println("Firmware is up to date");
+    } else {
+        Serial.printf("HTTP error: %d\n", httpCode);
+    }
+
+    https.end();
+}
+
+void setup() {
+    Serial.begin(115200);
+    pinMode(2, OUTPUT);
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+    }
+    // checkForUpdate();  // optional: check once at boot
+}
+
+void loop() {
+    static uint32_t lastCheck = 0;
+    if (millis() - lastCheck &gt; 120000) {
+        checkForUpdate();
+        lastCheck = millis();
+    }
+    digitalWrite(2, HIGH);
+    delay(2000);
+    digitalWrite(2, LOW);
+    delay(2000);
+}</code></pre>
+
+                            <h2 id="configuration">What You Need to Configure</h2>
+                            <ul>
+                                <li><strong>ssid / password</strong> — Your Wi‑Fi credentials.</li>
+                                <li><strong>firmwareUrl</strong> — Full HTTPS URL to the firmware binary (e.g. <code>https://your_domain/firmware/device_v3.bin</code>).</li>
+                                <li><strong>currentVersion</strong> — Version string reported to the server in <code>X-Current-Version</code>. The server can compare this and return 304 when no update is needed.</li>
+                                <li><strong>rootCACert</strong> — PEM of the CA that signed your server’s certificate. You can get it with: <code>openssl s_client -connect your-server.com:443 -showcerts</code> and copy the “BEGIN CERTIFICATE” block (usually the server cert or the CA that signed it).</li>
+                            </ul>
+
+                            <h2 id="server-side">Server-Side Behavior</h2>
+                            <p>Your server should:</p>
+                            <ol>
+                                <li>Accept GET requests to the firmware URL.</li>
+                                <li>Read the <code>X-Current-Version</code> header.</li>
+                                <li>If that version is already the latest, respond with <strong>304 Not Modified</strong> and no body (saves bandwidth and flash wear).</li>
+                                <li>If a newer build exists, respond with <strong>200 OK</strong>, <code>Content-Length</code> set to the binary size, and the <code>.bin</code> file as the body.</li>
+                            </ol>
+                            <p>That way the ESP32 only downloads and flashes when there is actually a new version.</p>
+
+                            <h2 id="building-firmware">Building the Firmware Binary</h2>
+                            <p>In Arduino IDE: <strong>Sketch → Export compiled Binary</strong>. The <code>.bin</code> is created in the sketch folder. Upload this file to your server at the path used in <code>firmwareUrl</code>. For PlatformIO, the built binary is typically under <code>.pio/build/&lt;env&gt;/firmware.bin</code>; use the same file (or a renamed copy) on the server.</p>
+
+                            <h2 id="security-notes">Security and Best Practices</h2>
+                            <ul>
+                                <li><strong>HTTPS and Root CA</strong> — Using <code>setCACert(rootCACert)</code> ensures the ESP32 only talks to a server that presents a certificate signed by your CA, which reduces man-in-the-middle risk.</li>
+                                <li><strong>Version header</strong> — Sending <code>X-Current-Version</code> and having the server return 304 when up to date avoids unnecessary downloads and flash writes.</li>
+                                <li><strong>Check interval</strong> — The example checks every 2 minutes (<code>120000</code> ms). For production you might use a longer interval (e.g. 24 hours) or trigger updates via a message (e.g. MQTT) instead of polling.</li>
+                                <li><strong>First flash</strong> — The first time you flash the device you must use USB/serial; after that, OTA can deliver all future updates.</li>
+                            </ul>
+
+                            <p>With this setup, your ESP32 can securely check for and install firmware updates over HTTPS without physical access.</p>
+                        </div>
+                        <div class="article-meta">
+                            <span class="article-category">Tutorial</span>
+                            <span class="article-date"><i class="far fa-calendar"></i><span>by Tuan Nguyen | Mar 3, 2025</span></span>
+                        </div>
+                    </div>
+
+                    <aside class="article-sidebar">
+                        <div class="article-footer-section">
+                            <h4>Related Articles</h4>
+                            <div class="related-articles-grid" style="grid-template-columns: 1fr; gap: 1rem;">
+                                <a href="post5.html" class="related-article-card">
+                                    <div class="related-article-image"><img src="../img/post5/cover.png" alt="MQTTS in A76xx"></div>
+                                    <div class="related-article-content"><h5>MQTTS in A76xx</h5></div>
+                                </a>
+                                <a href="post4.html" class="related-article-card">
+                                    <div class="related-article-image"><img src="../img/post4/cover.png" alt="MQTTS on W5500 and ESP32"></div>
+                                    <div class="related-article-content"><h5>MQTTS on W5500 and ESP32</h5></div>
+                                </a>
+                                <a href="post3.html" class="related-article-card">
+                                    <div class="related-article-image"><img src="../img/post3/cover.png" alt="Public MQTTS on ESP32"></div>
+                                    <div class="related-article-content"><h5>Public MQTTS on ESP32</h5></div>
+                                </a>
+                                <a href="post1.html" class="related-article-card">
+                                    <div class="related-article-image"><img src="../img/post1/cover.png" alt="How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu"></div>
+                                    <div class="related-article-content"><h5>How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu</h5></div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="sidebar-ad">
+                            <h4>Our Services</h4>
+                            <p>Gemify provides embedded systems and IoT solutions.</p>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Gemify</h3>
+                    <p data-translate="footer.tagline">Gemify Technology – Let's build something great together</p>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.follow">Follow Me</h4>
+                    <div class="social-links">
+                        <a href="https://github.com/s2nmt"><i class="fab fa-github"></i></a>
+                        <a href="https://www.youtube.com/@yourchannel"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.linkedin.com/in/yourprofile"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.tiktok.com/@gemify_technology"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4 data-translate="footer.contact">Contact</h4>
+                    <p style="color: var(--muted); line-height: 1.6; margin-bottom: 1.5rem; font-size: 0.9rem;">Interested in a custom project or have questions? I'd love to hear from you!</p>
+                    <div class="footer-contact">
+                        <div class="footer-contact-item"><i class="fas fa-envelope"></i><span>Gemifyvn@gmail.com</span></div>
+                        <div class="footer-contact-item"><i class="fas fa-phone"></i><span>+84 123-4567</span></div>
+                        <div class="footer-contact-item"><i class="fas fa-map-marker-alt"></i><span>Ho Chi Minh City, Viet Nam</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p data-translate="footer.copyright">&copy; 2025 Gemify. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tocList = document.getElementById('toc-list');
+            const articleContent = document.querySelector('.article-content');
+            const headings = articleContent.querySelectorAll('h2, h3');
+            headings.forEach((heading) => {
+                if (!heading.id) heading.id = heading.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                const li = document.createElement('li');
+                li.className = 'toc-item toc-level-' + heading.tagName.toLowerCase();
+                const a = document.createElement('a');
+                a.href = '#' + heading.id;
+                a.textContent = heading.textContent;
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const t = document.getElementById(heading.id);
+                    if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.pageYOffset - 90, behavior: 'smooth' });
+                });
+                li.appendChild(a);
+                tocList.appendChild(li);
+            });
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        tocList.querySelectorAll('a').forEach(x => x.classList.remove('active'));
+                        const link = tocList.querySelector('a[href="#' + entry.target.id + '"]');
+                        if (link) link.classList.add('active');
+                    }
+                });
+            }, { rootMargin: '-100px 0px -66%', threshold: 0 });
+            headings.forEach(h => observer.observe(h));
+        });
+    </script>
+</body>
+</html>
