@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "postbuild": "shx cp dist/index.html dist/404.html && shx cp styles.css dist/styles.css",
+    "postbuild": "shx cp dist/index.html dist/404.html && shx cp styles.css dist/styles.css && node scripts/copy-spa-fallbacks.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
