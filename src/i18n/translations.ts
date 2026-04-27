@@ -77,7 +77,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'services.products.title': 'Technology Products & IoT Platforms',
     'services.products.desc': 'Providing technology products and IoT platforms for your business needs.',
     'services.viewProjects': "View the outsource projects we've completed",
-    'projects.pageTitle': 'Completed outsource Projects',
+    'projects.pageTitle': 'Projects Delivered to Clients',
     'projects.subtitle': "Projects we've delivered for our clients.",
     'projects.readMore': 'Read more →',
     'outsource.project1.title': 'Remote Temperature & Humidity Monitoring & Control',
