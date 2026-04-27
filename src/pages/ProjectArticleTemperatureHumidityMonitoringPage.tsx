@@ -2,12 +2,12 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { ProjectArticleGallerySection } from '../components/ProjectArticleGallerySection';
-import { projectArticleExample1 } from '../content/projectArticleExample1';
+import { projectArticleTemperatureHumidityMonitoring } from '../content/projectArticleTemperatureHumidityMonitoring';
 import '../styles/project-article.css';
 
-export function ProjectArticleExample1Page() {
+export function ProjectArticleTemperatureHumidityMonitoringPage() {
   const { language } = useLanguage();
-  const c = projectArticleExample1[language];
+  const c = projectArticleTemperatureHumidityMonitoring[language];
 
   useEffect(() => {
     document.title = c.documentTitle;

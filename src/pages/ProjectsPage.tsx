@@ -27,7 +27,7 @@ export function ProjectsPage() {
               </div>
               <h3>{t('outsource.project1.title')}</h3>
               <p>{t('outsource.project1.desc')}</p>
-              <Link to="/projects/example-1" className="project-read-more">
+              <Link to="/projects/temperature-humidity-monitoring" className="project-read-more">
                 {t('projects.readMore')}
               </Link>
             </div>
@@ -38,6 +38,26 @@ export function ProjectsPage() {
               <h3>{t('outsource.project2.title')}</h3>
               <p>{t('outsource.project2.desc')}</p>
               <Link to="/projects/energy-monitoring" className="project-read-more">
+                {t('projects.readMore')}
+              </Link>
+            </div>
+            <div className="project-card">
+              <div className="service-icon">
+                <i className="fas fa-paw" />
+              </div>
+              <h3>{t('outsource.project3.title')}</h3>
+              <p>{t('outsource.project3.desc')}</p>
+              <Link to="/projects/livestock-monitoring-control" className="project-read-more">
+                {t('projects.readMore')}
+              </Link>
+            </div>
+            <div className="project-card">
+              <div className="service-icon">
+                <i className="fas fa-seedling" />
+              </div>
+              <h3>{t('outsource.project4.title')}</h3>
+              <p>{t('outsource.project4.desc')}</p>
+              <Link to="/projects/smart-agriculture-iot" className="project-read-more">
                 {t('projects.readMore')}
               </Link>
             </div>

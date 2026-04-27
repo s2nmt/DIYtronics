@@ -86,6 +86,12 @@ export const translations: Record<Lang, Record<string, string>> = {
     'outsource.project2.title': 'Remote energy monitoring system',
     'outsource.project2.desc':
       'Remotely track power use, loads, and trends via app and web—reports, thresholds, and alerts to cut waste and operating cost.',
+    'outsource.project3.title': 'Livestock monitoring and control system',
+    'outsource.project3.desc':
+      'Smart livestock farm monitoring and control via app and web: real-time environment data, alerts, and automated device operations.',
+    'outsource.project4.title': 'Smart agriculture system using IoT',
+    'outsource.project4.desc':
+      'Monitor cultivation zones and automate irrigation, nutrient dosing, and climate control with real-time alerts on app and web.',
     'contact.desc':
       "Interested in a custom project or have questions about my products? I'd love to hear from you!",
     'footer.tagline': "Gemify Technology – Let's Build Something Amazing",
@@ -170,12 +176,18 @@ export const translations: Record<Lang, Record<string, string>> = {
     'projects.pageTitle': 'Dự án outsource đã hoàn thành',
     'projects.subtitle': 'Các dự án chúng tôi đã bàn giao cho khách hàng.',
     'projects.readMore': 'Xem thêm →',
-    'outsource.project1.title': 'Giám sát & điều khiển nhiệt độ, độ ẩm từ xa qua App & Website',
+    'outsource.project1.title': 'Giám sát & điều khiển nhiệt độ, độ ẩm từ xa',
     'outsource.project1.desc':
       'Hệ thống giám sát và điều khiển nhiệt độ, độ ẩm từ xa thông qua app di động và website. Dữ liệu thời gian thực, cảnh báo và điều khiển từ xa.',
     'outsource.project2.title': 'Hệ thống giám sát năng lượng từ xa',
     'outsource.project2.desc':
       'Theo dõi từ xa điện năng, phụ tải và xu hướng tiêu thụ qua app và web; báo cáo, ngưỡng cảnh báo giúp tiết kiệm và vận hành hiệu quả hơn.',
+    'outsource.project3.title': 'Hệ thống giám sát điều khiển trong chăn nuôi',
+    'outsource.project3.desc':
+      'Giám sát môi trường chuồng nuôi theo thời gian thực và điều khiển thiết bị tự động qua app, web; có cảnh báo khi vượt ngưỡng.',
+    'outsource.project4.title': 'Hệ thống nông nghiệp thông minh ứng dụng IoT',
+    'outsource.project4.desc':
+      'Giám sát khu canh tác và tự động tưới, châm dinh dưỡng, điều khiển vi khí hậu theo thời gian thực qua app và web.',
     'contact.desc':
       'Quan tâm đến một dự án tùy chỉnh hoặc có câu hỏi về sản phẩm của tôi? Tôi rất muốn nghe từ bạn!',
     'footer.tagline': 'Gemify Technology – Hãy cùng xây dựng điều gì đó tuyệt vời',

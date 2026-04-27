@@ -3,8 +3,10 @@ import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { RfidProductPage } from './pages/RfidProductPage';
-import { ProjectArticleExample1Page } from './pages/ProjectArticleExample1Page';
+import { ProjectArticleTemperatureHumidityMonitoringPage } from './pages/ProjectArticleTemperatureHumidityMonitoringPage';
 import { ProjectArticleEnergyPage } from './pages/ProjectArticleEnergyPage';
+import { ProjectArticleLivestockMonitoringControlPage } from './pages/ProjectArticleLivestockMonitoringControlPage';
+import { ProjectArticleSmartAgricultureIotPage } from './pages/ProjectArticleSmartAgricultureIotPage';
 import { MicromouseProductPage } from './pages/MicromouseProductPage';
 import { TranslateProductPage } from './pages/TranslateProductPage';
 import { BlogPage } from './pages/BlogPage';
@@ -26,8 +28,16 @@ export default function App() {
         <Route path="/admin/pricing" element={<AdminPricingPage />} />
         <Route path="/admin/design-gallery" element={<AdminDesignGalleryPage />} />
         <Route path="/projects" element={<ProjectsPage />} />
-        <Route path="/projects/example-1" element={<ProjectArticleExample1Page />} />
+        <Route
+          path="/projects/temperature-humidity-monitoring"
+          element={<ProjectArticleTemperatureHumidityMonitoringPage />}
+        />
         <Route path="/projects/energy-monitoring" element={<ProjectArticleEnergyPage />} />
+        <Route
+          path="/projects/livestock-monitoring-control"
+          element={<ProjectArticleLivestockMonitoringControlPage />}
+        />
+        <Route path="/projects/smart-agriculture-iot" element={<ProjectArticleSmartAgricultureIotPage />} />
         <Route path="/products/micromouse" element={<MicromouseProductPage />} />
         <Route path="/products/translate" element={<TranslateProductPage />} />
         <Route path="/products/rfid" element={<RfidProductPage />} />

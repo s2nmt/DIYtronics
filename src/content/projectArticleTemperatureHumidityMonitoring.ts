@@ -1,12 +1,12 @@
 import type { Lang } from '../i18n/translations';
 
-export type Example1UiGallerySection = {
+export type TemperatureHumidityMonitoringUiGallerySection = {
   id: string;
   sectionTitle: string;
   images: { src: string; alt: string }[];
 };
 
-export type Example1ArticleCopy = {
+export type TemperatureHumidityMonitoringArticleCopy = {
   documentTitle: string;
   back: string;
   title: string;
@@ -22,18 +22,18 @@ export type Example1ArticleCopy = {
   uiTitle: string;
   uiBody: string;
   /** Grouped screenshots: login/register, home/detail, settings, export, config, devices, profile */
-  uiGallerySections: Example1UiGallerySection[];
+  uiGallerySections: TemperatureHumidityMonitoringUiGallerySection[];
   uiCarouselPrevAria: string;
   uiCarouselNextAria: string;
   outcomeTitle: string;
   outcomeBody: string;
 };
 
-export const projectArticleExample1: Record<Lang, Example1ArticleCopy> = {
+export const projectArticleTemperatureHumidityMonitoring: Record<Lang, TemperatureHumidityMonitoringArticleCopy> = {
   vi: {
     documentTitle: 'Giám sát & điều khiển nhiệt độ, độ ẩm từ xa | Gemify Projects',
     back: '← Quay lại Dự án',
-    title: 'Giám sát & điều khiển nhiệt độ, độ ẩm từ xa qua App & Website',
+    title: 'Giám sát & điều khiển nhiệt độ, độ ẩm từ xa',
     meta: 'Dự án đã hoàn thành · IoT · App & Web',
     lead:
       'Hệ thống giám sát và điều khiển nhiệt độ, độ ẩm từ xa thông qua app di động và website. Dữ liệu thời gian thực, cảnh báo và điều khiển từ xa.',
@@ -377,3 +377,4 @@ export const projectArticleExample1: Record<Lang, Example1ArticleCopy> = {
       'The system was delivered and runs reliably on Android, iOS, and the web—24/7 temperature and humidity monitoring, proactive remote control, lower equipment risk, and reduced operating cost.',
   },
 };
+

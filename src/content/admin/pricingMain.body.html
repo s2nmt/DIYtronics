@@ -1,10 +1,15 @@
 <div class="content-card">
-                        <h1>Quy Trình Báo Giá</h1>
+                        <h1>Quy Trình Làm Dự Án</h1>
                         <h3 id="overview">Tổng Quan</h3>
-                        <p>Tài liệu này mô tả quy trình báo giá cho khách hàng và định giá sản phẩm tại Gemify. Làm theo các quy trình này để đảm bảo báo giá chính xác và nhất quán cho tất cả khách hàng.</p>
+                        <p>Tài liệu này mô tả quy trình làm dự án tại Gemify, được chia thành 2 phần chính để triển khai nhất quán cho mọi khách hàng:</p>
+                        <ul>
+                            <li><strong>Phần 1 - Báo giá:</strong> Tiếp nhận yêu cầu, làm rõ phạm vi, phân tích hạng mục và chốt chi phí theo từng giai đoạn.</li>
+                            <li><strong>Phần 2 - Thực thi:</strong> Thiết kế, phát triển, kiểm thử, demo, nghiệm thu và bàn giao sản phẩm.</li>
+                        </ul>
 
-                        <h3 id="payment-stages">Quy Trình Báo Giá</h3>
+                        <h3 id="payment-stages">Giai đoạn &amp; tỷ lệ thanh toán</h3>
                         <h4>Lưu ý: Hoàn thiện giai đoạn nào thu giai đoạn đó.</h4>
+                        <h4 id="part-1-quote">Phần 1 — Báo giá (giai đoạn 1–2)</h4>
                         <div class="pricing-table-wrapper">
                         <table class="pricing-table">
                             <thead>
@@ -25,18 +30,32 @@
                                     <td>15%</td>
                                     <td>Báo cáo chi tiết nội dung khách hàng yêu cầu. Mô tả cách hoạt động của từng yêu cầu. Báo giá toàn bộ chi phí</td>
                                 </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                        <h4 id="part-2-execution">Phần 2 — Thực thi (giai đoạn 1–3)</h4>
+                        <div class="pricing-table-wrapper">
+                        <table class="pricing-table">
+                            <thead>
                                 <tr>
-                                    <td>Giai đoạn 3</td>
+                                    <th>Giai Đoạn</th>
+                                    <th>Tỷ Lệ</th>
+                                    <th>Nội Dung</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Giai đoạn 1</td>
                                     <td>30%</td>
-                                    <td>Làm layout demo sản phẩm. Mô tả cách sản phẩm sẽ hoạt động như thế nào,</td>
+                                    <td>Design layout và mô tả các tính năng hệ thống.</td>
                                 </tr>
                                 <tr>
-                                    <td>Giai đoạn 4</td>
+                                    <td>Giai đoạn 2</td>
                                     <td>35%</td>
                                     <td>Code sản phẩm, demo sản phẩm thực tế. </td>
                                 </tr>
                                 <tr>
-                                    <td>Giai đoạn 5</td>
+                                    <td>Giai đoạn 3</td>
                                     <td>20%</td>
                                     <td>Release sản phẩm chính thức, bàn giao layout, source code, tài liệu ...</td>
                                 </tr>
@@ -380,9 +399,10 @@
                             </tbody>
                         </table>
                         </div>
-                        <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 id="part-2-detail">Phần 2 — Thực thi</h3>
+                        <div class="pricing-section-header">
 
-                            <h3 id="design-layout" style="margin: 0;">Giai đoạn 3: Design layout và mô tả các tính năng hệ thống.</h3>
+                            <h3 id="design-layout">Giai đoạn 1: Design layout và mô tả các tính năng hệ thống.</h3>
                             <a href="/admin/design-gallery" style="display: inline-flex; align-items: center; gap: 0.5rem; color: #111; font-weight: 600; text-decoration: none; padding: 0.6rem 1.2rem; background: #f0f0f0; border-radius: 8px; transition: background 0.3s; white-space: nowrap; font-size: 0.85rem;" onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='#f0f0f0'">
                                 <i class="fas fa-images"></i> Xem toàn bộ design
                             </a>
@@ -402,7 +422,7 @@
                             </div>
                         </div>
                         
-                        <h3 id="demo-product" style="margin: 0;">Giai đoạn 4: Code sản phẩm, demo sản phẩm thực tế</h3>
+                        <h3 id="demo-product">Giai đoạn 2: Code sản phẩm, demo sản phẩm thực tế</h3>
                         <p style="margin-top: 1rem; line-height: 1.6; color: #333;">
                             Giai đoạn này tập trung vào việc triển khai và kiểm thử sản phẩm thực tế. Chúng tôi sẽ:
                         </p>
@@ -415,7 +435,7 @@
                         <p style="margin-top: 1rem; line-height: 1.6; color: #333;">
                             Sau khi khách hàng xác nhận hoàn tất và hài lòng với sản phẩm, chúng tôi sẽ tiến hành <strong>release sản phẩm chính thức</strong> lên production environment.
                         </p>
-                        <h3 id="release-product" style="margin: 0;">Giai đoạn 5: Release sản phẩm chính thức</h3>
+                        <h3 id="release-product">Giai đoạn 3: Release sản phẩm chính thức</h3>
                         <p style="margin-top: 1rem; line-height: 1.6; color: #333;">
                             Giai đoạn này tập trung vào việc release sản phẩm chính thức. Chúng tôi sẽ:
                         </p>

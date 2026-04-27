@@ -15,11 +15,11 @@ export function Home() {
           <div className="hero-content">
             <h1>{t('hero.title')}</h1>
             <p>{t('hero.subtitle')}</p>
-            <div className="hero-buttons">
+            {/* <div className="hero-buttons">
               <Link to="/projects" className="cta-button">
                 {t('services.viewProjects')}
               </Link>
-            </div>
+            </div> */}
           </div>
           <div className="hero-image">
             <div className="hero-placeholder">

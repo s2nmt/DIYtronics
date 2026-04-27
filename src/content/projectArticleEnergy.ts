@@ -1,7 +1,7 @@
 import type { Lang } from '../i18n/translations';
-import type { Example1ArticleCopy } from './projectArticleExample1';
+import type { TemperatureHumidityMonitoringArticleCopy } from './projectArticleTemperatureHumidityMonitoring';
 
-export const projectArticleEnergy: Record<Lang, Example1ArticleCopy> = {
+export const projectArticleEnergy: Record<Lang, TemperatureHumidityMonitoringArticleCopy> = {
   vi: {
     documentTitle: 'Hệ thống giám sát năng lượng từ xa | Gemify Projects',
     back: '← Quay lại Dự án',

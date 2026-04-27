@@ -23,8 +23,10 @@ function writeIndexHtml(...segments) {
 const routes = [
   'blog',
   'projects',
-  'projects/example-1',
+  'projects/temperature-humidity-monitoring',
   'projects/energy-monitoring',
+  'projects/livestock-monitoring-control',
+  'projects/smart-agriculture-iot',
   'products/micromouse',
   'products/translate',
   'products/rfid',
