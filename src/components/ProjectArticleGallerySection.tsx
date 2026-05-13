@@ -19,6 +19,10 @@ export function ProjectArticleGallerySection({
   nextAria,
 }: Props) {
   const [index, setIndex] = useState(0);
+  const imageLoading = showImageLoading(sectionId);
+  const sectionClassName = sectionId.startsWith('web-')
+    ? 'project-article-gallery-section project-article-gallery-section-web'
+    : 'project-article-gallery-section';
 
   useEffect(() => {
     setIndex((i) => (images.length ? Math.min(i, images.length - 1) : 0));
@@ -39,7 +43,7 @@ export function ProjectArticleGallerySection({
   if (!slide) return null;
 
   return (
-    <section className="project-article-gallery-section" aria-labelledby={`gallery-${sectionId}`}>
+    <section className={sectionClassName} aria-labelledby={`gallery-${sectionId}`}>
       <h3 className="project-article-gallery-heading" id={`gallery-${sectionId}`}>
         {title}
       </h3>
@@ -61,7 +65,7 @@ export function ProjectArticleGallerySection({
             key={slide.src}
             src={assetPath(slide.src)}
             alt={slide.alt}
-            loading="lazy"
+            loading={imageLoading}
             decoding="async"
           />
           {showCarousel ? (
@@ -98,4 +102,8 @@ export function ProjectArticleGallerySection({
       </div>
     </section>
   );
+}
+
+function showImageLoading(sectionId: string): 'eager' | 'lazy' {
+  return sectionId.startsWith('web-') || sectionId.startsWith('app-') ? 'eager' : 'lazy';
 }

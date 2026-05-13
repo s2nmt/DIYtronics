@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { ProjectArticleGallerySection } from '../components/ProjectArticleGallerySection';
 import { projectArticleTemperatureHumidityMonitoring } from '../content/projectArticleTemperatureHumidityMonitoring';
+import { assetPath } from '../utils/assetPath';
 import '../styles/project-article.css';
 
 export function ProjectArticleTemperatureHumidityMonitoringPage() {
   const { language } = useLanguage();
   const c = projectArticleTemperatureHumidityMonitoring[language];
+  const showTechSection = Boolean(c.techTitle || c.techBody || c.techTags.length);
 
   useEffect(() => {
     document.title = c.documentTitle;
@@ -39,15 +41,19 @@ export function ProjectArticleTemperatureHumidityMonitoringPage() {
               ))}
             </ul>
 
-            <h2>{c.techTitle}</h2>
-            <div className="tech-tags">
-              {c.techTags.map((tag) => (
-                <span key={tag} className="tech-tag">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <p>{c.techBody}</p>
+            {showTechSection ? (
+              <>
+                <h2>{c.techTitle}</h2>
+                <div className="tech-tags">
+                  {c.techTags.map((tag) => (
+                    <span key={tag} className="tech-tag">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <p>{c.techBody}</p>
+              </>
+            ) : null}
 
             <h2>{c.uiTitle}</h2>
             <p>{c.uiBody}</p>
@@ -66,6 +72,14 @@ export function ProjectArticleTemperatureHumidityMonitoringPage() {
 
             <h2>{c.outcomeTitle}</h2>
             <p>{c.outcomeBody}</p>
+            <figure className="project-article-bottom-figure">
+              <img
+                src={assetPath(c.bottomImage.src)}
+                alt={c.bottomImage.alt}
+                loading="lazy"
+                decoding="async"
+              />
+            </figure>
           </div>
         </div>
       </article>

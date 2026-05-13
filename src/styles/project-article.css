@@ -156,6 +156,7 @@ main.project-article-page {
   min-width: 0;
   max-width: 100%;
   text-align: center;
+  min-height: clamp(20rem, 58vw, 38rem);
 }
 
 /* Fluid image: grows with viewport, capped for large screens */
@@ -167,6 +168,22 @@ main.project-article-page {
   margin: 0 auto;
   border-radius: clamp(8px, 1.5vw, 10px);
   box-shadow: 0 clamp(4px, 1vw, 6px) clamp(16px, 4vw, 24px) rgba(0, 0, 0, 0.1);
+}
+
+.project-article-gallery-section-web .project-article-figure img {
+  max-width: min(100%, clamp(28rem, 92vw, 84rem));
+}
+
+.project-article-gallery-section-web .project-article-figure {
+  min-height: clamp(18rem, 42vw, 34rem);
+}
+
+.project-article-gallery-section-web {
+  width: min(92rem, calc(100vw - 1.5rem));
+  max-width: none;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .project-article-carousel-dots {
@@ -201,6 +218,21 @@ main.project-article-page {
 .project-article-carousel-dot:focus-visible {
   outline: 2px solid #111;
   outline-offset: 2px;
+}
+
+.project-article-bottom-figure {
+  margin: clamp(1.5rem, 3vw, 2rem) auto 0;
+  width: 100%;
+}
+
+.project-article-bottom-figure img {
+  display: block;
+  width: 100%;
+  max-width: min(100%, clamp(20rem, 88vw, 48rem));
+  height: auto;
+  margin: 0 auto;
+  border-radius: clamp(8px, 1.5vw, 10px);
+  box-shadow: 0 clamp(4px, 1vw, 6px) clamp(16px, 4vw, 24px) rgba(0, 0, 0, 0.1);
 }
 
 /* Large screens: slightly wider reading column feel */

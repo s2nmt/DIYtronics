@@ -283,6 +283,43 @@ body {
     margin-top: 2rem;
 }
 
+.featured-projects-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+    align-items: stretch;
+}
+
+.featured-project-btn-wrap {
+    justify-content: center;
+    display: flex;
+}
+
+.featured-projects-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 1.1rem;
+}
+
+.featured-projects-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    border: none;
+    background: #c8c8c8;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.featured-projects-dot:hover {
+    background: #8b8b8b;
+}
+
+.featured-projects-dot.active {
+    width: 28px;
+    background: #111;
+}
+
 .product-card {
     background: white;
     border-radius: 20px;
@@ -965,6 +1002,10 @@ body {
     .products-grid,
     .services-grid,
     .outsource-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .featured-projects-grid {
         grid-template-columns: 1fr;
     }
 
