@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { ProjectsPage } from './pages/ProjectsPage';
+import { ProductsOverviewPage } from './pages/ProductsOverviewPage';
 import { RfidProductPage } from './pages/RfidProductPage';
 import { ProjectArticleTemperatureHumidityMonitoringPage } from './pages/ProjectArticleTemperatureHumidityMonitoringPage';
 import { ProjectArticleEnergyPage } from './pages/ProjectArticleEnergyPage';
@@ -22,6 +23,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/blog" element={<BlogPage />} />
+        <Route path="/products" element={<ProductsOverviewPage />} />
         <Route path="/articles/:slug" element={<ArticlePostPage />} />
         <Route path="/admin" element={<AdminHomePage />} />
         <Route path="/admin/documents" element={<AdminDocumentsPage />} />

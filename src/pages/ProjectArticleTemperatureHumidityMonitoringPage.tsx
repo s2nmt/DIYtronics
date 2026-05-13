@@ -72,14 +72,16 @@ export function ProjectArticleTemperatureHumidityMonitoringPage() {
 
             <h2>{c.outcomeTitle}</h2>
             <p>{c.outcomeBody}</p>
-            <figure className="project-article-bottom-figure">
-              <img
-                src={assetPath(c.bottomImage.src)}
-                alt={c.bottomImage.alt}
-                loading="lazy"
-                decoding="async"
-              />
-            </figure>
+            {c.bottomImage ? (
+              <figure className="project-article-bottom-figure">
+                <img
+                  src={assetPath(c.bottomImage.src)}
+                  alt={c.bottomImage.alt}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </figure>
+            ) : null}
           </div>
         </div>
       </article>

@@ -27,7 +27,7 @@ export type TemperatureHumidityMonitoringArticleCopy = {
   uiCarouselNextAria: string;
   outcomeTitle: string;
   outcomeBody: string;
-  bottomImage: { src: string; alt: string };
+  bottomImage?: { src: string; alt: string };
 };
 
 const temperatureHumidityMonitoringAppImage = (fileName: string) =>

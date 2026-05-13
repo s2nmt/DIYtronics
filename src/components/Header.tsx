@@ -30,13 +30,16 @@ export function Header() {
               <a href={hashLink('home')}>{t('nav.home')}</a>
             </li>
             <li>
-              <a href={hashLink('products')}>{t('nav.products')}</a>
+              <a href={hashLink('services')}>{t('nav.services')}</a>
             </li>
             <li>
               <a href={hashLink('about')}>{t('nav.about')}</a>
             </li>
             <li>
-              <a href={hashLink('services')}>{t('nav.services')}</a>
+              <a href={hashLink('contact')}>{t('nav.contact')}</a>
+            </li>
+            <li>
+              <Link to="/products">{t('nav.products')}</Link>
             </li>
             <li>
               <Link to="/blog">{t('nav.blog')}</Link>
