@@ -20,11 +20,11 @@ const featuredProducts = [
     descKey: 'products.rfid.desc',
   },
   {
-    key: 'micromouse',
-    icon: 'fas fa-robot',
-    route: '/products/micromouse',
-    titleKey: 'products.micromouse.title',
-    descKey: 'products.micromouse.desc',
+    key: 'beagleboneBlackCape',
+    icon: 'fab fa-linux',
+    route: '/products/beaglebone-black-cape',
+    titleKey: 'products.beagleboneBlackCape.title',
+    descKey: 'products.beagleboneBlackCape.desc',
   },
   {
     key: 'project2',

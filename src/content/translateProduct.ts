@@ -1,5 +1,5 @@
 import type { Lang } from '../i18n/translations';
-import type { ProductDetailStrings } from './micromouseProduct';
+import type { ProductDetailStrings } from './productDetailStrings';
 
 export const translateProduct: Record<Lang, ProductDetailStrings> = {
   en: {

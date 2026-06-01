@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import type { ProductDetailStrings } from '../content/micromouseProduct';
+import type { ProductDetailStrings } from '../content/productDetailStrings';
 import { assetPath } from '../utils/assetPath';
 import '../styles/product-detail.css';
 
@@ -12,10 +12,12 @@ export function ProductDetailTemplate({
   strings: c,
   introImage,
   gallery,
+  sidebarIcon = 'fas fa-microchip',
 }: {
   strings: ProductDetailStrings;
   introImage: { src: string; width: 'half' | 'third' | 'full' };
   gallery?: ProductGallery | null;
+  sidebarIcon?: string;
 }) {
   useEffect(() => {
     document.title = c.documentTitle;
@@ -34,7 +36,7 @@ export function ProductDetailTemplate({
         <aside className="sidebar-diy">
           <div className="logo">
             <i
-              className="fas fa-microchip"
+              className={sidebarIcon}
               style={{
                 fontSize: '4.5rem',
                 color: '#111',

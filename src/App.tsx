@@ -7,7 +7,7 @@ import { ProjectArticleTemperatureHumidityMonitoringPage } from './pages/Project
 import { ProjectArticleEnergyPage } from './pages/ProjectArticleEnergyPage';
 import { ProjectArticleLivestockMonitoringControlPage } from './pages/ProjectArticleLivestockMonitoringControlPage';
 import { ProjectArticleSmartAgricultureIotPage } from './pages/ProjectArticleSmartAgricultureIotPage';
-import { MicromouseProductPage } from './pages/MicromouseProductPage';
+import { BeagleboneBlackCapeProductPage } from './pages/BeagleboneBlackCapeProductPage';
 import { TranslateProductPage } from './pages/TranslateProductPage';
 import { BlogPage } from './pages/BlogPage';
 import { ArticlePostPage } from './pages/ArticlePostPage';
@@ -39,7 +39,14 @@ export default function App() {
           element={<ProjectArticleLivestockMonitoringControlPage />}
         />
         <Route path="/projects/smart-agriculture-iot" element={<ProjectArticleSmartAgricultureIotPage />} />
-        <Route path="/products/micromouse" element={<MicromouseProductPage />} />
+        <Route
+          path="/products/beaglebone-black-cape"
+          element={<BeagleboneBlackCapeProductPage />}
+        />
+        <Route
+          path="/products/micromouse"
+          element={<Navigate to="/products/beaglebone-black-cape" replace />}
+        />
         <Route path="/products/translate" element={<TranslateProductPage />} />
         <Route path="/products/rfid" element={<RfidProductPage />} />
       </Route>

@@ -27,6 +27,7 @@ const routes = [
   'projects/energy-monitoring',
   'projects/livestock-monitoring-control',
   'projects/smart-agriculture-iot',
+  'products/beaglebone-black-cape',
   'products/micromouse',
   'products/translate',
   'products/rfid',
