@@ -1,6 +1,6 @@
 # Project articles
 
-Long-form case studies live in **React** (see `src/pages/`, `src/content/`). The blog lists them from `ProjectsPage`.
+Long-form case studies live in **React** (see `src/pages/`, `src/content/`). They are linked from `ProductsOverviewPage` (`/products`).
 
 **Temperature & humidity monitoring**:
 
@@ -19,4 +19,4 @@ Long-form case studies live in **React** (see `src/pages/`, `src/content/`). The
 
 `public/project-articles/example-1/index.html` is a **redirect** only so old URLs keep working after deploy.
 
-Add more case studies: new route + content module, then link from `ProjectsPage`.
+Add more case studies: new route + content module, then link from `ProductsOverviewPage`.

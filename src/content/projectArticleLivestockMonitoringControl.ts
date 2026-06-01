@@ -7,7 +7,6 @@ export const projectArticleLivestockMonitoringControl: Record<
 > = {
   vi: {
     documentTitle: 'Hệ thống giám sát điều khiển trong chăn nuôi | Gemify Projects',
-    back: '← Quay lại Dự án',
     title: 'Hệ thống giám sát điều khiển trong chăn nuôi',
     meta: 'Dự án đã hoàn thành · IoT · Nông nghiệp thông minh · App & Web',
     lead:
@@ -62,7 +61,6 @@ export const projectArticleLivestockMonitoringControl: Record<
   },
   en: {
     documentTitle: 'Livestock monitoring and control system | Gemify Projects',
-    back: '← Back to Projects',
     title: 'Livestock monitoring and control system',
     meta: 'Completed project · IoT · Smart agriculture · App & Web',
     lead:

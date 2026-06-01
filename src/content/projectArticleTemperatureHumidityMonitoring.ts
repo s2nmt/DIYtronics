@@ -8,7 +8,6 @@ export type TemperatureHumidityMonitoringUiGallerySection = {
 
 export type TemperatureHumidityMonitoringArticleCopy = {
   documentTitle: string;
-  back: string;
   title: string;
   meta: string;
   lead: string;
@@ -40,7 +39,6 @@ const temperatureHumidityMonitoringProjectImage = (fileName: string) =>
 export const projectArticleTemperatureHumidityMonitoring: Record<Lang, TemperatureHumidityMonitoringArticleCopy> = {
   vi: {
     documentTitle: 'Giám sát & điều khiển nhiệt độ, độ ẩm từ xa | Gemify Projects',
-    back: '← Quay lại Dự án',
     title: 'Giám sát & điều khiển nhiệt độ, độ ẩm từ xa',
     meta: 'Dự án đã hoàn thành · IoT · App & Web',
     lead:
@@ -365,7 +363,6 @@ export const projectArticleTemperatureHumidityMonitoring: Record<Lang, Temperatu
   },
   en: {
     documentTitle: 'Remote temperature & humidity monitoring & control | Gemify Projects',
-    back: '← Back to Projects',
     title: 'Remote temperature & humidity monitoring & control via app & website',
     meta: 'Completed project · IoT · App & Web',
     lead:

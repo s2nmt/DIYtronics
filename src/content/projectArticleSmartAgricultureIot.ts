@@ -4,7 +4,6 @@ import type { TemperatureHumidityMonitoringArticleCopy } from './projectArticleT
 export const projectArticleSmartAgricultureIot: Record<Lang, TemperatureHumidityMonitoringArticleCopy> = {
   vi: {
     documentTitle: 'Hệ thống nông nghiệp thông minh ứng dụng IoT | Gemify Projects',
-    back: '← Quay lại Dự án',
     title: 'Hệ thống nông nghiệp thông minh ứng dụng IoT',
     meta: 'Dự án đã hoàn thành · IoT · Nông nghiệp thông minh · App & Web',
     lead:
@@ -59,7 +58,6 @@ export const projectArticleSmartAgricultureIot: Record<Lang, TemperatureHumidity
   },
   en: {
     documentTitle: 'Smart agriculture system using IoT | Gemify Projects',
-    back: '← Back to Projects',
     title: 'Smart agriculture system using IoT',
     meta: 'Completed project · IoT · Smart agriculture · App & Web',
     lead:

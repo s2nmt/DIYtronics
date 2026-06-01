@@ -4,7 +4,6 @@ import type { TemperatureHumidityMonitoringArticleCopy } from './projectArticleT
 export const projectArticleEnergy: Record<Lang, TemperatureHumidityMonitoringArticleCopy> = {
   vi: {
     documentTitle: 'Hệ thống giám sát năng lượng từ xa | Gemify Projects',
-    back: '← Quay lại Dự án',
     title: 'Hệ thống giám sát năng lượng từ xa',
     meta: 'Dự án đã hoàn thành · IoT · Năng lượng · App & Web',
     lead:
@@ -58,7 +57,6 @@ export const projectArticleEnergy: Record<Lang, TemperatureHumidityMonitoringArt
   },
   en: {
     documentTitle: 'Remote energy monitoring system | Gemify Projects',
-    back: '← Back to Projects',
     title: 'Remote energy monitoring system',
     meta: 'Completed project · IoT · Energy · App & Web',
     lead:

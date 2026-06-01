@@ -1,7 +1,6 @@
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
-import { ProjectsPage } from './pages/ProjectsPage';
 import { ProductsOverviewPage } from './pages/ProductsOverviewPage';
 import { RfidProductPage } from './pages/RfidProductPage';
 import { ProjectArticleTemperatureHumidityMonitoringPage } from './pages/ProjectArticleTemperatureHumidityMonitoringPage';
@@ -29,7 +28,7 @@ export default function App() {
         <Route path="/admin/documents" element={<AdminDocumentsPage />} />
         <Route path="/admin/pricing" element={<AdminPricingPage />} />
         <Route path="/admin/design-gallery" element={<AdminDesignGalleryPage />} />
-        <Route path="/projects" element={<ProjectsPage />} />
+        <Route path="/projects" element={<Navigate to="/products" replace />} />
         <Route
           path="/projects/temperature-humidity-monitoring"
           element={<ProjectArticleTemperatureHumidityMonitoringPage />}

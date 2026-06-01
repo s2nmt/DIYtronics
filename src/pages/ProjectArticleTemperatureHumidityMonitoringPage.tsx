@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { ProjectArticleGallerySection } from '../components/ProjectArticleGallerySection';
 import { projectArticleTemperatureHumidityMonitoring } from '../content/projectArticleTemperatureHumidityMonitoring';
@@ -19,9 +18,6 @@ export function ProjectArticleTemperatureHumidityMonitoringPage() {
     <main className="project-article-page">
       <article>
         <div className="project-article-container">
-          <Link to="/projects" className="project-article-back">
-            {c.back}
-          </Link>
           <h1 className="project-article-title">{c.title}</h1>
           <p className="project-article-meta">{c.meta}</p>
 
