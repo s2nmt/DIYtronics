@@ -1,5 +1,8 @@
 # Build Vite + React and publish dist/ to GitHub Pages.
-# Repo settings → Pages → Build and deployment → Source: "GitHub Actions".
+#
+# REQUIRED (repo Settings → Pages → Build and deployment):
+#   Source MUST be "GitHub Actions" — NOT "Deploy from a branch".
+# If Source is "main / (root)", visitors get dev index.html (/src/main.tsx) and the site breaks.
 
 name: Deploy to GitHub Pages
 
