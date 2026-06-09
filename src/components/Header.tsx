@@ -39,9 +39,6 @@ export function Header() {
               <a href={hashLink('contact')}>{t('nav.contact')}</a>
             </li>
             <li>
-              <Link to="/products">{t('nav.products')}</Link>
-            </li>
-            <li>
               <Link to="/blog">{t('nav.blog')}</Link>
             </li>
           </ul>
