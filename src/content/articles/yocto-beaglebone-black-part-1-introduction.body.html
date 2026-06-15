@@ -1,0 +1,122 @@
+<p>Reference: <a href="https://embeddedlinux.blog/2025/06/28/yocto-bbb-1-build-beaglebone-black-image-bang-yocto-project/" target="_blank" rel="noopener noreferrer">[Yocto-BBB] 1. Build Beaglebone Black Image Bằng Yocto Project — Embedded Linux A-Z</a>.</p>
+<p>This is <strong>Part 1</strong> of our <strong>Yocto on BeagleBone Black</strong> series. We build a minimal Linux image with Yocto Scarthgap (5.0), flash it to a microSD card, and boot the board. The steps below follow the reference article above, adapted into English with the same commands and layer layout.</p>
+
+<h2 id="host-setup">1. Prepare the build host</h2>
+<p>Use <strong>Ubuntu 22.04 LTS</strong> (or equivalent). A multi-core machine with enough disk space is recommended—the reference build on an Intel i7-13700H (14 cores / 20 threads) took a little over one hour.</p>
+<p>Install host packages per the <a href="https://docs.yoctoproject.org/ref-manual/system-requirements.html" target="_blank" rel="noopener noreferrer">Yocto Project Reference Manual</a> (section 1.3.2.1):</p>
+
+<pre><code>sudo apt-get update
+sudo apt-get -y install gawk wget git-core diffstat unzip texinfo gcc-multilib \
+  build-essential chrpath socat cpio python3 python3-pip python3-pexpect \
+  libsdl1.2-dev xterm make xsltproc docbook-utils fop dblatex xmlto lz4</code></pre>
+
+<h2 id="clone-sources">2. Clone source code</h2>
+<p>We use <strong>Poky</strong> (the Yocto reference distribution) on branch <strong>scarthgap</strong> (Yocto 5.0), plus the layers needed for BeagleBone Black:</p>
+
+<pre><code>git clone -b scarthgap git://git.yoctoproject.org/poky.git
+cd poky
+
+git clone -b scarthgap git://git.openembedded.org/meta-openembedded
+git clone -b scarthgap git://git.yoctoproject.org/meta-ti
+git clone -b scarthgap https://git.yoctoproject.org/meta-arm</code></pre>
+
+<p>Directory layout after cloning:</p>
+<pre><code>poky/
+├── meta/                    # OE-Core
+├── meta-poky/
+├── meta-yocto-bsp/
+├── meta-openembedded/
+├── meta-ti/
+└── meta-arm/</code></pre>
+
+<h2 id="init-build-env">3. Setup and build</h2>
+
+<h3 id="create-build-env">3.1 Create the build environment</h3>
+<p>From inside <code>poky/</code>, run:</p>
+
+<pre><code>source oe-init-build-env build-bbb</code></pre>
+
+<p>This command:</p>
+<ul>
+  <li>Sets <code>$OEROOT</code> — root of the Yocto / Poky tree</li>
+  <li>Updates <code>$PATH</code> — adds BitBake to your shell session</li>
+  <li>Sets <code>$BUILDDIR</code> — output directory (<code>./build-bbb</code>; use separate build dirs when targeting multiple boards)</li>
+  <li>Sets <code>$BBPATH</code> — so BitBake can find layers</li>
+  <li>Creates the <code>$BUILDDIR</code> folder structure if it does not exist</li>
+</ul>
+
+<h3 id="conf-files">3.2 Edit configuration files</h3>
+<p>For simplicity we edit <code>local.conf</code> and <code>bblayers.conf</code> directly under <code>build-bbb/conf/</code>.</p>
+
+<p><strong>Machine</strong> — open <code>build-bbb/conf/local.conf</code> and set:</p>
+<pre><code>MACHINE ?= "beaglebone"</code></pre>
+
+<p><strong>Layers</strong> — open <code>build-bbb/conf/bblayers.conf</code> and add the OpenEmbedded, ARM, and TI layers. Use <strong>absolute paths</strong> on your machine (example below—replace <code>/home/user/Learning/poky</code> with your path):</p>
+
+<pre><code>POKY_BBLAYERS_CONF_VERSION = "2"
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+
+BBLAYERS ?= " \
+  /home/user/Learning/poky/meta \
+  /home/user/Learning/poky/meta-poky \
+  /home/user/Learning/poky/meta-yocto-bsp \
+  /home/user/Learning/poky/meta-openembedded/meta-oe \
+  /home/user/Learning/poky/meta-arm/meta-arm-toolchain \
+  /home/user/Learning/poky/meta-arm/meta-arm \
+  /home/user/Learning/poky/meta-ti/meta-ti-bsp \
+  /home/user/Learning/poky/meta-ti/meta-ti-extras \
+  /home/user/Learning/poky/meta-ti/meta-beagle \
+  "</code></pre>
+
+<h3 id="run-bitbake">3.3 Build the image</h3>
+<p>Build the smallest reference image—it boots a minimal OS with very few packages, so the first build is faster than a desktop image:</p>
+
+<pre><code>bitbake core-image-minimal</code></pre>
+
+<p>Expect the first build to take roughly one hour or more depending on CPU, disk, and network. Subsequent builds are much faster when the download and shared-state caches are warm.</p>
+
+<h2 id="flash-sd">4. Flash the image to microSD</h2>
+
+<h3 id="find-image">4.1 Find the output image</h3>
+<p>If you are unsure where BitBake placed the artifacts, query the recipe environment:</p>
+
+<pre><code>bitbake -e core-image-minimal | grep ^WORKDIR=</code></pre>
+
+<p><code>bitbake -e &lt;recipe&gt;</code> prints all variables set for that recipe. <code>grep ^WORKDIR=</code> filters the work directory line. Example output:</p>
+
+<pre><code>WORKDIR="/home/user/Learning/poky/build-bbb/tmp/work/beaglebone-oe-linux-gnueabi/core-image-minimal/1.0-r0"</code></pre>
+
+<p>Then open the deploy folder inside that path:</p>
+
+<pre><code>cd /home/user/Learning/poky/build-bbb/tmp/work/beaglebone-oe-linux-gnueabi/core-image-minimal/1.0-r0
+cd deploy-core-image-minimal-image-complete</code></pre>
+
+<p>You can also find images under <code>build-bbb/tmp/deploy/images/beaglebone/</code>.</p>
+
+<h3 id="copy-to-sd">4.2 Write the image to the SD card</h3>
+<p>Use the <code>.wic.xz</code> image—it is compressed and works well with <code>bmaptool</code> for faster flashing.</p>
+
+<p>Insert the microSD card and check the device name:</p>
+<pre><code>lsblk</code></pre>
+
+<p>If partitions are auto-mounted, unmount them first (adjust paths to match your system):</p>
+<pre><code>sudo umount /media/user/boot /media/user/root</code></pre>
+
+<p>Flash with <code>bmaptool</code> (replace <code>/dev/mmcblk0</code> with your card device—<strong>double-check</strong> to avoid wiping the wrong disk):</p>
+
+<pre><code>sudo bmaptool copy core-image-minimal-beaglebone.wic.xz /dev/mmcblk0</code></pre>
+
+<h2 id="boot-bbb">5. Boot BeagleBone Black</h2>
+<p>Insert the microSD card into the BBB and power on.</p>
+<ul>
+  <li>Hold the <strong>S2 (boot)</strong> button while powering on to boot from <strong>MMC1</strong> (microSD). Without S2, the board boots from <strong>MMC2</strong> (onboard eMMC).</li>
+  <li>Log in as user <code>root</code> with <strong>no password</strong> on the default minimal image.</li>
+</ul>
+
+<h2 id="whats-next">What’s next (Part 2)</h2>
+<p>Part 2 covers how to fetch and unpack the kernel source locally with BitBake (<code>virtual/kernel</code>) and use <code>devtool modify</code> for driver and device-tree work.</p>
+
+<h2 id="summary">Summary</h2>
+<p>You prepared an Ubuntu host, cloned Poky Scarthgap with meta-openembedded, meta-arm, and meta-ti, built <code>core-image-minimal</code> for <code>MACHINE = "beaglebone"</code>, flashed the <code>.wic.xz</code> image to microSD, and booted the board. Part 2 moves on to working with the kernel tree on your build machine.</p>

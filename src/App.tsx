@@ -9,6 +9,7 @@ import { ProjectArticleLivestockMonitoringControlPage } from './pages/ProjectArt
 import { ProjectArticleSmartAgricultureIotPage } from './pages/ProjectArticleSmartAgricultureIotPage';
 import { BeagleboneBlackCapeProductPage } from './pages/BeagleboneBlackCapeProductPage';
 import { TranslateProductPage } from './pages/TranslateProductPage';
+import { ArticleSeriesPage } from './pages/ArticleSeriesPage';
 import { BlogPage } from './pages/BlogPage';
 import { ArticlePostPage } from './pages/ArticlePostPage';
 import { AdminHomePage } from './pages/AdminHomePage';
@@ -22,6 +23,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/blog" element={<BlogPage />} />
+        <Route path="/blog/series/:seriesSlug" element={<ArticleSeriesPage />} />
         <Route path="/products" element={<ProductsOverviewPage />} />
         <Route path="/articles/:slug" element={<ArticlePostPage />} />
         <Route path="/admin" element={<AdminHomePage />} />

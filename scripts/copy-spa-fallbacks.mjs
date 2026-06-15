@@ -22,6 +22,8 @@ function writeIndexHtml(...segments) {
 
 const routes = [
   'blog',
+  'blog/series/yocto-beaglebone-black',
+  'blog/series/mqtt-iot',
   'projects',
   'projects/temperature-humidity-monitoring',
   'projects/energy-monitoring',
@@ -42,8 +44,23 @@ for (const r of routes) {
   writeIndexHtml(...r.split('/'));
 }
 
-for (let n = 1; n <= 6; n++) {
-  writeIndexHtml('articles', `post${n}`);
+const articleSlugs = [
+  'yocto-beaglebone-black-part-2-kernel-local',
+  'yocto-beaglebone-black-part-1-introduction',
+  'post1',
+  'post2',
+  'post3',
+  'post4',
+  'post5',
+  'post6',
+];
+
+for (const slug of articleSlugs) {
+  writeIndexHtml('articles', slug);
 }
 
-console.log('copy-spa-fallbacks: wrote index.html for', routes.length + 6, 'SPA paths under dist/');
+console.log(
+  'copy-spa-fallbacks: wrote index.html for',
+  routes.length + articleSlugs.length,
+  'SPA paths under dist/',
+);

@@ -1,7 +1,6 @@
 import { useArticleToc } from '../hooks/useArticleToc';
 import { assetPath } from '../utils/assetPath';
 import '../styles/article-page.css';
-
 export type ArticleRelatedPost = {
   href: string;
   cover: string;
@@ -18,6 +17,7 @@ export function ArticlePostShell({
   tocListId,
   tocKey,
   relatedPosts,
+  relatedHeading = 'Related Articles',
 }: {
   bodyHtml: string;
   title: string;
@@ -28,6 +28,7 @@ export function ArticlePostShell({
   tocListId: string;
   tocKey: string;
   relatedPosts: ArticleRelatedPost[];
+  relatedHeading?: string;
 }) {
   useArticleToc(`#${contentId}`, tocListId, tocKey);
 
@@ -70,7 +71,7 @@ export function ArticlePostShell({
 
             <aside className="article-sidebar">
               <div className="article-footer-section">
-                <h4>Related Articles</h4>
+                <h4>{relatedHeading}</h4>
                 <div className="related-articles-grid">
                   {relatedPosts.map((p) => (
                     <a
@@ -87,10 +88,6 @@ export function ArticlePostShell({
                     </a>
                   ))}
                 </div>
-              </div>
-              <div className="sidebar-ad">
-                <h4>Our Services</h4>
-                <p>Gemify provides embedded systems and IoT solutions.</p>
               </div>
             </aside>
           </div>

@@ -5,6 +5,8 @@ import post3Body from './post3.body.html?raw';
 import post4Body from './post4.body.html?raw';
 import post5Body from './post5.body.html?raw';
 import post6Body from './post6.body.html?raw';
+import yoctoBeagleboneBlackPart1Body from './yocto-beaglebone-black-part-1-introduction.body.html?raw';
+import yoctoBeagleboneBlackPart2Body from './yocto-beaglebone-black-part-2-kernel-local.body.html?raw';
 
 function rel(href: string, cover: string, title: string): ArticleRelatedPost {
   return { href, cover, title };
@@ -23,6 +25,8 @@ export type ArticleConfig = {
 };
 
 export const ARTICLE_SLUGS = [
+  'yocto-beaglebone-black-part-2-kernel-local',
+  'yocto-beaglebone-black-part-1-introduction',
   'post1',
   'post2',
   'post3',
@@ -34,22 +38,53 @@ export const ARTICLE_SLUGS = [
 export type ArticleSlug = (typeof ARTICLE_SLUGS)[number];
 
 export const articlesBySlug: Record<ArticleSlug, ArticleConfig> = {
+  'yocto-beaglebone-black-part-2-kernel-local': {
+    documentTitle:
+      'Yocto on BeagleBone Black — Part 2: Get Kernel Source Locally | Gemify Blog',
+    title: 'Yocto on BeagleBone Black — Part 2: Get Kernel Source Locally',
+    cover: 'img/articles/yocto-beaglebone-black-part-2-kernel-local/cover.png',
+    category: 'Series',
+    metaLine: 'by Tuan Nguyen | Jun 15, 2025',
+    body: yoctoBeagleboneBlackPart2Body,
+    contentId: 'article-yocto-bbb-part-2-content',
+    tocListId: 'toc-list-yocto-bbb-part-2',
+    related: [
+      rel(
+        'articles/yocto-beaglebone-black-part-1-introduction',
+        'img/articles/yocto-beaglebone-black-part-1-introduction/cover.png',
+        'Yocto on BeagleBone Black — Part 1: Build Image & Flash SD Card',
+      ),
+    ],
+  },
+  'yocto-beaglebone-black-part-1-introduction': {
+    documentTitle:
+      'Yocto on BeagleBone Black — Part 1: Build Image & Flash SD Card | Gemify Blog',
+    title: 'Yocto on BeagleBone Black — Part 1: Build Image & Flash SD Card',
+    cover: 'img/articles/yocto-beaglebone-black-part-1-introduction/cover.png',
+    category: 'Series',
+    metaLine: 'by Tuan Nguyen | Jun 15, 2025',
+    body: yoctoBeagleboneBlackPart1Body,
+    contentId: 'article-yocto-bbb-part-1-content',
+    tocListId: 'toc-list-yocto-bbb-part-1',
+    related: [
+      rel(
+        'articles/yocto-beaglebone-black-part-2-kernel-local',
+        'img/articles/yocto-beaglebone-black-part-2-kernel-local/cover.png',
+        'Yocto on BeagleBone Black — Part 2: Get Kernel Source Locally',
+      ),
+    ],
+  },
   post1: {
     documentTitle:
       'How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu | Gemify Blog',
     title: 'How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu',
     cover: 'img/post1/cover.png',
-    category: 'Tutorial',
+    category: 'Series',
     metaLine: 'by Tuan Nguyen | Jan 20, 2025',
     body: post1Body,
     contentId: 'article-post1-content',
     tocListId: 'toc-list-post1',
-    related: [
-      rel('articles/post5', 'img/post5/cover.png', 'MQTTS in A76xx'),
-      rel('articles/post4', 'img/post4/cover.png', 'MQTTS on W5500 and ESP32'),
-      rel('articles/post2', 'img/post2/cover.png', 'How to Send Email Using Node.js'),
-      rel('articles/post3', 'img/post3/cover.png', 'Public MQTTs on ESP32'),
-    ],
+    related: [],
   },
   post2: {
     documentTitle: 'How to Send Email Using Node.js | Gemify Blog',
@@ -61,55 +96,41 @@ export const articlesBySlug: Record<ArticleSlug, ArticleConfig> = {
     contentId: 'article-post2-content',
     tocListId: 'toc-list-post2',
     related: [
-      rel('articles/post5', 'img/post5/cover.png', 'MQTTS in A76xx'),
-      rel('articles/post4', 'img/post4/cover.png', 'MQTTS on W5500 and ESP32'),
-      rel('articles/post1', 'img/post1/cover.png', 'How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu'),
+      rel('blog/series/mqtt-iot', 'img/post1/cover.png', 'MQTT & MQTTS for IoT'),
     ],
   },
   post3: {
     documentTitle: 'Public MQTTS on ESP32 | Gemify Blog',
     title: 'Public MQTTS on ESP32',
     cover: 'img/post3/cover.png',
-    category: 'Tutorial',
+    category: 'Series',
     metaLine: 'by Tuan Nguyen | Jan 22, 2025',
     body: post3Body,
     contentId: 'article-post3-content',
     tocListId: 'toc-list-post3',
-    related: [
-      rel('articles/post5', 'img/post5/cover.png', 'MQTTS in A76xx'),
-      rel('articles/post4', 'img/post4/cover.png', 'MQTTS on W5500 and ESP32'),
-      rel('articles/post2', 'img/post2/cover.png', 'How to Send Email Using Node.js'),
-    ],
+    related: [],
   },
   post4: {
     documentTitle: 'MQTTS on W5500 and ESP32 | Gemify Blog',
     title: 'MQTTS on W5500 and ESP32',
     cover: 'img/post4/cover.png',
-    category: 'Tutorial',
+    category: 'Series',
     metaLine: 'by Tuan Nguyen | Jan 23, 2025',
     body: post4Body,
     contentId: 'article-post4-content',
     tocListId: 'toc-list-post4',
-    related: [
-      rel('articles/post5', 'img/post5/cover.png', 'MQTTS in A76xx'),
-      rel('articles/post3', 'img/post3/cover.png', 'Public MQTTs on ESP32'),
-      rel('articles/post2', 'img/post2/cover.png', 'How to Send Email Using Node.js'),
-    ],
+    related: [],
   },
   post5: {
     documentTitle: 'MQTTS in A76xx | Gemify Blog',
     title: 'MQTTS in A76xx',
     cover: 'img/post5/cover.png',
-    category: 'Tutorial',
+    category: 'Series',
     metaLine: 'by Tuan Nguyen | Jan 24, 2025',
     body: post5Body,
     contentId: 'article-post5-content',
     tocListId: 'toc-list-post5',
-    related: [
-      rel('articles/post4', 'img/post4/cover.png', 'MQTTS on W5500 and ESP32'),
-      rel('articles/post3', 'img/post3/cover.png', 'Public MQTTs on ESP32'),
-      rel('articles/post1', 'img/post1/cover.png', 'How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu'),
-    ],
+    related: [],
   },
   post6: {
     documentTitle: 'ESP32 OTA Firmware Update over HTTPS | Gemify Blog',
@@ -121,10 +142,7 @@ export const articlesBySlug: Record<ArticleSlug, ArticleConfig> = {
     contentId: 'article-post6-content',
     tocListId: 'toc-list-post6',
     related: [
-      rel('articles/post5', 'img/post5/cover.png', 'MQTTS in A76xx'),
-      rel('articles/post4', 'img/post4/cover.png', 'MQTTS on W5500 and ESP32'),
-      rel('articles/post3', 'img/post3/cover.png', 'Public MQTTs on ESP32'),
-      rel('articles/post1', 'img/post1/cover.png', 'How to Set up an MQTT Broker Using Aedes MQTT on Ubuntu'),
+      rel('blog/series/mqtt-iot', 'img/post1/cover.png', 'MQTT & MQTTS for IoT'),
     ],
   },
 };

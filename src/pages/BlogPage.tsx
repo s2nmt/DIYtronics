@@ -1,8 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { articleSeriesList } from '../content/articleSeries';
 import { assetPath } from '../utils/assetPath';
 import { blogPosts, blogRecentSidebarCount } from '../content/blogPosts';
 import '../styles/blog-page.css';
+
+type BlogFeedItem = {
+  key: string;
+  href: string;
+  cover: string;
+  title: string;
+  author: string;
+  date: string;
+  excerpt: string;
+  isSeries: boolean;
+};
 
 export function BlogPage() {
   const { t, language } = useLanguage();
@@ -12,26 +24,48 @@ export function BlogPage() {
     document.title = t('blog.documentTitle');
   }, [t, language]);
 
+  const feedItems = useMemo<BlogFeedItem[]>(() => {
+    const series: BlogFeedItem[] = articleSeriesList.map((s) => ({
+      key: `series-${s.slug}`,
+      href: `blog/series/${s.slug}`,
+      cover: s.cover,
+      title: s.title,
+      author: s.author,
+      date: s.date,
+      excerpt: s.description,
+      isSeries: true,
+    }));
+
+    const posts: BlogFeedItem[] = blogPosts.map((p) => ({
+      key: p.href,
+      href: p.href,
+      cover: p.cover,
+      title: p.title,
+      author: p.author,
+      date: p.date,
+      excerpt: p.excerpt,
+      isSeries: false,
+    }));
+
+    return [...series, ...posts];
+  }, []);
+
   const q = query.trim().toLowerCase();
   const filtered = useMemo(() => {
-    if (!q) return blogPosts;
-    return blogPosts.filter(
-      (p) =>
-        p.title.toLowerCase().includes(q) ||
-        p.excerpt.toLowerCase().includes(q),
+    if (!q) return feedItems;
+    return feedItems.filter(
+      (item) =>
+        item.title.toLowerCase().includes(q) || item.excerpt.toLowerCase().includes(q),
     );
-  }, [q]);
+  }, [feedItems, q]);
 
-  const recent = blogPosts.slice(0, blogRecentSidebarCount);
+  const recent = feedItems.slice(0, blogRecentSidebarCount);
 
   const heroBg = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${assetPath('img/cover_blog.jpg')})`;
 
   return (
     <main className="blog-page-root">
-      <section
-        className="blog-hero"
-        style={{ backgroundImage: heroBg }}
-      >
+      <section className="blog-hero" style={{ backgroundImage: heroBg }}>
         <div className="blog-hero-content">
           <h1>{t('blog.heroTitle')}</h1>
           <p>{t('blog.heroSubtitle')}</p>
@@ -46,23 +80,22 @@ export function BlogPage() {
               <p>{t('blog.welcomeBody')}</p>
             </div>
 
-            {filtered.map((post) => (
-              <article key={post.href} className="blog-post">
-                <img
-                  src={assetPath(post.cover)}
-                  alt=""
-                  className="blog-post-image"
-                />
+            {filtered.map((item) => (
+              <article key={item.key} className="blog-post">
+                <img src={assetPath(item.cover)} alt="" className="blog-post-image" />
                 <div className="blog-post-content">
+                  {item.isSeries ? (
+                    <span className="blog-series-label">{t('series.eyebrow')}</span>
+                  ) : null}
                   <h3 className="blog-post-title">
-                    <a href={assetPath(post.href)}>{post.title}</a>
+                    <a href={assetPath(item.href)}>{item.title}</a>
                   </h3>
                   <div className="blog-post-meta">
-                    {t('blog.by')} {post.author} | {post.date}
+                    {t('blog.by')} {item.author} | {item.date}
                   </div>
-                  <p className="blog-post-excerpt">{post.excerpt}</p>
-                  <a href={assetPath(post.href)} className="blog-read-more">
-                    {t('blog.readMore')}
+                  <p className="blog-post-excerpt">{item.excerpt}</p>
+                  <a href={assetPath(item.href)} className="blog-read-more">
+                    {item.isSeries ? t('series.viewAllParts') : t('blog.readMore')}
                   </a>
                 </div>
               </article>
@@ -72,14 +105,14 @@ export function BlogPage() {
           <aside className="blog-sidebar">
             <div className="sidebar-widget">
               <h3>{t('blog.recentPosts')}</h3>
-              {recent.map((post) => (
-                <div key={post.href} className="recent-post">
-                  <img src={assetPath(post.cover)} alt="" />
+              {recent.map((item) => (
+                <div key={item.key} className="recent-post">
+                  <img src={assetPath(item.cover)} alt="" />
                   <div className="recent-post-content">
                     <h4>
-                      <a href={assetPath(post.href)}>{post.title}</a>
+                      <a href={assetPath(item.href)}>{item.title}</a>
                     </h4>
-                    <div className="date">{post.date}</div>
+                    <div className="date">{item.date}</div>
                   </div>
                 </div>
               ))}
@@ -87,10 +120,7 @@ export function BlogPage() {
 
             <div className="sidebar-widget">
               <h3>{t('blog.search')}</h3>
-              <form
-                className="search-form"
-                onSubmit={(e) => e.preventDefault()}
-              >
+              <form className="search-form" onSubmit={(e) => e.preventDefault()}>
                 <input
                   type="search"
                   placeholder={t('blog.searchPlaceholder')}
@@ -131,6 +161,9 @@ export function BlogPage() {
                     'ESP32',
                     'MQTT',
                     'OTA',
+                    'Yocto',
+                    'BeagleBone',
+                    'Embedded Linux',
                   ] as const
                 ).map((tag) => (
                   <a key={tag} href="#">

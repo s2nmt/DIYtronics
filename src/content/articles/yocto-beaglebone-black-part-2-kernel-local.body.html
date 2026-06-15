@@ -1,0 +1,69 @@
+<p>This is <strong>Part 2</strong> of the <strong>Yocto on BeagleBone Black</strong> series. After <a href="../articles/yocto-beaglebone-black-part-1-introduction">Part 1</a> (build environment and a working SD image), we use BitBake to download and unpack the kernel so the full source tree is available locally on your PC.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Complete Part 1 first. You should already have Poky Scarthgap cloned, <code>build-bbb</code> configured with <code>MACHINE ?= "beaglebone"</code>, and a successful <code>bitbake core-image-minimal</code> run.</p>
+
+<p>Re-enter the build environment:</p>
+<pre><code>cd poky
+source oe-init-build-env build-bbb</code></pre>
+
+<h2 id="which-kernel-recipe">Which kernel recipe?</h2>
+<p>Target the virtual provider rather than hard-coding a recipe name. Confirm on your setup:</p>
+
+<pre><code>bitbake -e virtual/kernel | grep ^P=
+bitbake -e virtual/kernel | grep ^PV=</code></pre>
+
+<p>Example output:</p>
+<pre><code>P="linux-ti-staging"
+PV="6.6.xx"</code></pre>
+
+<p>Use <code>virtual/kernel</code> in the commands below so they stay valid even if the underlying recipe name changes.</p>
+
+<h2 id="fetch-unpack-kernel">Fetch and unpack the kernel locally</h2>
+<pre><code>bitbake -c fetch virtual/kernel
+bitbake -c unpack virtual/kernel</code></pre>
+
+<p>Downloads go to <code>build-bbb/downloads/</code>. The unpacked tree lands under <code>build-bbb/tmp/work/</code>.</p>
+
+<h2 id="find-kernel-source-path">Find the local kernel source path</h2>
+<pre><code>bitbake -e virtual/kernel | grep ^S=</code></pre>
+
+<p>Typical path pattern:</p>
+<pre><code>S=".../build-bbb/tmp/work/beaglebone-oe-linux-gnueabi/linux-ti-staging/&lt;version&gt;/git"</code></pre>
+
+<p>Go there and verify:</p>
+<pre><code>cd $(bitbake -e virtual/kernel | sed -n 's/^S="\([^"]*\)".*/\1/p')
+pwd
+ls
+# expect: arch/ drivers/ include/ kernel/ Makefile  ...</code></pre>
+
+<h2 id="build-kernel-only">Build the kernel only (optional)</h2>
+<pre><code>bitbake virtual/kernel</code></pre>
+
+<p>Artifacts land under <code>build-bbb/tmp/deploy/images/beaglebone/</code> (e.g. <code>zImage</code>, device-tree blobs).</p>
+
+<h2 id="devtool-modify">Keep a persistent local copy with devtool</h2>
+<p>Files under <code>tmp/work</code> can be wiped on rebuild. For ongoing changes, use the recipe name from <code>bitbake -e virtual/kernel | grep ^P=</code>:</p>
+
+<pre><code>devtool modify linux-ti-staging
+bitbake virtual/kernel</code></pre>
+
+<p>Sources are copied to <code>build-bbb/workspace/sources/</code>. When done, save your work into a layer:</p>
+<pre><code>devtool finish linux-ti-staging &lt;your-meta-layer&gt;</code></pre>
+
+<p>Or reset:</p>
+<pre><code>devtool reset linux-ti-staging</code></pre>
+
+<h2 id="useful-paths">Useful paths (summary)</h2>
+<ul>
+  <li><strong>Downloads:</strong> <code>build-bbb/downloads/</code></li>
+  <li><strong>Unpacked work copy:</strong> <code>build-bbb/tmp/work/.../&lt;kernel-recipe&gt;/.../git/</code></li>
+  <li><strong>devtool workspace:</strong> <code>build-bbb/workspace/sources/</code></li>
+  <li><strong>Built kernel output:</strong> <code>build-bbb/tmp/deploy/images/beaglebone/</code></li>
+</ul>
+
+<h2 id="whats-next">What’s next (Part 3)</h2>
+<p>Part 3 will cover UART debug board setup and BitBake append files (<code>bbappend</code>).</p>
+
+<h2 id="summary">Summary</h2>
+<p><code>bitbake -c fetch</code> and <code>bitbake -c unpack virtual/kernel</code> place the BeagleBone kernel source on your host. Use <code>bitbake -e virtual/kernel</code> to print the exact path, and <code>devtool modify</code> when you need a lasting local tree for patches and driver work.</p>
