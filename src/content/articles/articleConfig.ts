@@ -7,6 +7,9 @@ import post5Body from './post5.body.html?raw';
 import post6Body from './post6.body.html?raw';
 import yoctoBeagleboneBlackPart1Body from './yocto-beaglebone-black-part-1-introduction.body.html?raw';
 import yoctoBeagleboneBlackPart2Body from './yocto-beaglebone-black-part-2-kernel-local.body.html?raw';
+import yoctoBeagleboneBlackPart3Body from './yocto-beaglebone-black-part-3-st7789-display.body.html?raw';
+import yoctoBeagleboneBlackPart4Body from './yocto-beaglebone-black-part-4-button-p8-keys.body.html?raw';
+import yoctoBeagleboneBlackPart5Body from './yocto-beaglebone-black-part-5-mpu6050-imu.body.html?raw';
 
 function rel(href: string, cover: string, title: string): ArticleRelatedPost {
   return { href, cover, title };
@@ -25,6 +28,9 @@ export type ArticleConfig = {
 };
 
 export const ARTICLE_SLUGS = [
+  'yocto-beaglebone-black-part-5-mpu6050-imu',
+  'yocto-beaglebone-black-part-4-button-p8-keys',
+  'yocto-beaglebone-black-part-3-st7789-display',
   'yocto-beaglebone-black-part-2-kernel-local',
   'yocto-beaglebone-black-part-1-introduction',
   'post1',
@@ -38,23 +44,53 @@ export const ARTICLE_SLUGS = [
 export type ArticleSlug = (typeof ARTICLE_SLUGS)[number];
 
 export const articlesBySlug: Record<ArticleSlug, ArticleConfig> = {
+  'yocto-beaglebone-black-part-5-mpu6050-imu': {
+    documentTitle:
+      'Yocto on BeagleBone Black — Part 5: MPU6050 IMU | Gemify Blog',
+    title: 'Yocto on BeagleBone Black — Part 5: Enabling the MPU6050 IMU',
+    cover: 'img/articles/yocto-beaglebone-black-part-5-mpu6050-imu/cover.png',
+    category: 'Series',
+    metaLine: 'by Tuan Nguyen | Jun 15, 2026',
+    body: yoctoBeagleboneBlackPart5Body,
+    contentId: 'article-yocto-bbb-part-5-content',
+    tocListId: 'toc-list-yocto-bbb-part-5',
+    related: [],
+  },
+  'yocto-beaglebone-black-part-4-button-p8-keys': {
+    documentTitle:
+      'Yocto on BeagleBone Black — Part 4: P8 Buttons & LEDs | Gemify Blog',
+    title: 'Yocto on BeagleBone Black — Part 4: P8 Buttons & LEDs (button-p8-keys)',
+    cover: 'img/articles/yocto-beaglebone-black-part-4-button-p8-keys/cover.png',
+    category: 'Series',
+    metaLine: 'by Tuan Nguyen | Jun 15, 2026',
+    body: yoctoBeagleboneBlackPart4Body,
+    contentId: 'article-yocto-bbb-part-4-content',
+    tocListId: 'toc-list-yocto-bbb-part-4',
+    related: [],
+  },
+  'yocto-beaglebone-black-part-3-st7789-display': {
+    documentTitle:
+      'Yocto on BeagleBone Black — Part 3: ST7789 Display | Gemify Blog',
+    title: 'Yocto on BeagleBone Black — Part 3: Enabling the ST7789 Display',
+    cover: 'img/articles/yocto-beaglebone-black-part-3-st7789-display/cover.png',
+    category: 'Series',
+    metaLine: 'by Tuan Nguyen | Jun 15, 2026',
+    body: yoctoBeagleboneBlackPart3Body,
+    contentId: 'article-yocto-bbb-part-3-content',
+    tocListId: 'toc-list-yocto-bbb-part-3',
+    related: [],
+  },
   'yocto-beaglebone-black-part-2-kernel-local': {
     documentTitle:
-      'Yocto on BeagleBone Black — Part 2: Get Kernel Source Locally | Gemify Blog',
-    title: 'Yocto on BeagleBone Black — Part 2: Get Kernel Source Locally',
+      'Yocto on BeagleBone Black — Part 2: Building the Kernel Locally | Gemify Blog',
+    title: 'Yocto on BeagleBone Black — Part 2: Building the Kernel Locally',
     cover: 'img/articles/yocto-beaglebone-black-part-2-kernel-local/cover.png',
     category: 'Series',
     metaLine: 'by Tuan Nguyen | Jun 15, 2025',
     body: yoctoBeagleboneBlackPart2Body,
     contentId: 'article-yocto-bbb-part-2-content',
     tocListId: 'toc-list-yocto-bbb-part-2',
-    related: [
-      rel(
-        'articles/yocto-beaglebone-black-part-1-introduction',
-        'img/articles/yocto-beaglebone-black-part-1-introduction/cover.png',
-        'Yocto on BeagleBone Black — Part 1: Build Image & Flash SD Card',
-      ),
-    ],
+    related: [],
   },
   'yocto-beaglebone-black-part-1-introduction': {
     documentTitle:
@@ -66,13 +102,7 @@ export const articlesBySlug: Record<ArticleSlug, ArticleConfig> = {
     body: yoctoBeagleboneBlackPart1Body,
     contentId: 'article-yocto-bbb-part-1-content',
     tocListId: 'toc-list-yocto-bbb-part-1',
-    related: [
-      rel(
-        'articles/yocto-beaglebone-black-part-2-kernel-local',
-        'img/articles/yocto-beaglebone-black-part-2-kernel-local/cover.png',
-        'Yocto on BeagleBone Black — Part 2: Get Kernel Source Locally',
-      ),
-    ],
+    related: [],
   },
   post1: {
     documentTitle:

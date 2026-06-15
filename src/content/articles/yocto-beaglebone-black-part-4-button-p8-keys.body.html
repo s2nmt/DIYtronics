@@ -1,0 +1,300 @@
+<p>This is <strong>Part 4</strong> of the <strong>Yocto on BeagleBone Black</strong> series. It explains how this project exposes four buttons and two LEDs on the P8 header through a custom out-of-tree kernel module <code>button-p8-keys</code>. Unlike the standard <code>gpio-keys</code> input driver, this module provides a simple sysfs interface under <code>/sys/kernel/button_p8_keys/</code> — easy to read from shell scripts or userspace without the Linux input subsystem.</p>
+
+<h2 id="overview">1. Overview</h2>
+<p>The <code>button-p8-keys</code> package is a custom kernel module built as a separate Yocto recipe in <code>meta-bbb</code>. It is not part of the main kernel tree (<code>linux-bb/</code>). Instead, it is compiled out-of-tree against your kernel headers and loaded at boot.</p>
+
+<table>
+  <thead>
+    <tr><th>Feature</th><th>Detail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Buttons</td><td>4 switches — read-only via sysfs</td></tr>
+    <tr><td>LEDs</td><td>2 GPIO outputs — read/write via sysfs</td></tr>
+    <tr><td>Interface</td><td><code>/sys/kernel/button_p8_keys/</code></td></tr>
+    <tr><td>Driver type</td><td>Platform driver (<code>bbb,button-p8-keys</code>)</td></tr>
+    <tr><td>Recipe</td><td><code>meta-bbb/recipes-kernel/button-p8-keys/</code></td></tr>
+  </tbody>
+</table>
+
+<p><strong>Why a custom driver?</strong> The standard Linux approach uses <code>gpio-keys</code> and the input subsystem (<code>/dev/input/event*</code>). This project uses a simpler sysfs-based driver instead:</p>
+<ul>
+  <li>Read button state with <code>cat /sys/kernel/button_p8_keys/sw1</code></li>
+  <li>Control LEDs with <code>echo 1 &gt; /sys/kernel/button_p8_keys/led1</code></li>
+  <li>No <code>evtest</code> or input device handling required</li>
+</ul>
+
+<h2 id="how-it-works">2. How it works</h2>
+<pre><code>  Buttons + LEDs (hardware)
+         │
+         │  GPIO pins on P8 header
+         ▼
+  Device Tree node (bbb,button-p8-keys)
+         │
+         ▼
+  Kernel module: button_p8_keys.ko
+         │
+         ▼
+  /sys/kernel/button_p8_keys/
+      ├── sw1, sw2, sw3, sw4   (read: 0=pressed, 1=released)
+      └── led1, led2            (read/write: 0 or 1)</code></pre>
+
+<p><strong>Data flow</strong></p>
+<ol>
+  <li>Device tree declares GPIO pins and binds the <code>bbb,button-p8-keys</code> compatible string</li>
+  <li>Module probe runs when the module loads — reads GPIOs from device tree</li>
+  <li>Sysfs files are created under <code>/sys/kernel/button_p8_keys/</code></li>
+  <li>Userspace reads buttons and writes LED values through those files</li>
+</ol>
+
+<h2 id="hardware">3. Hardware connections</h2>
+
+<h3 id="buttons">Buttons (input, active-low)</h3>
+<p>Buttons connect between the GPIO pin and GND. Internal pull-up is enabled in the device tree — released = 1, pressed = 0.</p>
+
+<table>
+  <thead>
+    <tr><th>Sysfs name</th><th>BBB pin</th><th>GPIO</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>sw1</td><td>P8_12</td><td>gpio1_12</td></tr>
+    <tr><td>sw2</td><td>P8_14</td><td>gpio0_26</td></tr>
+    <tr><td>sw3</td><td>P8_16</td><td>gpio1_14</td></tr>
+    <tr><td>sw4</td><td>P8_18</td><td>gpio2_1</td></tr>
+  </tbody>
+</table>
+
+<h3 id="leds">LEDs (output)</h3>
+<table>
+  <thead>
+    <tr><th>Sysfs name</th><th>BBB pin</th><th>GPIO</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>led1</td><td>P8_8</td><td>gpio2_3</td></tr>
+    <tr><td>led2</td><td>P8_10</td><td>gpio2_4</td></tr>
+  </tbody>
+</table>
+<p>Write <code>0</code> to turn off, <code>1</code> to turn on.</p>
+
+<h2 id="device-tree">4. Device tree configuration</h2>
+<p><strong>File:</strong> <code>linux-bb/arch/arm/boot/dts/am335x-bone-common.dtsi</code></p>
+
+<h3 id="platform-node">Platform node</h3>
+<pre><code>button_p8_keys {
+    compatible = "bbb,button-p8-keys";
+    pinctrl-names = "default";
+    pinctrl-0 = &lt;&amp;button_p8_keys_pins&gt;, &lt;&amp;p8_leds_pins&gt;;
+    button-gpios = &lt;&amp;gpio1 12 GPIO_ACTIVE_HIGH&gt;,
+                   &lt;&amp;gpio0 26 GPIO_ACTIVE_HIGH&gt;,
+                   &lt;&amp;gpio1 14 GPIO_ACTIVE_HIGH&gt;,
+                   &lt;&amp;gpio2 1 GPIO_ACTIVE_HIGH&gt;;
+    led-gpios = &lt;&amp;gpio2 3 GPIO_ACTIVE_HIGH&gt;,
+                &lt;&amp;gpio2 4 GPIO_ACTIVE_HIGH&gt;;
+    status = "okay";
+};</code></pre>
+
+<table>
+  <thead>
+    <tr><th>Property</th><th>Purpose</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>compatible</code></td><td>Must match driver: <code>bbb,button-p8-keys</code></td></tr>
+    <tr><td><code>button-gpios</code></td><td>Four button GPIO lines (input)</td></tr>
+    <tr><td><code>led-gpios</code></td><td>Two LED GPIO lines (output)</td></tr>
+    <tr><td><code>pinctrl-0</code></td><td>Pin mux for buttons and LEDs</td></tr>
+  </tbody>
+</table>
+
+<h3 id="pin-mux">Pin mux</h3>
+<pre><code>button_p8_keys_pins: button-p8-keys-pins {
+    pinctrl-single,pins = &lt;
+        AM33XX_PADCONF(AM335X_PIN_GPMC_AD12, PIN_INPUT_PULLUP, MUX_MODE7)  /* P8_12 */
+        AM33XX_PADCONF(AM335X_PIN_GPMC_AD10, PIN_INPUT_PULLUP, MUX_MODE7)  /* P8_14 */
+        AM33XX_PADCONF(AM335X_PIN_GPMC_AD14, PIN_INPUT_PULLUP, MUX_MODE7)  /* P8_16 */
+        AM33XX_PADCONF(AM335X_PIN_GPMC_CLK,  PIN_INPUT_PULLUP, MUX_MODE7)  /* P8_18 */
+    &gt;;
+};
+
+p8_leds_pins: p8-leds-pins {
+    pinctrl-single,pins = &lt;
+        AM33XX_PADCONF(AM335X_PIN_GPMC_OEN_REN, PIN_OUTPUT_PULLDOWN, MUX_MODE7)  /* P8_8 */
+        AM33XX_PADCONF(AM335X_PIN_GPMC_WEN,     PIN_OUTPUT_PULLDOWN, MUX_MODE7)  /* P8_10 */
+    &gt;;
+};</code></pre>
+
+<p>After editing the device tree, rebuild the kernel so the updated DTB is deployed:</p>
+<pre><code>bitbake linux-bb.org -c compile -f
+bitbake linux-bb.org</code></pre>
+
+<h2 id="kernel-module">5. The kernel module</h2>
+<p><strong>Source:</strong> <code>meta-bbb/recipes-kernel/button-p8-keys/files/button_p8_keys.c</code></p>
+
+<h3 id="driver-structure">Driver structure</h3>
+<p>The module is a platform driver that:</p>
+<ul>
+  <li>Matches device tree compatible <code>bbb,button-p8-keys</code></li>
+  <li>Gets button GPIOs via <code>gpiod_get_array(..., "button", GPIOD_IN)</code></li>
+  <li>Gets LED GPIOs via <code>gpiod_get_array(..., "led", GPIOD_OUT_LOW)</code></li>
+  <li>Creates a sysfs kobject at <code>/sys/kernel/button_p8_keys/</code></li>
+</ul>
+
+<h3 id="sysfs-interface">Sysfs interface</h3>
+<table>
+  <thead>
+    <tr><th>File</th><th>Mode</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>sw1</code> … <code>sw4</code></td><td>read-only (0444)</td><td>Button state: 1 = released, 0 = pressed</td></tr>
+    <tr><td><code>led1</code>, <code>led2</code></td><td>read/write (0644)</td><td>LED state: write 0 or 1</td></tr>
+  </tbody>
+</table>
+
+<p>From the driver source:</p>
+<pre><code>/* pull-up, button to GND: released=1, pressed=0 */
+return sysfs_emit(buf, "%d\n", gpiod_get_value(key->gpio));</code></pre>
+
+<h3 id="device-tree-binding">Device tree binding</h3>
+<pre><code>static const struct of_device_id button_p8_keys_of_match[] = {
+    { .compatible = "bbb,button-p8-keys" },
+    {}
+};</code></pre>
+<p>The <code>button-gpios</code> and <code>led-gpios</code> properties map to the <code>"button"</code> and <code>"led"</code> gpio specifier names used in <code>gpiod_get_array()</code>.</p>
+
+<h3 id="makefile">Makefile</h3>
+<p><strong>File:</strong> <code>meta-bbb/recipes-kernel/button-p8-keys/files/Makefile</code></p>
+<pre><code>obj-m := button_p8_keys.o</code></pre>
+<p>Standard out-of-tree kernel module build against <code>KERNEL_SRC</code> provided by Yocto's <code>module</code> class.</p>
+
+<h2 id="yocto-recipe">6. The Yocto recipe</h2>
+<p><strong>File:</strong> <code>meta-bbb/recipes-kernel/button-p8-keys/button-p8-keys_1.0.bb</code></p>
+
+<pre><code>SUMMARY = "Kernel module: P8 buttons (input) and LEDs (output) via sysfs"
+LICENSE = "GPL-2.0-only"
+
+inherit module
+
+DEPENDS += "virtual/kernel"
+
+SRC_URI = "file://Makefile \
+           file://button_p8_keys.c \
+          "
+
+S = "${WORKDIR}"
+
+KERNEL_MODULE_AUTOLOAD += "button_p8_keys"
+RPROVIDES:${PN} += "kernel-module-button_p8_keys"</code></pre>
+
+<table>
+  <thead>
+    <tr><th>Setting</th><th>Purpose</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>inherit module</code></td><td>Yocto class for out-of-tree kernel modules</td></tr>
+    <tr><td><code>DEPENDS += "virtual/kernel"</code></td><td>Build against the active kernel recipe</td></tr>
+    <tr><td><code>KERNEL_MODULE_AUTOLOAD</code></td><td>Load <code>button_p8_keys</code> automatically at boot</td></tr>
+    <tr><td><code>RPROVIDES</code></td><td>Package name alias for dependency resolution</td></tr>
+  </tbody>
+</table>
+
+<p>This module is independent of <code>linux-bb.org_%.bbappend</code>. It builds separately but requires the kernel (for headers and module ABI).</p>
+
+<h2 id="image">7. Adding to the image</h2>
+<p><strong>File:</strong> <code>meta-bbb/recipes-core/image/core-image-minimal.bbappend</code></p>
+<pre><code>IMAGE_INSTALL:append = " button-p8-keys ..."</code></pre>
+<p>This installs <code>button_p8_keys.ko</code> into the rootfs under <code>/lib/modules/&lt;kernel-version&gt;/</code> and configures module autoload.</p>
+<p>Without this line, the module is built in <code>tmp/deploy/</code> but not present on the board.</p>
+
+<h2 id="building">8. Building</h2>
+
+<h3 id="build-module-only">Build only the module</h3>
+<pre><code>cd poky
+source oe-init-build-env build-bbb
+bitbake button-p8-keys</code></pre>
+
+<h3 id="build-kernel-module-image">Build kernel + module + image</h3>
+<p>If you changed the device tree:</p>
+<pre><code>bitbake linux-bb.org
+bitbake button-p8-keys
+bitbake core-image-minimal</code></pre>
+<p>Or build the full image — BitBake resolves dependencies automatically:</p>
+<pre><code>bitbake core-image-minimal</code></pre>
+
+<p><strong>Output</strong></p>
+<pre><code>tmp/deploy/ipk/.../button-p8-keys_1.0-r0_*.ipk</code></pre>
+<p>Installed on the rootfs as:</p>
+<pre><code>/lib/modules/&lt;version&gt;/kernel/drivers/.../button_p8_keys.ko</code></pre>
+
+<h2 id="using">9. Using on the board</h2>
+<p>After boot, verify the module loaded:</p>
+<pre><code>lsmod | grep button_p8_keys</code></pre>
+
+<p>Check sysfs:</p>
+<pre><code>ls /sys/kernel/button_p8_keys/
+# sw1  sw2  sw3  sw4  led1  led2</code></pre>
+
+<p><strong>Read a button</strong></p>
+<pre><code>cat /sys/kernel/button_p8_keys/sw1
+# 1 = not pressed
+# 0 = pressed</code></pre>
+
+<p><strong>Control an LED</strong></p>
+<pre><code>echo 1 &gt; /sys/kernel/button_p8_keys/led1   # turn on
+echo 0 &gt; /sys/kernel/button_p8_keys/led1   # turn off
+cat /sys/kernel/button_p8_keys/led1        # read state</code></pre>
+
+<p><strong>Poll buttons in a loop</strong></p>
+<pre><code>while true; do
+    echo -n "sw1=$(cat /sys/kernel/button_p8_keys/sw1) "
+    echo -n "sw2=$(cat /sys/kernel/button_p8_keys/sw2) "
+    echo -n "sw3=$(cat /sys/kernel/button_p8_keys/sw3) "
+    echo "sw4=$(cat /sys/kernel/button_p8_keys/sw4)"
+    sleep 0.2
+done</code></pre>
+
+<p><strong>Kernel log on probe</strong></p>
+<pre><code>dmesg | grep button-p8-keys</code></pre>
+<p>Expected output:</p>
+<pre><code>buttons (input): /sys/kernel/button_p8_keys/{sw1..sw4} (1=released, 0=pressed)
+leds (output): /sys/kernel/button_p8_keys/{led1,led2} = P8_8,P8_10 (write 0/1)</code></pre>
+
+<h2 id="troubleshooting">10. Troubleshooting</h2>
+
+<table>
+  <thead>
+    <tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>No <code>/sys/kernel/button_p8_keys/</code></td><td>Module not loaded</td><td><code>modprobe button_p8_keys</code></td></tr>
+    <tr><td><code>modprobe</code> fails</td><td>Module not in image</td><td>Add <code>button-p8-keys</code> to <code>IMAGE_INSTALL</code>, rebuild image</td></tr>
+    <tr><td>Probe fails</td><td>Device tree node missing or wrong compatible</td><td>Check DTS, rebuild kernel DTB</td></tr>
+    <tr><td>Wrong button count error</td><td><code>button-gpios</code> has wrong number of entries</td><td>Must be exactly 4 buttons, 2 LEDs</td></tr>
+    <tr><td>Buttons always 0 or always 1</td><td>Wrong wiring or pull-up config</td><td>Buttons must connect to GND when pressed</td></tr>
+    <tr><td>Module build fails</td><td>Kernel not built first</td><td><code>bitbake linux-bb.org</code> then <code>bitbake button-p8-keys</code></td></tr>
+  </tbody>
+</table>
+
+<p><strong>Manual load for testing</strong></p>
+<pre><code>modprobe button_p8_keys</code></pre>
+
+<p><strong>Check device tree binding</strong></p>
+<pre><code>ls /proc/device-tree/button_p8_keys/ 2>/dev/null
+cat /proc/device-tree/button_p8_keys/compatible
+# bbb,button-p8-keys</code></pre>
+
+<h2 id="summary">11. Summary</h2>
+
+<table>
+  <thead>
+    <tr><th>Layer</th><th>File</th><th>Role</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Device tree</td><td><code>linux-bb/.../am335x-bone-common.dtsi</code></td><td>GPIO pins, <code>bbb,button-p8-keys</code> node</td></tr>
+    <tr><td>Kernel module</td><td><code>button_p8_keys.c</code></td><td>Platform driver, sysfs interface</td></tr>
+    <tr><td>Yocto recipe</td><td><code>button-p8-keys_1.0.bb</code></td><td>Build out-of-tree module, autoload</td></tr>
+    <tr><td>Image</td><td><code>core-image-minimal.bbappend</code></td><td>Install module on rootfs</td></tr>
+  </tbody>
+</table>
+
+<p><code>button-p8-keys</code> is an out-of-tree kernel module — separate from the main kernel source but dependent on it. The device tree lives in <code>linux-bb/</code>; the driver source lives in <code>meta-bbb/</code>. Together they give you a simple sysfs API for four P8 buttons and two P8 LEDs.</p>
+
+<p>Previous: <a href="../articles/yocto-beaglebone-black-part-3-st7789-display">Part 3 — Enabling the ST7789 Display</a></p>
+<p>Next: <a href="../articles/yocto-beaglebone-black-part-5-mpu6050-imu">Part 5 — Enabling the MPU6050 IMU</a></p>

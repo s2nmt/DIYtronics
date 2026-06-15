@@ -46,7 +46,7 @@ export const articleSeriesBySlug: Record<ArticleSeriesSlug, ArticleSeriesConfig>
     slug: 'yocto-beaglebone-black',
     title: 'Yocto on BeagleBone Black',
     description:
-      'Build custom embedded Linux for BeagleBone Black with Yocto Scarthgap — image build, SD flash, kernel source, and board bring-up.',
+      'Build custom embedded Linux for BeagleBone Black with Yocto Scarthgap — image build, local kernel, ST7789 display, P8 I/O, MPU6050 IMU, and board bring-up.',
     cover: 'img/articles/yocto-beaglebone-black-part-1-introduction/cover.png',
     author: 'Tuan Nguyen',
     date: 'Jun 15, 2026',
@@ -65,10 +65,32 @@ export const articleSeriesBySlug: Record<ArticleSeriesSlug, ArticleSeriesConfig>
         part: 2,
         date: 'Jun 15, 2026',
         excerpt:
-          'Fetch and unpack virtual/kernel with BitBake and use devtool modify for local kernel changes.',
+          'Full guide: upstream linux-bb.org recipe, meta-bbb bbappend, externalsrc, config flow, build steps, and troubleshooting.',
       },
-      { status: 'planned', part: 3, title: 'UART debug board & bitbake append' },
-      { status: 'planned', part: 4, title: 'Custom layers & device tree' },
+      {
+        status: 'published',
+        slug: 'yocto-beaglebone-black-part-3-st7789-display',
+        part: 3,
+        date: 'Jun 15, 2026',
+        excerpt:
+          'Device tree, fbtft/fb_st7789v modules, no-fbcon fragment, image packages, verification, and optional boot splash for ST7789 on SPI1.',
+      },
+      {
+        status: 'published',
+        slug: 'yocto-beaglebone-black-part-4-button-p8-keys',
+        part: 4,
+        date: 'Jun 15, 2026',
+        excerpt:
+          'Out-of-tree button-p8-keys module: P8 buttons and LEDs via sysfs, device tree, Yocto recipe, build, and on-board usage.',
+      },
+      {
+        status: 'published',
+        slug: 'yocto-beaglebone-black-part-5-mpu6050-imu',
+        part: 5,
+        date: 'Jun 15, 2026',
+        excerpt:
+          'MPU6050 on I2C2 with inv-mpu6050 IIO driver: device tree, kernel modules, i2c-tools, verification, and reading accel/gyro data.',
+      },
     ],
   },
   'mqtt-iot': {

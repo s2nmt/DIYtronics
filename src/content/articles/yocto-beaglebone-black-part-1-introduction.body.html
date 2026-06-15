@@ -116,7 +116,7 @@ cd deploy-core-image-minimal-image-complete</code></pre>
 </ul>
 
 <h2 id="whats-next">What’s next (Part 2)</h2>
-<p>Part 2 covers how to fetch and unpack the kernel source locally with BitBake (<code>virtual/kernel</code>) and use <code>devtool modify</code> for driver and device-tree work.</p>
+<p>Part 2 sets up a local <code>linux-bb/</code> kernel tree and uses Yocto <code>externalsrc</code> with a <code>meta-bbb</code> bbappend to build the kernel without re-fetching from GitHub.</p>
 
 <h2 id="summary">Summary</h2>
-<p>You prepared an Ubuntu host, cloned Poky Scarthgap with meta-openembedded, meta-arm, and meta-ti, built <code>core-image-minimal</code> for <code>MACHINE = "beaglebone"</code>, flashed the <code>.wic.xz</code> image to microSD, and booted the board. Part 2 moves on to working with the kernel tree on your build machine.</p>
+<p>You prepared an Ubuntu host, cloned Poky Scarthgap with meta-openembedded, meta-arm, and meta-ti, built <code>core-image-minimal</code> for <code>MACHINE = "beaglebone"</code>, flashed the <code>.wic.xz</code> image to microSD, and booted the board. Part 2 covers local kernel builds with <code>externalsrc</code>.</p>

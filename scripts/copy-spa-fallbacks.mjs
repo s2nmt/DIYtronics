@@ -45,6 +45,9 @@ for (const r of routes) {
 }
 
 const articleSlugs = [
+  'yocto-beaglebone-black-part-5-mpu6050-imu',
+  'yocto-beaglebone-black-part-4-button-p8-keys',
+  'yocto-beaglebone-black-part-3-st7789-display',
   'yocto-beaglebone-black-part-2-kernel-local',
   'yocto-beaglebone-black-part-1-introduction',
   'post1',

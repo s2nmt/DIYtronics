@@ -1,0 +1,317 @@
+<p>This is <strong>Part 5</strong> of the <strong>Yocto on BeagleBone Black</strong> series. It explains how to bring up the InvenSense <strong>MPU6050</strong> 6-axis IMU (accelerometer + gyroscope). Unlike <a href="../articles/yocto-beaglebone-black-part-4-button-p8-keys">button-p8-keys</a>, there is no custom driver — the board uses the standard in-kernel IIO driver (<code>inv-mpu6050</code>). Your job is to wire it correctly, describe it in the device tree, enable the kernel modules, and read sensor data through the IIO sysfs interface.</p>
+
+<h2 id="overview">1. Overview</h2>
+<p>The MPU6050 communicates over I2C. Linux exposes it through the Industrial I/O (IIO) subsystem — not a custom sysfs driver like the P8 buttons.</p>
+
+<table>
+  <thead>
+    <tr><th>Item</th><th>Detail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Sensor</td><td>MPU6050 (accel + gyro)</td></tr>
+    <tr><td>Bus</td><td>I2C2</td></tr>
+    <tr><td>I2C address</td><td><code>0x68</code> (AD0 low) or <code>0x69</code> (AD0 high)</td></tr>
+    <tr><td>Compatible string</td><td><code>invensense,mpu6050</code></td></tr>
+    <tr><td>Kernel modules</td><td><code>inv-mpu6050</code>, <code>inv-mpu6050-i2c</code></td></tr>
+    <tr><td>Userspace API</td><td>IIO sysfs under <code>/sys/bus/iio/devices/</code></td></tr>
+  </tbody>
+</table>
+
+<p><strong>Compared to other project components</strong></p>
+<table>
+  <thead>
+    <tr><th>Component</th><th>Driver type</th><th>Interface</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>ST7789 display</td><td>In-kernel fbtft</td><td><code>/dev/fb0</code></td></tr>
+    <tr><td>P8 buttons/LEDs</td><td>Out-of-tree button_p8_keys</td><td><code>/sys/kernel/button_p8_keys/</code></td></tr>
+    <tr><td>MPU6050</td><td>In-kernel inv-mpu6050</td><td>IIO sysfs</td></tr>
+  </tbody>
+</table>
+
+<p>No separate recipe is needed for the driver itself — only device tree changes, kernel modules in the image, and optional <code>i2c-tools</code> for debugging.</p>
+
+<h2 id="sensor-stack">2. How the sensor stack works</h2>
+<pre><code>  MPU6050 chip (hardware)
+         │
+         │  I2C2 (SDA, SCL)
+         ▼
+  Device Tree node (invensense,mpu6050 @ 0x68)
+         │
+         ▼
+  Kernel modules: inv-mpu6050-i2c + inv-mpu6050
+         │
+         ▼
+  IIO subsystem
+         │
+         ▼
+  /sys/bus/iio/devices/iio:deviceN/
+      ├── in_accel_x_raw, in_accel_y_raw, in_accel_z_raw
+      ├── in_anglvel_x_raw, in_anglvel_y_raw, in_anglvel_z_raw
+      └── in_temp_raw (if exposed)</code></pre>
+
+<p>The I2C driver (<code>inv-mpu6050-i2c</code>) handles bus communication. The core driver (<code>inv-mpu6050</code>) registers accelerometer and gyroscope channels with the IIO framework.</p>
+
+<h2 id="hardware">3. Hardware connections</h2>
+<p>In this project, the MPU6050 is on <strong>I2C2</strong>:</p>
+
+<table>
+  <thead>
+    <tr><th>Signal</th><th>BBB Pin</th><th>Notes</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>SCL</td><td>P9_19</td><td>I2C2 clock</td></tr>
+    <tr><td>SDA</td><td>P9_20</td><td>I2C2 data</td></tr>
+    <tr><td>VCC</td><td>3.3V</td><td>e.g. P9_03 or P9_04</td></tr>
+    <tr><td>GND</td><td>GND</td><td>e.g. P9_01 or P9_02</td></tr>
+  </tbody>
+</table>
+
+<h3 id="i2c-address">I2C address</h3>
+<table>
+  <thead>
+    <tr><th>AD0 pin</th><th>Address</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>GND</td><td><code>0x68</code> (used in this project)</td></tr>
+    <tr><td>VCC</td><td><code>0x69</code></td></tr>
+  </tbody>
+</table>
+<p>The device tree uses <code>reg = &lt;0x68&gt;</code>. If your module has AD0 tied high, change it to <code>&lt;0x69&gt;</code>.</p>
+
+<h3 id="pull-ups">Pull-ups</h3>
+<p>I2C requires pull-up resistors on SDA and SCL (typically 4.7 kΩ to 3.3V). Many breakout boards include them. The device tree enables internal pull-ups on the AM335x pins, but external pull-ups on the breakout are usually still required for reliable operation.</p>
+
+<h2 id="device-tree">4. Device tree configuration</h2>
+<p><strong>File:</strong> <code>linux-bb/arch/arm/boot/dts/am335x-bone-common.dtsi</code></p>
+
+<h3 id="i2c2-pins">I2C2 pin mux</h3>
+<pre><code>i2c2_pins: i2c2-pins {
+    pinctrl-single,pins = &lt;
+        AM33XX_PADCONF(AM335X_PIN_UART1_CTSN, PIN_INPUT_PULLUP, MUX_MODE3)  /* P9_20: i2c2_sda */
+        AM33XX_PADCONF(AM335X_PIN_UART1_RTSN, PIN_INPUT_PULLUP, MUX_MODE3)  /* P9_19: i2c2_scl */
+    &gt;;
+};</code></pre>
+
+<h3 id="i2c2-node">I2C2 bus and IMU node</h3>
+<pre><code>&amp;i2c2 {
+    pinctrl-names = "default";
+    pinctrl-0 = &lt;&amp;i2c2_pins&gt;;
+    status = "okay";
+    clock-frequency = &lt;100000&gt;;
+
+    /* MPU6050: P9_19=SCL, P9_20=SDA, addr 0x68 */
+    imu@68 {
+        compatible = "invensense,mpu6050";
+        reg = &lt;0x68&gt;;
+    };
+};</code></pre>
+
+<table>
+  <thead>
+    <tr><th>Property</th><th>Value</th><th>Meaning</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>status = "okay"</code></td><td>—</td><td>Enable I2C2 controller</td></tr>
+    <tr><td><code>clock-frequency</code></td><td><code>100000</code></td><td>I2C bus speed: 100 kHz (standard mode)</td></tr>
+    <tr><td><code>compatible</code></td><td><code>invensense,mpu6050</code></td><td>Binds the inv-mpu6050 IIO driver</td></tr>
+    <tr><td><code>reg</code></td><td><code>&lt;0x68&gt;</code></td><td>I2C slave address</td></tr>
+  </tbody>
+</table>
+
+<p>After editing the device tree, rebuild the kernel:</p>
+<pre><code>bitbake linux-bb.org -c compile -f
+bitbake linux-bb.org</code></pre>
+<p>Deploy the updated <code>am335x-boneblack.dtb</code> to the board.</p>
+
+<h2 id="kernel-config">5. Kernel configuration</h2>
+<p>The BeagleBoard.org defconfig already enables the required drivers as modules.</p>
+<p><strong>File:</strong> <code>linux-bb/arch/arm/configs/bb.org_defconfig</code></p>
+<pre><code>CONFIG_IIO=y
+CONFIG_INV_MPU6050_I2C=m</code></pre>
+<p><code>CONFIG_INV_MPU6050_I2C</code> automatically selects the core <code>inv-mpu6050</code> module. No extra config fragment is needed in <code>meta-bbb</code> for the MPU6050.</p>
+
+<h3 id="module-names">Module names</h3>
+<table>
+  <thead>
+    <tr><th>Kconfig</th><th>Module file</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>CONFIG_INV_MPU6050_IIO</code></td><td><code>inv-mpu6050.ko</code> (core, pulled in as dependency)</td></tr>
+    <tr><td><code>CONFIG_INV_MPU6050_I2C</code></td><td><code>inv-mpu6050-i2c.ko</code></td></tr>
+  </tbody>
+</table>
+<p>Both must be present on the rootfs for I2C probing to work.</p>
+
+<h2 id="yocto-layer">6. Yocto layer changes</h2>
+<p>All MPU6050-related Yocto settings are in <code>meta-bbb</code>.</p>
+
+<h3 id="module-autoload">Module autoload</h3>
+<p><strong>File:</strong> <code>meta-bbb/recipes-kernel/linux/linux-bb.org_%.bbappend</code></p>
+<pre><code>KERNEL_MODULE_AUTOLOAD:append:beaglebone = " inv-mpu6050 inv-mpu6050-i2c"</code></pre>
+<p>At boot, the kernel loads both modules so the driver can probe the I2C device automatically.</p>
+
+<h3 id="image-install">Install modules and tools in the image</h3>
+<p><strong>File:</strong> <code>meta-bbb/recipes-core/image/core-image-minimal.bbappend</code></p>
+<pre><code>IMAGE_INSTALL:append = " \
+    i2c-tools \
+    kernel-module-inv-mpu6050 \
+    kernel-module-inv-mpu6050-i2c \
+"</code></pre>
+
+<table>
+  <thead>
+    <tr><th>Package</th><th>Purpose</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>kernel-module-inv-mpu6050</code></td><td>Core IIO driver</td></tr>
+    <tr><td><code>kernel-module-inv-mpu6050-i2c</code></td><td>I2C transport layer</td></tr>
+    <tr><td><code>i2c-tools</code></td><td><code>i2cdetect</code>, <code>i2cget</code>, <code>i2cset</code> for bus debugging</td></tr>
+  </tbody>
+</table>
+
+<h2 id="build-deploy">7. Building and deploying</h2>
+
+<h3 id="build-kernel">Build kernel (device tree + modules)</h3>
+<pre><code>cd poky
+source oe-init-build-env build-bbb
+bitbake linux-bb.org</code></pre>
+
+<h3 id="build-image">Build full image</h3>
+<pre><code>bitbake core-image-minimal</code></pre>
+
+<p><strong>Output</strong></p>
+<pre><code>build-bbb/deploy-ti/images/beaglebone/
+├── am335x-boneblack.dtb          ← contains I2C2 + MPU6050 node
+└── core-image-minimal-*.rootfs.wic ← contains kernel modules + i2c-tools</code></pre>
+<p>Flash the image to SD card or eMMC.</p>
+
+<h2 id="verify">8. Verifying on the board</h2>
+
+<h3 id="verify-i2c">Step 1: Check I2C bus</h3>
+<pre><code># List I2C buses
+ls /dev/i2c-*
+
+# Scan I2C bus 2 for devices
+i2cdetect -y 2</code></pre>
+<p>You should see <code>68</code> (or <code>69</code>) in the grid:</p>
+<pre><code>     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+00:                         -- -- -- -- -- -- -- --
+10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+30: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+60: -- -- -- -- -- -- -- -- 68 -- -- -- -- -- -- --
+70: -- -- -- -- -- -- -- --</code></pre>
+
+<h3 id="verify-modules">Step 2: Check kernel modules</h3>
+<pre><code>lsmod | grep inv_mpu</code></pre>
+<p>Expected:</p>
+<pre><code>inv_mpu6050_i2c    ...
+inv_mpu6050        ...</code></pre>
+<p>If missing:</p>
+<pre><code>modprobe inv-mpu6050-i2c
+modprobe inv-mpu6050</code></pre>
+
+<h3 id="verify-dmesg">Step 3: Check kernel probe message</h3>
+<pre><code>dmesg | grep -i mpu</code></pre>
+<p>A successful probe typically shows the driver binding to the I2C device.</p>
+
+<h3 id="verify-iio">Step 4: Check IIO device</h3>
+<pre><code>ls /sys/bus/iio/devices/
+cat /sys/bus/iio/devices/iio:device*/name</code></pre>
+<p>You should see device names like <code>mpu6050</code> or similar for accel/gyro channels.</p>
+
+<h2 id="reading-data">9. Reading sensor data</h2>
+<p>IIO exposes each channel as a sysfs file. Find your device first:</p>
+<pre><code>IIO_DEV=$(grep -l mpu /sys/bus/iio/devices/iio:device*/name 2>/dev/null | head -1)
+IIO_DEV=$(dirname "$IIO_DEV")
+echo "Device: $IIO_DEV"</code></pre>
+
+<h3 id="list-channels">List available channels</h3>
+<pre><code>ls $IIO_DEV/</code></pre>
+<p>Typical files:</p>
+<pre><code>in_accel_x_raw    in_accel_y_raw    in_accel_z_raw
+in_anglvel_x_raw  in_anglvel_y_raw  in_anglvel_z_raw
+in_temp_raw
+in_accel_scale    in_anglvel_scale</code></pre>
+
+<h3 id="read-accel">Read accelerometer (raw values)</h3>
+<pre><code>cat $IIO_DEV/in_accel_x_raw
+cat $IIO_DEV/in_accel_y_raw
+cat $IIO_DEV/in_accel_z_raw</code></pre>
+
+<h3 id="read-gyro">Read gyroscope (raw values)</h3>
+<pre><code>cat $IIO_DEV/in_anglvel_x_raw
+cat $IIO_DEV/in_anglvel_y_raw
+cat $IIO_DEV/in_anglvel_z_raw</code></pre>
+
+<h3 id="convert-units">Convert to physical units</h3>
+<p>Raw values must be multiplied by the scale factor:</p>
+<pre><code># Example: read scale and compute
+SCALE=$(cat $IIO_DEV/in_accel_scale)
+RAW=$(cat $IIO_DEV/in_accel_x_raw)
+echo "$RAW * $SCALE" | bc -l</code></pre>
+
+<h3 id="monitor-loop">Simple monitoring loop</h3>
+<pre><code>while true; do
+    echo -n "accel: "
+    echo -n "$(cat $IIO_DEV/in_accel_x_raw) "
+    echo -n "$(cat $IIO_DEV/in_accel_y_raw) "
+    echo -n "$(cat $IIO_DEV/in_accel_z_raw)  "
+    echo -n "gyro: "
+    echo -n "$(cat $IIO_DEV/in_anglvel_x_raw) "
+    echo -n "$(cat $IIO_DEV/in_anglvel_y_raw) "
+    echo "$(cat $IIO_DEV/in_anglvel_z_raw)"
+    sleep 0.5
+done</code></pre>
+
+<p>For production applications, consider <code>libiio</code> or direct <code>read()</code> on <code>/dev/iio:deviceN</code> with proper buffer setup for higher sample rates.</p>
+
+<h2 id="troubleshooting">10. Troubleshooting</h2>
+
+<table>
+  <thead>
+    <tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>i2cdetect</code> shows <code>--</code> at 0x68</td><td>Wiring, power, wrong bus</td><td>Check SDA/SCL, 3.3V, GND; confirm bus number 2</td></tr>
+    <tr><td>Device at 0x69 not 0x68</td><td>AD0 pin tied high</td><td>Change <code>reg = &lt;0x69&gt;</code> in device tree</td></tr>
+    <tr><td><code>modprobe</code> fails</td><td>Modules not in image</td><td>Add <code>kernel-module-inv-mpu6050*</code> to <code>IMAGE_INSTALL</code></td></tr>
+    <tr><td>I2C seen but no IIO device</td><td>Modules not loaded, wrong compatible</td><td>Load modules; check compatible string</td></tr>
+    <tr><td>Probe error in dmesg</td><td>Wrong address, bus speed, power</td><td>Try <code>clock-frequency = &lt;400000&gt;</code>; verify hardware</td></tr>
+    <tr><td>Multiple IIO devices</td><td>Other sensors on same bus</td><td>Identify by <code>name</code> file in each <code>iio:deviceN</code></td></tr>
+  </tbody>
+</table>
+
+<p><strong>Useful debug commands</strong></p>
+<pre><code># Device tree node present?
+ls /proc/device-tree/soc/i2c@481a0000/imu@68/ 2>/dev/null
+cat /proc/device-tree/soc/i2c@481a0000/imu@68/compatible
+
+# I2C bus status
+ls /sys/bus/iio/devices/
+
+# Read chip WHO_AM_I register directly (MPU6050 = 0x68)
+i2cget -y 2 0x68 0x75</code></pre>
+<p>Register <code>0x75</code> (WHO_AM_I) should return <code>0x68</code> on a genuine MPU6050.</p>
+
+<h2 id="summary">11. Summary</h2>
+<p>Enabling the MPU6050 requires four steps:</p>
+
+<table>
+  <thead>
+    <tr><th>Step</th><th>What</th><th>Where</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>Enable I2C2 and describe the sensor</td><td><code>linux-bb/.../am335x-bone-common.dtsi</code></td></tr>
+    <tr><td>2</td><td>Enable <code>INV_MPU6050_I2C</code> in kernel config</td><td><code>bb.org_defconfig</code> (already set)</td></tr>
+    <tr><td>3</td><td>Autoload kernel modules</td><td><code>linux-bb.org_%.bbappend</code></td></tr>
+    <tr><td>4</td><td>Install modules and i2c-tools in image</td><td><code>core-image-minimal.bbappend</code></td></tr>
+  </tbody>
+</table>
+
+<p>Unlike <code>button-p8-keys</code>, there is no custom driver or separate recipe. The MPU6050 uses the standard in-kernel <code>inv-mpu6050</code> driver. Device tree tells the kernel where the chip is; IIO sysfs gives you accelerometer and gyroscope data in userspace.</p>
+
+<p>Previous: <a href="../articles/yocto-beaglebone-black-part-4-button-p8-keys">Part 4 — P8 Buttons &amp; LEDs (button-p8-keys)</a></p>
