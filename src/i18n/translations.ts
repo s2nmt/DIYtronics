@@ -34,6 +34,9 @@ export const translations: Record<Lang, Record<string, string>> = {
     'series.backToBlog': 'Back to blog',
     'series.viewAllParts': 'View all parts →',
     'hero.title': 'Gemify Technology',
+    'hero.titleBrand': 'Gemify',
+    'hero.titleHighlight': 'Technology',
+    'hero.badge': 'IoT · Hardware · Software',
     'hero.subtitle':
       'Discover modern technology devices and AIoT systems, professionally customized for each customer with precision.',
     'products.title': 'IoT Platform and IoT Device',
@@ -87,7 +90,10 @@ export const translations: Record<Lang, Record<string, string>> = {
       'From simple applications to complex AIoT systems, modern design that is easy to understand, easy to use, and expandable.',
     'about.stats.products': 'Products Created',
     'about.stats.support': 'Support',
+    'services.label': 'What We Offer',
     'services.title': 'Our Services',
+    'services.subtitle':
+      'End-to-end IoT capabilities — from ready-made platforms and devices to custom hardware design and full-stack software development.',
     'services.hardware.title': 'Hardware Development',
     'services.hardware.desc':
       'Outsource hardware design and firmware development services for custom electronic devices and IoT solutions.',
@@ -151,6 +157,9 @@ export const translations: Record<Lang, Record<string, string>> = {
     'series.backToBlog': 'Quay lại blog',
     'series.viewAllParts': 'Xem tất cả phần →',
     'hero.title': 'Gemify Technology',
+    'hero.titleBrand': 'Gemify',
+    'hero.titleHighlight': 'Công nghệ',
+    'hero.badge': 'IoT · Phần cứng · Phần mềm',
     'hero.subtitle':
       'Khám phá các thiết bị công nghệ, hệ thống AIoT hiện đại được thiết kế chuyên môn hóa đối với từng khách hàng với độ tỉ mỉ, chính xác cao.',
     'products.title': 'Platform IoT và Thiết bị IoT',
@@ -203,7 +212,10 @@ export const translations: Record<Lang, Record<string, string>> = {
       'Từ các ứng dụng đơn giản đến hệ thống AIoT phức tạp, thiết kế hiện đại dễ hiểu dễ sử dụng và mở rộng.',
     'about.stats.products': 'Sản phẩm đã tạo',
     'about.stats.support': 'Hỗ trợ',
+    'services.label': 'Dịch vụ',
     'services.title': 'Dịch vụ của chúng tôi',
+    'services.subtitle':
+      'Giải pháp IoT trọn gói — từ sản phẩm công nghệ, platform IoT đến thiết kế phần cứng và phát triển phần mềm theo yêu cầu.',
     'services.hardware.title': 'Phát triển phần cứng',
     'services.hardware.desc':
       'Thiết kế phần cứng và phát triển firmware cho các thiết bị điện tử tùy chỉnh và giải pháp IoT.',

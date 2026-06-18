@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
 import App from './App';
+import './styles/theme.css';
 import '../styles.css';
 import './styles/mobile-nav.css';
 

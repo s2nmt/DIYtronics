@@ -1,6 +1,6 @@
 main.project-article-page {
-  background: #fff;
-  color: #111;
+  background: var(--bg);
+  color: var(--text);
   padding: clamp(4.5rem, 5vw + 3rem, 6.25rem) 0 clamp(3rem, 5vw + 2rem, 5rem);
   box-sizing: border-box;
   width: 100%;
@@ -18,14 +18,14 @@ main.project-article-page {
 .project-article-title {
   font-size: clamp(1.375rem, 2.5vw + 0.85rem, 2.25rem);
   font-weight: 700;
-  color: #111;
+  color: var(--text);
   margin-bottom: clamp(0.65rem, 1.5vw, 1rem);
   line-height: 1.25;
   word-wrap: break-word;
 }
 
 .project-article-meta {
-  color: #666;
+  color: var(--muted);
   font-size: clamp(0.8125rem, 0.4vw + 0.78rem, 0.95rem);
   margin-bottom: clamp(1.25rem, 3vw, 2rem);
 }
@@ -33,7 +33,7 @@ main.project-article-page {
 .project-article-content {
   line-height: clamp(1.65, 0.5vw + 1.55, 1.8);
   font-size: clamp(0.9375rem, 0.35vw + 0.88rem, 1.0625rem);
-  color: #333;
+  color: var(--text-secondary);
 }
 
 .project-article-content h2 {
@@ -41,7 +41,7 @@ main.project-article-page {
   font-weight: 600;
   margin-top: clamp(1.75rem, 3vw + 1rem, 2.5rem);
   margin-bottom: clamp(0.5rem, 1.2vw, 0.75rem);
-  color: #111;
+  color: var(--text);
 }
 
 .project-article-content p {
@@ -70,7 +70,7 @@ main.project-article-page {
   padding: clamp(0.28rem, 1vw, 0.35rem) clamp(0.55rem, 2vw, 0.75rem);
   border-radius: 6px;
   font-size: clamp(0.8rem, 0.25vw + 0.76rem, 0.9rem);
-  color: #333;
+  color: var(--text-secondary);
 }
 
 .project-article-ui-galleries {
@@ -87,7 +87,7 @@ main.project-article-page {
 .project-article-gallery-heading {
   font-size: clamp(1rem, 0.9vw + 0.82rem, 1.2rem);
   font-weight: 600;
-  color: #111;
+  color: var(--text);
   margin: 0 0 clamp(0.5rem, 1.5vw, 0.65rem);
   line-height: 1.35;
 }
@@ -117,7 +117,7 @@ main.project-article-page {
   border: 1px solid #ddd;
   border-radius: 50%;
   background: #fff;
-  color: #111;
+  color: var(--text);
   font-size: clamp(1.1rem, 2.5vw, 1.5rem);
   line-height: 1;
   cursor: pointer;

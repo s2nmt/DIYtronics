@@ -1,0 +1,195 @@
+.services-showcase {
+  padding: 72px 0;
+  background: var(--bg-soft);
+}
+
+.services-showcase-header {
+  max-width: 680px;
+  margin: 0 auto 2.75rem;
+  text-align: center;
+}
+
+.services-showcase-label {
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 0.6rem;
+}
+
+.services-showcase-header h2 {
+  font-size: clamp(1.75rem, 3vw, 2.35rem);
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.services-showcase-subtitle {
+  font-size: 1rem;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.services-showcase-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.services-showcase-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0;
+  align-items: stretch;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+}
+
+.services-showcase-item:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  border-color: rgba(13, 148, 136, 0.25);
+}
+
+.services-showcase-item--reverse .services-showcase-media {
+  order: 2;
+}
+
+.services-showcase-item--reverse .services-showcase-body {
+  order: 1;
+}
+
+.services-showcase-media {
+  position: relative;
+  min-height: 220px;
+  background: linear-gradient(145deg, var(--primary-subtle) 0%, var(--bg-muted) 100%);
+  border-right: 1px solid var(--border);
+}
+
+.services-showcase-item--reverse .services-showcase-media {
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+
+.services-showcase-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  object-fit: cover;
+  transition: transform 0.45s ease;
+}
+
+.services-showcase-item:hover .services-showcase-image {
+  transform: scale(1.02);
+}
+
+.services-showcase-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.75rem 2rem;
+}
+
+.services-showcase-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+.services-showcase-index {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+}
+
+.services-showcase-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--primary-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.services-showcase-icon i {
+  font-size: 1.15rem;
+  color: var(--primary);
+  transition: color 0.3s ease;
+}
+
+.services-showcase-item:hover .services-showcase-icon {
+  background: var(--gradient-brand);
+  transform: scale(1.04);
+}
+
+.services-showcase-item:hover .services-showcase-icon i {
+  color: var(--white);
+}
+
+.services-showcase-body h3 {
+  font-size: clamp(1.2rem, 1.9vw, 1.45rem);
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.6rem;
+  line-height: 1.35;
+}
+
+.services-showcase-body p {
+  font-size: 0.95rem;
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 52ch;
+}
+
+@media (max-width: 900px) {
+  .services-showcase {
+    padding: 56px 0;
+  }
+
+  .services-showcase-item,
+  .services-showcase-item--reverse {
+    grid-template-columns: 1fr;
+  }
+
+  .services-showcase-item--reverse .services-showcase-media,
+  .services-showcase-item--reverse .services-showcase-body {
+    order: unset;
+  }
+
+  .services-showcase-media,
+  .services-showcase-item--reverse .services-showcase-media {
+    border-right: none;
+    border-left: none;
+    border-bottom: 1px solid var(--border);
+    min-height: 180px;
+  }
+
+  .services-showcase-image {
+    min-height: 180px;
+  }
+
+  .services-showcase-body {
+    padding: 1.5rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .services-showcase-header {
+    margin-bottom: 2rem;
+  }
+
+  .services-showcase-body {
+    padding: 1.25rem 1.15rem;
+  }
+}

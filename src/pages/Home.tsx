@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
-import { assetPath } from '../utils/assetPath';
+import { ServicesSection } from '../components/ServicesSection';
+
 export function Home() {
   const { t } = useLanguage();
 
@@ -11,10 +12,26 @@ export function Home() {
   return (
     <main>
       <section id="home" className="hero">
+        <div className="hero-bg" aria-hidden="true">
+          <div className="hero-blob hero-blob--1" />
+          <div className="hero-blob hero-blob--2" />
+        </div>
         <div className="hero-container">
           <div className="hero-content">
-            <h1>{t('hero.title')}</h1>
+            <span className="hero-badge">{t('hero.badge')}</span>
+            <h1>
+              {t('hero.titleBrand')}{' '}
+              <span className="hero-highlight">{t('hero.titleHighlight')}</span>
+            </h1>
             <p>{t('hero.subtitle')}</p>
+            <div className="hero-actions">
+              <a className="cta-button cta-button--primary" href="#services">
+                {t('nav.services')}
+              </a>
+              <a className="cta-button cta-button--outline" href="#contact">
+                {t('nav.contact')}
+              </a>
+            </div>
           </div>
           <div className="hero-image">
             <div className="hero-placeholder">
@@ -24,34 +41,7 @@ export function Home() {
         </div>
       </section>
 
-      <section id="services" className="services">
-        <div className="container">
-          <h2>{t('services.title')}</h2>
-          <div className="services-grid">
-            <div className="service-card">
-              <div className="service-image-wrap">
-                <img className="service-image" src={assetPath('img/platformIot.png')} alt={t('services.products.title')} />
-              </div>
-              <h3>{t('services.products.title')}</h3>
-              <p>{t('services.products.desc')}</p>
-            </div>
-            <div className="service-card">
-              <div className="service-image-wrap">
-                <img className="service-image" src={assetPath('img/hardwaredevelop.png')} alt={t('services.hardware.title')} />
-              </div>
-              <h3>{t('services.hardware.title')}</h3>
-              <p>{t('services.hardware.desc')}</p>
-            </div>
-            <div className="service-card">
-              <div className="service-image-wrap">
-                <img className="service-image" src={assetPath('img/softwareIoT.png')} alt={t('services.software.title')} />
-              </div>
-              <h3>{t('services.software.title')}</h3>
-              <p>{t('services.software.desc')}</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <ServicesSection />
 
       <section id="about" className="about">
         <div className="container">
@@ -79,7 +69,6 @@ export function Home() {
           </div>
         </div>
       </section>
-
     </main>
   );
 }

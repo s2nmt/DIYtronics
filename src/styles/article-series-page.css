@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: #fff;
+  color: var(--white);
   margin-top: 70px;
   padding: 3rem 1.5rem;
 }
@@ -70,7 +70,7 @@
 .article-series-page-root .article-series-card {
   display: flex;
   gap: 1.5rem;
-  background: #fff;
+  background: var(--bg-card);
   border: 1px solid #e5e5e5;
   border-radius: 8px;
   overflow: hidden;
@@ -107,7 +107,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #666;
+  color: var(--muted);
   margin-bottom: 0.35rem;
 }
 
@@ -118,24 +118,24 @@
 }
 
 .article-series-page-root .article-series-card-content h3 a {
-  color: #111;
+  color: var(--text);
   text-decoration: none;
 }
 
 .article-series-page-root .article-series-card-date {
-  color: #666;
+  color: var(--muted);
   font-size: 0.85rem;
   margin-bottom: 0.75rem;
 }
 
 .article-series-page-root .article-series-card-content p {
-  color: #666;
+  color: var(--muted);
   line-height: 1.6;
   margin-bottom: 0.75rem;
 }
 
 .article-series-page-root .article-series-card-link {
-  color: #111;
+  color: var(--text);
   font-weight: 600;
   text-decoration: none;
 }
@@ -152,11 +152,11 @@
   border-radius: 4px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #666;
+  color: var(--muted);
 }
 
 .article-series-page-root .article-series-back {
-  color: #111;
+  color: var(--text);
   font-weight: 600;
   text-decoration: none;
 }
@@ -181,13 +181,13 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #666;
+  color: var(--muted);
 }
 
 .article-post-page .article-series-nav-title {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #111;
+  color: var(--text);
   text-decoration: none;
 }
 
@@ -211,12 +211,12 @@
 
 .article-post-page .article-series-nav-part {
   font-weight: 700;
-  color: #666;
+  color: var(--muted);
   white-space: nowrap;
 }
 
 .article-post-page .article-series-nav-item-title {
-  color: #111;
+  color: var(--text);
   text-decoration: none;
 }
 
@@ -249,7 +249,7 @@
 
 .blog-page-root .blog-series-item a {
   display: block;
-  color: #111;
+  color: var(--text);
   text-decoration: none;
   font-weight: 600;
   font-size: 0.9rem;
@@ -257,7 +257,7 @@
 }
 
 .blog-page-root .blog-series-item p {
-  color: #666;
+  color: var(--muted);
   font-size: 0.8rem;
   line-height: 1.45;
   margin: 0;

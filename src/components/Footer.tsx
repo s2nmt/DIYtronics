@@ -30,16 +30,7 @@ export function Footer() {
           </div>
           <div className="footer-section" id="contact">
             <h4>{t('footer.contact')}</h4>
-            <p
-              style={{
-                color: 'var(--muted)',
-                lineHeight: 1.6,
-                marginBottom: '1.5rem',
-                fontSize: '0.9rem',
-              }}
-            >
-              {t('contact.desc')}
-            </p>
+            <p className="footer-desc">{t('contact.desc')}</p>
             <div className="footer-contact">
               <div className="footer-contact-item">
                 <i className="fas fa-envelope" />

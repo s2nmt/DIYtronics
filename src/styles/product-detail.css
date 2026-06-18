@@ -1,6 +1,6 @@
 main.product-detail-page {
-  background: #f5f5f5;
-  color: #111;
+  background: var(--bg-soft);
+  color: var(--text);
 }
 
 .product-detail-page .product-layout {
@@ -13,9 +13,10 @@ main.product-detail-page {
 }
 
 .product-detail-page .sidebar-diy {
-  background: #fff;
-  border-radius: 20px;
-  border: 1px solid #e5e5e5;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
   width: 340px;
   min-width: 260px;
   max-width: 340px;
@@ -32,12 +33,15 @@ main.product-detail-page {
 .product-detail-page .sidebar-diy h2 {
   font-size: 2rem;
   font-weight: 800;
-  color: #111;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
   margin-bottom: 0.5rem;
 }
 
 .product-detail-page .sidebar-diy .desc {
-  color: #666;
+  color: var(--muted);
   font-size: 1.08rem;
   margin-bottom: 1.2rem;
 }
@@ -52,8 +56,8 @@ main.product-detail-page {
 .product-detail-page .sidebar-diy .sidebar-social a {
   width: 38px;
   height: 38px;
-  background: #eee;
-  color: #111;
+  background: var(--primary-subtle);
+  color: var(--primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -64,27 +68,28 @@ main.product-detail-page {
 }
 
 .product-detail-page .sidebar-diy .sidebar-social a:hover {
-  background: #111;
-  color: #fff;
+  background: var(--gradient-brand);
+  color: var(--white);
 }
 
 .product-detail-page .sidebar-diy .about-btn {
   display: inline-block;
   margin-top: 0.7rem;
   padding: 0.7rem 2.2rem;
-  background: #111;
-  color: #fff;
-  border-radius: 10px;
+  background: var(--gradient-brand);
+  color: var(--white);
+  border-radius: var(--radius-full);
   font-size: 1.1rem;
   font-weight: 600;
   text-decoration: none;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(13, 148, 136, 0.3);
 }
 
 .product-detail-page .sidebar-diy .about-btn:hover {
-  background: #fff;
-  color: #111;
-  border: 1px solid #111;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(13, 148, 136, 0.4);
+  color: var(--white);
 }
 
 .product-detail-page .main-content {
@@ -93,18 +98,19 @@ main.product-detail-page {
 }
 
 .product-detail-page .product-section {
-  background: #fff;
-  border-radius: 18px;
-  border: 1px solid #e5e5e5;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
   padding: 2.5rem 2rem;
   margin-bottom: 2.5rem;
   max-width: 900px;
   margin-left: auto;
   margin-right: auto;
+  box-shadow: var(--shadow-sm);
 }
 
 .product-detail-page .product-section h2 {
-  color: #111;
+  color: var(--text);
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
@@ -118,6 +124,7 @@ main.product-detail-page {
 .product-detail-page .product-section li {
   font-size: 1rem;
   margin-bottom: 0.5rem;
+  color: var(--text-secondary);
 }
 
 .product-detail-page .intro-img {
@@ -125,8 +132,8 @@ main.product-detail-page {
   max-width: 80%;
   margin: 0 auto 1.2rem;
   display: block;
-  border-radius: 10px;
-  border: 1px solid #e5e5e5;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
 }
 
 .product-detail-page .intro-img--half {
@@ -144,7 +151,7 @@ main.product-detail-page {
   max-width: 100%;
   display: block;
   margin: 0 auto 1rem;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 @media (max-width: 700px) {
@@ -162,15 +169,15 @@ main.product-detail-page {
 .product-detail-page .product-title {
   font-size: 2rem;
   font-weight: 800;
-  color: #111;
+  color: var(--text);
   margin-bottom: 1.2rem;
   margin-top: 0.2rem;
-  letter-spacing: -1px;
+  letter-spacing: -0.02em;
 }
 
 .product-detail-page .gallery-img {
   max-width: 100%;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   margin-bottom: 1rem;
 }
 

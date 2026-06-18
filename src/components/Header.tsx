@@ -45,28 +45,28 @@ export function Header() {
           <div className="language-switcher">
             <button
               type="button"
-              className={`lang-btn${language === 'vi' ? ' active' : ''}`}
-              onClick={() => setLanguage('vi')}
-              aria-pressed={language === 'vi'}
+              className="lang-btn lang-btn--toggle active"
+              onClick={() => setLanguage(language === 'vi' ? 'en' : 'vi')}
+              aria-label={language === 'vi' ? 'Switch to English' : 'Chuyển sang Tiếng Việt'}
             >
-              <img
-                src={assetPath('img/flagVN.png')}
-                alt=""
-                className="flag-icon"
-                style={{ height: 20, verticalAlign: 'middle', marginRight: 4 }}
-              />
-              <span className="lang-text">VI</span>
-            </button>
-            <button
-              type="button"
-              className={`lang-btn${language === 'en' ? ' active' : ''}`}
-              onClick={() => setLanguage('en')}
-              aria-pressed={language === 'en'}
-            >
-              <span className="flag">
-                <i className="fas fa-globe" />
-              </span>
-              <span className="lang-text">EN</span>
+              {language === 'vi' ? (
+                <>
+                  <img
+                    src={assetPath('img/flagVN.png')}
+                    alt=""
+                    className="flag-icon"
+                  />
+                  <span className="lang-text">VI</span>
+                </>
+              ) : (
+                <>
+                  <span className="flag" aria-hidden="true">
+                    <i className="fas fa-globe" />
+                  </span>
+                  <span className="lang-text">EN</span>
+                </>
+              )}
+              <i className="fas fa-exchange-alt lang-swap-icon" aria-hidden="true" />
             </button>
           </div>
           <button
