@@ -83,7 +83,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'rfid.sidebarDesc':
       'Handcrafted electronics, IoT & embedded systems for makers and engineers. Sharing open-source projects and tutorials.',
     'rfid.sidebarAbout': 'About Gemify',
-    'about.title': 'About Gemify',
+    'about.title': 'About Gemify Technology',
     'about.desc1':
       'We are passionate about creating modern technology products from hardware to software that combine functionality with customer-specific design. Each product is custom-designed and tested to ensure the highest quality.',
     'about.desc2':
@@ -158,7 +158,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'series.viewAllParts': 'Xem tất cả phần →',
     'hero.title': 'Gemify Technology',
     'hero.titleBrand': 'Gemify',
-    'hero.titleHighlight': 'Công nghệ',
+    'hero.titleHighlight': 'Technology',
     'hero.badge': 'IoT · Phần cứng · Phần mềm',
     'hero.subtitle':
       'Khám phá các thiết bị công nghệ, hệ thống AIoT hiện đại được thiết kế chuyên môn hóa đối với từng khách hàng với độ tỉ mỉ, chính xác cao.',
@@ -205,7 +205,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'rfid.sidebarDesc':
       'Gemify Technology, IoT & hệ thống nhúng cho người dùng và developer. Chia sẻ dự án mã nguồn mở và hướng dẫn sử dụng.',
     'rfid.sidebarAbout': 'Về Gemify',
-    'about.title': 'Giới thiệu Gemify',
+    'about.title': 'Giới thiệu Gemify Technology',
     'about.desc1':
       'Chúng tôi đam mê tạo ra các sản phẩm công nghệ từ phần cứng đến phần mềm hiện đại kết hợp chức năng với thiết kế cụ thể hóa từng khách hàng. Mỗi sản phẩm được thiết kế riêng và kiểm tra để đảm bảo chất lượng cao nhất.',
     'about.desc2':

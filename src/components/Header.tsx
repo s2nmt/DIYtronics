@@ -22,7 +22,7 @@ export function Header() {
         <div className="nav-container">
           <div className="logo">
             <Link to="/">
-              <h1>Gemify</h1>
+              <h1>Gemify Technology</h1>
             </Link>
           </div>
           <ul className={`nav-menu${menuOpen ? ' active' : ''}`}>

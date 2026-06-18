@@ -6,7 +6,7 @@ export function Home() {
   const { t } = useLanguage();
 
   useEffect(() => {
-    document.title = 'Gemify - Technology';
+    document.title = 'Gemify Technology';
   }, []);
 
   return (

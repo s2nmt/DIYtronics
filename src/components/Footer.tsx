@@ -8,7 +8,7 @@ export function Footer() {
       <div className="container">
         <div className="footer-content">
           <div className="footer-section">
-            <h3>Gemify</h3>
+            <h3>Gemify Technology</h3>
             <p>{t('footer.tagline')}</p>
           </div>
           <div className="footer-section">
