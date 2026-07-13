@@ -11,9 +11,12 @@ import ArticleSeriesPage from "./pages/ArticleSeriesPage.jsx";
 import ProductsPage from "./pages/ProductsPage.jsx";
 import ProductDetail from "./pages/ProductDetail.jsx";
 
+const rawBase = import.meta.env.BASE_URL || "/";
+const routerBasename = rawBase === "/" ? "" : rawBase.replace(/\/$/, "");
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={routerBasename || undefined}>
       <Routes>
         <Route element={<App />}>
           <Route path="/" element={<Home />} />
