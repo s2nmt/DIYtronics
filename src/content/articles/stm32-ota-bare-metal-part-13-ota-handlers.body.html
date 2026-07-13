@@ -1,0 +1,26 @@
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-12-ota-parser">Part 12: OTA parser</a> — next: <a href="articles/stm32-ota-bare-metal-part-14-application">Part 14: Application</a>.</p>
+
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/boot/src/ota.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/boot/src/ota.c</code></a> — command handlers and slot swap.</p>
+
+<h2 id="start">1. START</h2>
+<p>Payload carries firmware size / CRC metadata expected by the host tool. Handler selects <strong>inactive</strong> slot base, records <code>fw_write_addr</code>, erases required pages, resets sequence counters, ACKs.</p>
+
+<h2 id="data">2. DATA</h2>
+<p>Each chunk: sequence number + up to 256 data bytes. Writes via <code>flash_write_buffer</code> at the running address. After enough bytes exist, <code>ota_early_slot_check()</code> parses the IMG1 header and verifies the vector table belongs to <em>this</em> slot — rejecting a wrong-linked image before the transfer finishes.</p>
+
+<h2 id="end">3. END</h2>
+<ol>
+  <li>Confirm length / CRC32 of what was written (as implemented in the file).</li>
+  <li><code>boot_verify_slot</code> on the inactive slot (SHA-256 + ECDSA).</li>
+  <li>Update <code>ota_config_t</code>: flip <code>active_slot</code> to the newly programmed slot.</li>
+  <li>ACK, then <code>jump_to_application</code> — success does not return to <code>main</code>.</li>
+</ol>
+
+<h2 id="abort">4. Abort / NACK</h2>
+<p>Once <code>fw_aborted</code> is set (bad header, wrong slot, verify fail), subsequent frames NACK until the session ends. The previous active slot remains bootable.</p>
+
+<h2 id="next">Next</h2><ul>
+  <li><a href="articles/stm32-ota-bare-metal-part-14-application">Part 14: Application</a></li>
+  <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
+  <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
+</ul>

@@ -1,0 +1,63 @@
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-2-keygen">Part 2: keygen.py</a> — next: <a href="articles/stm32-ota-bare-metal-part-4-rcc-system">Part 4: RCC & system</a>.</p>
+
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/Src/main.c" target="_blank" rel="noopener noreferrer"><code>bootloader/Src/main.c</code></a> in <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">STM32F103C8T6-ota-base-metal</a>.</p>
+<p>This post walks through the bootloader entry point. After reset, <code>main()</code> decides among three paths: honor an app-requested OTA flag, verify and jump a signed slot, or sit in the UART OTA receiver.</p>
+
+<h2 id="boot-flow">1. Boot decision flow</h2>
+<pre><code>reset
+  → enable IRQ, init clocks/GPIO/UART
+  → if OTA flag set → clear flag → ota_run()
+  → else pick a valid signed slot
+       → wait 3 s for key 'U'
+       → no key → jump_to_application()
+       → key pressed → ota_run()
+  → no valid slot → ota_run()
+  → after OTA idle timeout → retry pick / OTA loop</code></pre>
+
+<h2 id="helpers">2. Helpers in main.c</h2>
+<ul>
+  <li><strong><code>_write</code></strong> — retargets <code>printf</code> to <code>uart1_write</code> so logs go out USART1.</li>
+  <li><strong><code>boot_poll_ota_key</code></strong> — drains the UART RX ring; returns 1 if byte <code>OTA_UPDATE_KEY</code> (<code>'U'</code>) arrived.</li>
+  <li><strong><code>boot_pick_slot</code></strong> — tries active then inactive slot via <code>boot_verify_slot()</code> (SHA-256 + ECDSA). First success wins.</li>
+  <li><strong><code>boot_wait_ota_key</code></strong> — flushes RX, prints a prompt, polls for <code>BOOT_WAIT_MS</code> (3000 ms).</li>
+  <li><strong><code>boot_enter_ota</code></strong> — prints <code>OTA RX ready</code>, calls <code>ota_run(OTA_IDLE_TIMEOUT_MS)</code>.</li>
+</ul>
+
+<h2 id="main">3. <code>main()</code> step by step</h2>
+<pre><code>__asm volatile("cpsie i");
+init();
+SystemClock_Config();
+GPIO_Init();
+Uart1_Init();
+printf("STM32F103 Bootloader\r\n");
+
+if (ota_flag_is_set()) {
+    (void)ota_flag_clear();
+    boot_enter_ota();
+}
+
+if (boot_pick_slot(...) == 0) {
+    if (!boot_wait_ota_key(BOOT_WAIT_MS)) {
+        jump_to_application(jump_addr);
+    }
+} else {
+    printf("No valid signed app\r\n");
+}
+boot_enter_ota();
+while (1) { /* retry verify + OTA */ }</code></pre>
+<ol>
+  <li><strong>IRQ on</strong> — interrupts were possibly off in startup; enable before UART IRQ RX.</li>
+  <li><strong>Board bring-up</strong> — same driver stack the app uses (clock, PC13 LED, USART1).</li>
+  <li><strong>OTA flag</strong> — the app writes magic <code>0xDEADBEEF</code> at <code>OTA_CONFIG_ADDR</code> then resets. Bootloader clears it and enters OTA immediately (no 3 s wait).</li>
+  <li><strong>Normal boot</strong> — verify active/inactive; if OK, give the host 3 s to press <code>U</code> before jumping.</li>
+  <li><strong>Fallback</strong> — no image or user requested OTA → stay in the receiver. After idle timeout, try jump again so a successful OTA that already jumped never returns, but a timed-out session can recover.</li>
+</ol>
+
+<h2 id="why">4. Why this shape</h2>
+<p>The 3-second window lets <code>main.py --enter-ota</code> catch a fresh reset without requiring the app to set the flag. The flag path is for in-field updates when the app is already running. Dual-slot verify-before-jump is the safety net: a bad OTA never becomes the execution image.</p>
+
+<h2 id="next">Next</h2><ul>
+  <li><a href="articles/stm32-ota-bare-metal-part-4-rcc-system">Part 4: RCC & system</a></li>
+  <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
+  <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
+</ul>

@@ -41,6 +41,20 @@ for (const r of routes) {
 }
 
 const articleSlugs = [
+  "stm32-ota-bare-metal-part-16-tools",
+  "stm32-ota-bare-metal-part-15-startup-linker",
+  "stm32-ota-bare-metal-part-14-application",
+  "stm32-ota-bare-metal-part-13-ota-handlers",
+  "stm32-ota-bare-metal-part-12-ota-parser",
+  "stm32-ota-bare-metal-part-11-img-verify",
+  "stm32-ota-bare-metal-part-10-bootloader",
+  "stm32-ota-bare-metal-part-9-crypto",
+  "stm32-ota-bare-metal-part-8-nvic-tick-iwdg",
+  "stm32-ota-bare-metal-part-7-flash",
+  "stm32-ota-bare-metal-part-6-uart",
+  "stm32-ota-bare-metal-part-5-gpio",
+  "stm32-ota-bare-metal-part-4-rcc-system",
+  "stm32-ota-bare-metal-part-3-main",
   "stm32-ota-bare-metal-part-2-keygen",
   "stm32-ota-bare-metal",
   "yocto-beaglebone-black-part-5-mpu6050-imu",

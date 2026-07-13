@@ -1,0 +1,20 @@
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-14-application">Part 14: Application</a> — next: <a href="articles/stm32-ota-bare-metal-part-16-tools">Part 16: Host tools</a>.</p>
+
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/STM32F103C8TX_FLASH.ld" target="_blank" rel="noopener noreferrer"><code>bootloader/STM32F103C8TX_FLASH.ld</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/application/STM32F103C8TX_FLASH.ld" target="_blank" rel="noopener noreferrer"><code>application/STM32F103C8TX_FLASH.ld</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/Startup/startup_stm32f103c8tx.s" target="_blank" rel="noopener noreferrer"><code>bootloader/Startup/startup_stm32f103c8tx.s</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/application/Startup/startup_stm32f103c8tx.s" target="_blank" rel="noopener noreferrer"><code>application/Startup/startup_stm32f103c8tx.s</code></a>.</p>
+
+<h2 id="bl-ld">1. Bootloader linker</h2>
+<pre><code>FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 22K
+RAM        : ORIGIN = 0x20000000, LENGTH = 20K</code></pre>
+<p>Vectors live at the start of Flash — ST-Link boots the bootloader after every reset.</p>
+
+<h2 id="app-ld">2. Application linker</h2>
+<p>FLASH ORIGIN is the <strong>payload</strong> address (slot + 256), not the slot base. Length must fit under the remaining slot size after the header. VTOR is remapped at jump time to that payload address.</p>
+
+<h2 id="startup">3. Startup</h2>
+<p>Standard Cube-style <code>startup_stm32f103c8tx.s</code>: copy data, zero BSS, call <code>SystemInit</code> (if present), branch to <code>main</code>. The important OTA detail is not the assembly itself — it is that <strong>each image's vector table must match its link address</strong>, which <code>app_is_valid_at</code> enforces.</p>
+
+<h2 id="next">Next</h2><ul>
+  <li><a href="articles/stm32-ota-bare-metal-part-16-tools">Part 16: Host tools</a></li>
+  <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
+  <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
+</ul>

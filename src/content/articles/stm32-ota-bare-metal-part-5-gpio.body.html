@@ -1,0 +1,25 @@
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-4-rcc-system">Part 4: RCC & system</a> — next: <a href="articles/stm32-ota-bare-metal-part-6-uart">Part 6: UART</a>.</p>
+
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/gpio.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/gpio.c</code></a>.</p>
+<p>The Blue Pill LED on <strong>PC13</strong> is the only user-facing GPIO in the bootloader path — useful as a heartbeat while waiting for OTA or after a failed jump.</p>
+
+<h2 id="api">1. API surface</h2>
+<ul>
+  <li><code>GPIO_Init()</code> — enables GPIOC clock, configures PC13 as push-pull output.</li>
+  <li><code>GPIO_Write</code> / <code>GPIO_Toggle</code> — bit-band style set/clear via ODR/BSRR patterns in the driver.</li>
+</ul>
+
+<h2 id="registers">2. Register access pattern</h2>
+<p>Pins are programmed through <code>CRL</code>/<code>CRH</code> mode bits (output 2/10/50 MHz, CNF push-pull). The driver avoids HAL <code>GPIO_InitTypeDef</code> and writes the packed register fields defined in the local header map.</p>
+<pre><code>/* Conceptual */
+GPIOC_CRH: MODE13 = output, CNF13 = push-pull
+GPIOC_ODR: bit 13 toggled for LED</code></pre>
+
+<h2 id="why-bl">3. Why the bootloader needs GPIO</h2>
+<p>During bring-up you can confirm life before trusting UART. The application reuses the same driver to blink once per second — same pin, same code path.</p>
+
+<h2 id="next">Next</h2><ul>
+  <li><a href="articles/stm32-ota-bare-metal-part-6-uart">Part 6: UART</a></li>
+  <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
+  <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
+</ul>

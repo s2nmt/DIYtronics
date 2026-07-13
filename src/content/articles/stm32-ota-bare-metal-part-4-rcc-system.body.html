@@ -1,0 +1,28 @@
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-3-main">Part 3: bootloader main.c</a> — next: <a href="articles/stm32-ota-bare-metal-part-5-gpio">Part 5: GPIO</a>.</p>
+
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/inc/types.h" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/inc/types.h</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/inc/conf.h" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/inc/conf.h</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/rcc.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/rcc.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/system.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/system.c</code></a>.</p>
+<p>Before UART or Flash, the MCU needs a stable clock. This layer is pure register programming — no STM32 HAL clock tree helpers.</p>
+
+<h2 id="types-conf">1. <code>types.h</code> and <code>conf.h</code></h2>
+<p><code>types.h</code> defines packed register access helpers (bitfield + <code>REG</code> union style) used across drivers. <code>conf.h</code> holds board constants: HSE/HSI assumptions, USART baud, pin maps, and Flash page size (1 KB on the F103 medium-density parts used here).</p>
+
+<h2 id="rcc">2. <code>rcc.c</code></h2>
+<p>Thin wrappers to enable peripheral clocks (GPIOA/C, USART1, etc.) by setting the right bits in <code>RCC_APB2ENR</code> / <code>RCC_APB1ENR</code>. Calling these once from <code>init()</code> / MSP keeps the higher-level drivers free of clock noise.</p>
+
+<h2 id="system">3. <code>SystemClock_Config</code></h2>
+<p><code>system.c</code> configures the F103 for a typical 72 MHz SYSCLK from HSE + PLL (or a documented HSI fallback in the file). Important side effects:</p>
+<ul>
+  <li>Flash wait states via <code>flash_latency_config()</code> before raising the clock.</li>
+  <li>Prefetch buffer enable for denser instruction fetch.</li>
+  <li><code>SystemClock_DeInit()</code> — used by <code>jump_to_application()</code> to leave a clean clock state for the app.</li>
+</ul>
+<p>Read the full sequence in <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/system.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/system.c</code></a> — order matters: you must not run Flash at 72 MHz with zero wait states.</p>
+
+<h2 id="takeaway">4. Takeaway</h2>
+<p>Clock bring-up is the first place bare-metal projects silently fail. Keeping it in one file makes the rest of the bootloader (UART baud, SysTick 1 ms) deterministic.</p>
+
+<h2 id="next">Next</h2><ul>
+  <li><a href="articles/stm32-ota-bare-metal-part-5-gpio">Part 5: GPIO</a></li>
+  <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
+  <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
+</ul>

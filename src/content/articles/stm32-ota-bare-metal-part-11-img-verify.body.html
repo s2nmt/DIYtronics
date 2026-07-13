@@ -1,0 +1,35 @@
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-10-bootloader">Part 10: bootloader.c</a> — next: <a href="articles/stm32-ota-bare-metal-part-12-ota-parser">Part 12: OTA parser</a>.</p>
+
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/boot/inc/img.h" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/boot/inc/img.h</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/boot/src/img.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/boot/src/img.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/boot/src/verify.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/boot/src/verify.c</code></a>.</p>
+
+<h2 id="header">1. IMG1 header (256 bytes)</h2>
+<pre><code>typedef struct packed {
+    uint32_t magic;           // 0x494D4731 "IMG1"
+    uint32_t image_type;      // APP = 1
+    uint32_t payload_offset;  // usually 0x100
+    uint32_t payload_size;
+    uint32_t version;
+    uint32_t reserved0;
+    uint8_t  sha256[32];
+    uint8_t  signature[64];   // ECDSA P-256 r||s
+    uint8_t  reserved1[32];
+} img_header_t;</code></pre>
+<p>Slot layout: <code>[header | payload]</code>. App linker <code>ORIGIN = slot_base + 0x100</code>.</p>
+
+<h2 id="parse">2. <code>img_header_parse</code> / <code>img_payload_bounds</code></h2>
+<p>Rejects bad magic/type, zero size, offset &lt; 256, or payload that would run past the slot end (with overflow checks).</p>
+
+<h2 id="verify">3. <code>boot_verify_slot</code></h2>
+<pre><code>parse header
+bounds check
+app_is_valid_at(payload)
+SHA-256(payload) == header.sha256   // crypto_memcmp_ct
+ECDSA verify(pubkey, hash, signature)
+→ out_jump_addr = payload_addr</code></pre>
+<p>Error codes distinguish parse vs hash vs signature failures for serial debugging (<code>BL: ok %08lX</code> on success).</p>
+
+<h2 id="next">Next</h2><ul>
+  <li><a href="articles/stm32-ota-bare-metal-part-12-ota-parser">Part 12: OTA parser</a></li>
+  <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
+  <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
+</ul>

@@ -1,0 +1,30 @@
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-6-uart">Part 6: UART</a> — next: <a href="articles/stm32-ota-bare-metal-part-8-nvic-tick-iwdg">Part 8: NVIC / tick / IWDG</a>.</p>
+
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/flash.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/flash.c</code></a>.</p>
+<p>All OTA durability goes through this driver: unlock → erase page → program half-words → lock. Mistakes here brick a slot (recoverable via the other slot or ST-Link).</p>
+
+<h2 id="ops">1. Core operations</h2>
+<ul>
+  <li><code>flash_unlock</code> / <code>flash_lock</code> — KEY1/KEY2 sequence; LOCK bit in <code>FLASH_CR</code>.</li>
+  <li><code>flash_erase_page(addr)</code> — PER + AR + STRT; waits BSY; checks PGERR/WRPRTERR.</li>
+  <li><code>flash_write_buffer(addr, data, len)</code> — programs in 16-bit units as required by F1 Flash.</li>
+  <li><code>flash_latency_config</code> / <code>flash_prefetch_enable</code> — used during clock setup.</li>
+</ul>
+
+<h2 id="safety">2. Safety checks</h2>
+<pre><code>flash_addr_in_range()   // stay inside [FLASH_MEM_BASE, FLASH_MEM_END)
+flash_page_is_protected() // respect WRPR if set
+flash_wait_ready()        // timeout on BSY</code></pre>
+<p>Status bits are cleared by writing 1 (RM0008). The driver uses full <code>REG</code> writes to avoid read-modify-write hazards on bitfield structs.</p>
+
+<h2 id="who-calls">3. Callers</h2>
+<ul>
+  <li><code>ota.c</code> — erase inactive slot pages, write DATA chunks.</li>
+  <li><code>ota_flag_clear</code> / app <code>ota_request_enter</code> — rewrite the 1 KB config page at <code>0x0800FC00</code>.</li>
+</ul>
+
+<h2 id="next">Next</h2><ul>
+  <li><a href="articles/stm32-ota-bare-metal-part-8-nvic-tick-iwdg">Part 8: NVIC / tick / IWDG</a></li>
+  <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
+  <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
+</ul>

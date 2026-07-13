@@ -1,0 +1,27 @@
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-11-img-verify">Part 11: img & verify</a> — next: <a href="articles/stm32-ota-bare-metal-part-13-ota-handlers">Part 13: OTA handlers</a>.</p>
+
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/boot/src/ota.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/boot/src/ota.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/boot/inc/ota.h" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/boot/inc/ota.h</code></a> — framing half.</p>
+
+<h2 id="frame">1. Frame format</h2>
+<pre><code>STX(0x02) | CMD | LEN_L | LEN_H | PAYLOAD[len] | CRC16_L | CRC16_H | ETX(0x03)</code></pre>
+<ul>
+  <li>Commands: <code>START=0x01</code>, <code>DATA=0x02</code>, <code>END=0x03</code></li>
+  <li>Responses: <code>ACK=0x06</code>, <code>NACK=0x15</code> (single byte)</li>
+  <li>Chunk size: 256 bytes max payload data</li>
+</ul>
+
+<h2 id="fsm">2. RX state machine</h2>
+<pre><code>RX_WAIT_STX → CMD → LEN_L → LEN_H → PAYLOAD* → CRC_L → CRC_H → ETX</code></pre>
+<p><code>ota_receive_frame()</code> consumes one byte per call from the UART ring (with idle timeout). CRC-16/CCITT-ish (<code>poly 0x1021</code>, init <code>0xFFFF</code>) covers <code>CMD|LEN|PAYLOAD</code>.</p>
+
+<h2 id="idle">3. Idle timeout</h2>
+<p><code>uart_rx_byte</code> refreshes the deadline when a frame is in progress or STX arrives. Pure idle for <code>OTA_IDLE_TIMEOUT_MS</code> (5 s default) returns to <code>main</code> so a hung host cannot wedge the bootloader forever.</p>
+
+<h2 id="iwdg">4. Watchdog</h2>
+<p>Each wait loop calls <code>Iwdg_Feed()</code> so multi-second transfers stay alive.</p>
+
+<h2 id="next">Next</h2><ul>
+  <li><a href="articles/stm32-ota-bare-metal-part-13-ota-handlers">Part 13: OTA handlers</a></li>
+  <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
+  <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
+</ul>

@@ -1,0 +1,31 @@
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-15-startup-linker">Part 15: Startup & linker</a>.</p>
+
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/tools/main.py" target="_blank" rel="noopener noreferrer"><code>bootloader/tools/main.py</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/tools/serial.py" target="_blank" rel="noopener noreferrer"><code>bootloader/tools/serial.py</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/tools/sign_image.py" target="_blank" rel="noopener noreferrer"><code>bootloader/tools/sign_image.py</code></a>, plus Part 2 <code>keygen.py</code>.</p>
+
+<h2 id="sign">1. <code>sign_image.py</code></h2>
+<pre><code>payload = read(app.bin)
+digest = SHA-256(payload)
+sig = ECDSA_P256_sign(digest)   # r||s 64 bytes via keygen.derive_signing_key()
+header = pack(IMG1 fields) + digest + sig + pad to 256
+write header + payload</code></pre>
+
+<h2 id="serial">2. <code>serial.py</code></h2>
+<p>Small helper around PySerial port open/close used by the uploader (or inlined patterns in <code>main.py</code> depending on revision).</p>
+
+<h2 id="main">3. <code>main.py</code> host uploader</h2>
+<ul>
+  <li>Load <code>.bin</code> / Intel HEX.</li>
+  <li>Optional <code>--sign</code> to produce a slot image.</li>
+  <li><code>--enter-ota</code> spam <code>U</code> / wait for bootloader banner.</li>
+  <li>Send START → DATA chunks (256 B) → END with CRC16 frames matching <code>ota.c</code>.</li>
+  <li>Wait ACK/NACK; log device printf lines on the same UART.</li>
+</ul>
+<pre><code>python main.py COM6 path/to/app.bin --sign --enter-ota</code></pre>
+
+<h2 id="end">4. Series wrap-up</h2>
+<p>You now have the full path: keys → signed IMG1 → bare-metal drivers → dual-slot bootloader → UART protocol → app request flag → host tool. Clone <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">STM32F103C8T6-ota-base-metal</a>, flash the bootloader once with ST-Link, and iterate apps over serial.</p>
+
+<h2 id="next">Next</h2><ul>
+  <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
+  <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
+</ul>

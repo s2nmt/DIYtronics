@@ -1,0 +1,26 @@
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-13-ota-handlers">Part 13: OTA handlers</a> — next: <a href="articles/stm32-ota-bare-metal-part-15-startup-linker">Part 15: Startup & linker</a>.</p>
+
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/application/Src/main.c" target="_blank" rel="noopener noreferrer"><code>application/Src/main.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/application/Src/ota_req.c" target="_blank" rel="noopener noreferrer"><code>application/Src/ota_req.c</code></a>.</p>
+
+<h2 id="app-main">1. Application <code>main</code></h2>
+<p>Same bring-up as the bootloader (clock, GPIO, UART), then:</p>
+<ul>
+  <li>Prints which app started and the OTA key hint.</li>
+  <li>Enables IWDG.</li>
+  <li>Loop: poll for <code>'U'</code>, print heartbeat, toggle PC13, feed watchdog, <code>delay_ms(1000)</code>.</li>
+</ul>
+
+<h2 id="ota-req">2. <code>ota_request_enter</code></h2>
+<pre><code>guess active slot from APP_FLASH_ORIGIN (APP1 vs APP2 payload address)
+write ota_config_t { magic = 0xDEADBEEF, active_slot = … }
+system reset via AIRCR SYSRESETREQ</code></pre>
+<p>Bootloader sees the flag and enters OTA without waiting for the 3 s window.</p>
+
+<h2 id="link">3. Link offsets</h2>
+<p>Two app builds (or two linker scripts) place the vector table at <code>APP1_START+0x100</code> (<code>0x08005900</code>) or <code>APP2_START+0x100</code> (<code>0x0800AB00</code>). Signing wraps that raw <code>.bin</code> with the 256-byte header; the slot image base is the APP1/APP2 start address.</p>
+
+<h2 id="next">Next</h2><ul>
+  <li><a href="articles/stm32-ota-bare-metal-part-15-startup-linker">Part 15: Startup & linker</a></li>
+  <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
+  <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
+</ul>

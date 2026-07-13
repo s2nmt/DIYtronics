@@ -1,0 +1,21 @@
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-7-flash">Part 7: Flash</a> — next: <a href="articles/stm32-ota-bare-metal-part-9-crypto">Part 9: Crypto</a>.</p>
+
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/nvic.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/nvic.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/tick.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/tick.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/iwdg.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/iwdg.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/init.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/init.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/msp.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/msp.c</code></a>.</p>
+
+<h2 id="nvic">1. NVIC</h2>
+<p>Enables USART1 IRQ priority/enable so the RX ring fills in the background. On jump-to-app, <code>bootloader.c</code> disables all NVIC enables/pending bits itself — the NVIC helper is for normal runtime.</p>
+
+<h2 id="tick">2. SysTick</h2>
+<p><code>tick.c</code> programs SysTick for 1 ms ticks (<code>tick_get()</code>, <code>delay_ms()</code>). OTA idle timeout and the bootloader's 3 s key window both depend on this free-running counter.</p>
+
+<h2 id="iwdg">3. Independent watchdog</h2>
+<p><code>Iwdg_Init</code> / <code>Iwdg_Feed</code> keep long OTA transfers from resetting the MCU. <code>ota.c</code> feeds the dog while waiting for UART bytes.</p>
+
+<h2 id="init-msp">4. <code>init()</code> and MSP</h2>
+<p><code>init.c</code> is the single bring-up call from <code>main</code>: Flash prefetch/latency hooks, NVIC/SysTick baseline, then MSP low-level pin/clock prep. Keeping MSP tiny avoids Cube-generated sprawl.</p>
+
+<h2 id="next">Next</h2><ul>
+  <li><a href="articles/stm32-ota-bare-metal-part-9-crypto">Part 9: Crypto</a></li>
+  <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
+  <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
+</ul>

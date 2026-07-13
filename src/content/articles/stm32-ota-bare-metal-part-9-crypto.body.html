@@ -1,0 +1,25 @@
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-8-nvic-tick-iwdg">Part 8: NVIC / tick / IWDG</a> — next: <a href="articles/stm32-ota-bare-metal-part-10-bootloader">Part 10: bootloader.c</a>.</p>
+
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/crypto/inc/crypto/crypto.h" target="_blank" rel="noopener noreferrer"><code>crypto.h</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/crypto/src/crypto.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/crypto/src/crypto.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/crypto/src/sha256.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/crypto/src/sha256.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/crypto/src/uECC.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/crypto/src/uECC.c</code></a> (micro-ecc).</p>
+
+<h2 id="api">1. Thin wrapper API</h2>
+<pre><code>crypto_sha256(data, len, out32);
+crypto_ecdsa_p256_verify(pubkey64, hash32, sig64);  // 1 = ok
+crypto_memcmp_ct(a, b, n);  // constant-time compare</code></pre>
+<p><code>verify.c</code> only calls these — hash payload, compare digest to header, verify ECDSA over the digest with <code>bootloader_pubkey</code>.</p>
+
+<h2 id="stack">2. What is underneath</h2>
+<ul>
+  <li><strong>SHA-256</strong> — local implementation in <code>sha256.c</code>.</li>
+  <li><strong>ECDSA P-256</strong> — <a href="https://github.com/kmackay/micro-ecc" target="_blank" rel="noopener noreferrer">micro-ecc</a> (<code>uECC.c</code>) sized for Cortex-M3.</li>
+  <li><strong>Public key</strong> — 64-byte uncompressed X||Y from <code>boot_pubkey.c</code> (Part 2).</li>
+</ul>
+
+<h2 id="why">3. Why hash-then-sign</h2>
+<p>The IMG1 header stores both <code>sha256[32]</code> and <code>signature[64]</code>. The signature is over the hash, not the raw payload — so verify does one digest pass over Flash-mapped payload bytes, then a fixed-size ECDSA verify. That keeps RAM use tiny on a 20 KB device.</p>
+
+<h2 id="next">Next</h2><ul>
+  <li><a href="articles/stm32-ota-bare-metal-part-10-bootloader">Part 10: bootloader.c</a></li>
+  <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
+  <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
+</ul>

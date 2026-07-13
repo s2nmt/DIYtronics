@@ -1,0 +1,37 @@
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-9-crypto">Part 9: Crypto</a> — next: <a href="articles/stm32-ota-bare-metal-part-11-img-verify">Part 11: img & verify</a>.</p>
+
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/boot/src/bootloader.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/boot/src/bootloader.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/boot/inc/bootloader.h" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/boot/inc/bootloader.h</code></a>.</p>
+
+<h2 id="map">1. Flash map (from the header)</h2>
+<pre><code>0x08000000  22 KB   Bootloader
+0x08005800  20.5 KB APP1 slot (256 B header + payload)
+0x0800AA00  20.5 KB APP2 slot
+0x0800FC00   1 KB   OTA config (active slot + magic)</code></pre>
+
+<h2 id="slots">2. Active / inactive</h2>
+<ul>
+  <li><code>app_get_active_start()</code> — reads <code>ota_config_t.active_slot</code>; virgin Flash (0xFF) defaults to APP1.</li>
+  <li><code>app_get_inactive_start()</code> — the other slot; OTA always programs the inactive side.</li>
+</ul>
+
+<h2 id="valid">3. <code>app_is_valid_at</code></h2>
+<p>Sanity-checks the vector table at the payload address: SP in SRAM (<code>0x2000xxxx</code>), Reset_Handler Thumb bit set, entry inside the slot. This catches “signed but linked for the wrong slot” early (also used mid-OTA).</p>
+
+<h2 id="flag">4. OTA flag</h2>
+<p><code>ota_flag_is_set</code> — <code>magic == 0xDEADBEEF</code>. Clear rewrites the config page preserving <code>active_slot</code>.</p>
+
+<h2 id="jump">5. <code>jump_to_application</code></h2>
+<ol>
+  <li>Validate vectors again.</li>
+  <li>De-init clock, USART1, SysTick.</li>
+  <li><code>cpsid i</code>, clear NVIC enable/pending.</li>
+  <li>Set <code>SCB-&gt;VTOR</code> to the app vector table.</li>
+  <li>Load MSP from vector[0], <code>bx</code> to Reset_Handler (vector[1]).</li>
+</ol>
+<p>If anything looks wrong, the function returns and <code>main</code> falls through to OTA.</p>
+
+<h2 id="next">Next</h2><ul>
+  <li><a href="articles/stm32-ota-bare-metal-part-11-img-verify">Part 11: img & verify</a></li>
+  <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
+  <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
+</ul>

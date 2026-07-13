@@ -1,0 +1,27 @@
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-5-gpio">Part 5: GPIO</a> — next: <a href="articles/stm32-ota-bare-metal-part-7-flash">Part 7: Flash</a>.</p>
+
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/uart.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/uart.c</code></a>.</p>
+<p>USART1 is the OTA pipe and the log console. RX is interrupt-driven into a ring buffer; TX is polled for simplicity.</p>
+
+<h2 id="init">1. Init</h2>
+<p><code>Uart1_Init()</code> enables GPIOA + USART1 clocks, sets PA9/PA10 to AF push-pull / input floating, programs baud (typically 115200), enables RXNE IRQ, and turns the USART on.</p>
+
+<h2 id="ring">2. Ring buffer RX</h2>
+<ul>
+  <li><code>USART1_IRQHandler</code> (or the IRQ hook used by this tree) pushes bytes into a fixed circular buffer.</li>
+  <li><code>uart1_rx_get(&amp;c)</code> pops one byte; returns 0 if empty.</li>
+  <li><code>uart1_rx_flush()</code> clears stale bytes before the 3 s OTA key window.</li>
+</ul>
+<p>OTA framing in <code>ota.c</code> only reads through this API — never busy-spins on <code>USART_SR.RXNE</code> in the hot path (except TX empty waits).</p>
+
+<h2 id="printf">3. printf</h2>
+<p><code>uart1_write(ptr, len)</code> + <code>_write</code> in <code>main.c</code> make <code>printf("…\r\n")</code> work in both bootloader and app builds.</p>
+
+<h2 id="pins">4. Wiring</h2>
+<p>Host USB–UART adapter: TX→PA10 (USART1_RX), RX→PA9 (USART1_TX), GND common. Match baud with <code>main.py --baud</code>.</p>
+
+<h2 id="next">Next</h2><ul>
+  <li><a href="articles/stm32-ota-bare-metal-part-7-flash">Part 7: Flash</a></li>
+  <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
+  <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
+</ul>
