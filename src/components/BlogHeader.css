@@ -1,0 +1,62 @@
+.blog-chrome-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(249, 250, 251, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.blog-chrome-header__inner {
+  width: min(100% - 2rem, 1080px);
+  margin-inline: auto;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.blog-chrome-logo {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.2rem;
+  letter-spacing: -0.03em;
+  color: var(--dark);
+}
+
+.blog-chrome-logo span {
+  color: var(--primary);
+  font-style: italic;
+  font-weight: 500;
+}
+
+.blog-chrome-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.blog-chrome-nav a {
+  color: var(--gray);
+  transition: color 0.15s ease;
+}
+
+.blog-chrome-nav a:hover,
+.blog-chrome-nav a.is-active {
+  color: var(--dark);
+}
+
+.blog-chrome-site {
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--dark) !important;
+  background: var(--white);
+}
+
+.blog-chrome-site:hover {
+  border-color: var(--dark);
+}

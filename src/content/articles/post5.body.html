@@ -1,0 +1,105 @@
+<p>This post shows a minimal example: ESP32 + A76xx LTE module connecting to an MQTT broker over MQTTS (port 8883), subscribing to a topic, publishing "Hello World", and printing received messages. We use the <strong>A76XX</strong> library (e.g. from GitHub) to talk to the module over UART.</p>   <h2 id="what-you-need">What you need</h2> <p><strong>Hardware:</strong> ESP32 (or other MCU), A76xx-based module (e.g. A7680, A7670), SIM with data, antenna. Connect the module UART to the MCU (e.g. TX→16, RX→17 on ESP32).</p> <p><strong>Library:</strong> <strong>A76XX</strong> (provides <code>A76XX</code>, <code>A76XXMQTTClient</code>, <code>A76XXSecureClient</code>). Optional: <code>StreamDebugger</code> to echo AT traffic to Serial, <code>ArduinoJson</code> if you later extend to JSON payloads.</p> <p>For MQTTS the module must have the broker’s CA certificate stored. Run the <strong>SaveCertificate</strong> sketch once to write the CA (e.g. PEM) to the module; then the main sketch uses that cert by name.</p>   <h2 id="step-1-save-cert">Step 1: Save CA certificate to the module</h2> <p>Run this sketch once. It sends the broker’s CA certificate (PEM) to the module and saves it under a name (e.g. <code>mosquitto.pem</code>). Use the same name in the main sketch with <code>mqtt.setCaCert(...)</code>.</p> <pre><code>#include &lt;StreamDebugger.h&gt;
+#include "A76XX.h"
+
+#define DEBUG_AT true
+#if DEBUG_AT
+  StreamDebugger SerialAT(Serial1, Serial);
+#else
+  #define SerialAT Serial1
+#endif
+
+static const char* mosquittoCert PROGMEM = R"EOF(
+-----BEGIN CERTIFICATE-----
+... paste your broker CA PEM here ...
+-----END CERTIFICATE-----)EOF";
+
+A76XX modem(SerialAT);
+A76XXSecureClient client(modem);
+
+#define PIN_TX 17
+#define PIN_RX 16
+
+void setup() {
+  Serial.begin(115200);
+  Serial1.begin(115200, SERIAL_8N1, PIN_RX, PIN_TX);
+  delay(3000);
+
+  if (!modem.init()) { Serial.println("modem error"); while(1) {} }
+  if (!client.writeCaCert(mosquittoCert, "mosquitto.pem")) {
+    Serial.println("write cert error"); while(1) {}
+  }
+  Serial.println("Certificate saved.");
+  modem.powerOff();
+}
+
+void loop() {}</code></pre>   <h2 id="main-sketch">Step 2: Main sketch – send and receive (Hello World)</h2> <p>After the certificate is stored, use this sketch. It initializes the modem, waits for network registration, connects GPRS (APN), sets the CA cert by name, starts the MQTT client, connects to the broker with optional LWT, subscribes to <code>/test/hello</code>, and in <code>loop</code> calls <code>modem.listen()</code>, reads any incoming MQTT messages and prints them, and publishes "Hello World" every 5 seconds.</p> <pre><code>#include &lt;StreamDebugger.h&gt;
+#include "A76XX.h"
+
+#define DEBUG_AT true
+#if DEBUG_AT
+  StreamDebugger SerialAT(Serial1, Serial);
+#else
+  #define SerialAT Serial1
+#endif
+
+const char* deviceId   = "a76xx_hello_01";
+const char* server     = "your-broker.com";
+const int   port       = 8883;
+const char* apn        = "your-apn";
+const char* will_topic   = "/data/a76xx_hello_01";
+const char* will_message = "{\"isAlive\":0}";
+#define MOSQUITTO_CA_CERTNAME "mosquitto.pem"
+
+#define PIN_TX 17
+#define PIN_RX 16
+
+A76XX modem(SerialAT);
+A76XXMQTTClient mqtt(modem, deviceId, true);
+
+void reconnect() {
+  if (!mqtt.connect(server, port, true, 60, NULL, NULL, will_topic, will_message, 0)) {
+    Serial.println("MQTT connect failed");
+    return;
+  }
+  mqtt.subscribe("/test/hello");
+  Serial.println("Subscribed /test/hello");
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial1.begin(115200, SERIAL_8N1, PIN_RX, PIN_TX);
+  delay(3000);
+
+  modem.reset();
+  delay(1000);
+  if (!modem.init()) { Serial.println("modem error"); while(1) {} }
+  if (!modem.waitForRegistration()) { Serial.println("registration timeout"); while(1) {} }
+  if (!modem.GPRSConnect(apn)) { Serial.println("GPRS failed"); while(1) {} }
+  if (!mqtt.setCaCert(MOSQUITTO_CA_CERTNAME)) { Serial.println("setCaCert error"); while(1) {} }
+  if (!mqtt.begin()) { Serial.println("mqtt.begin error"); while(1) {} }
+
+  if (!mqtt.connect(server, port, true, 60, NULL, NULL, will_topic, will_message, 0)) {
+    Serial.println("connect error"); while(1) {}
+  }
+  mqtt.subscribe("/test/hello");
+  Serial.println("Ready.");
+}
+
+void loop() {
+  modem.listen(100);
+
+  while (mqtt.messageAvailable() &gt; 0) {
+    MQTTMessage_t msg = mqtt.getMessage();
+    Serial.print("RX [");
+    Serial.print(msg.topic);
+    Serial.print("] ");
+    Serial.println(msg.payload);
+  }
+
+  static unsigned long last = 0;
+  if (millis() - last &gt;= 5000) {
+    last = millis();
+    mqtt.publish("/test/hello", "Hello World", 0, 60, false);
+    Serial.println("Published: Hello World");
+  }
+}</code></pre>   <h2 id="summary">Summary</h2> <p>Run the SaveCertificate sketch once to store the broker CA on the module. Then run the main sketch: it connects over MQTTS, subscribes to <code>/test/hello</code>, publishes "Hello World" every 5 seconds, and prints any message received on that topic. Replace <code>server</code> and <code>apn</code> with your broker host and cellular APN.</p>

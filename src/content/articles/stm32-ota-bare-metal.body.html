@@ -1,0 +1,135 @@
+<p>Source code: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">STM32F103C8T6-ota-base-metal</a>.</p>
+<p>This post walks through a <strong>bare-metal</strong> UART bootloader and secure OTA stack for the <strong>STM32F103C8T6</strong> (Blue Pill) — <strong>no STM32 HAL</strong>. Flash the bootloader once with an ST-Link, then update the application over serial with signed images and a dual-slot A/B layout for safe rollback.</p>
+
+<h2 id="what-it-is">1. What this project is</h2>
+<p>The repository is a learning-oriented firmware stack that shows how to:</p>
+<ul>
+  <li>Drive STM32 peripherals through registers (RCC, GPIO, UART, NVIC, Flash, IWDG)</li>
+  <li>Build a custom bootloader that verifies and jumps to an application</li>
+  <li>Update firmware over UART with a dual-slot A/B layout</li>
+  <li>Sign images with <strong>SHA-256</strong> and <strong>ECDSA P-256</strong>, and verify them before boot</li>
+</ul>
+<p>It is aimed at engineers and students who want to understand bootloaders and OTA beyond CubeMX-generated code.</p>
+
+<h2 id="features">2. Features</h2>
+<ul>
+  <li><strong>Bare-metal drivers</strong> — clock, GPIO, UART (IRQ + ring buffer), Flash, SysTick, IWDG</li>
+  <li><strong>Dual-slot OTA</strong> — writes only the inactive slot; swaps <code>active_slot</code> on success</li>
+  <li><strong>Signed images</strong> — 256-byte <code>IMG1</code> header + payload; SHA-256 and ECDSA-P256 verify</li>
+  <li><strong>UART protocol</strong> — framed <code>START</code> / <code>DATA</code> / <code>END</code> with CRC16 and ACK/NACK</li>
+  <li><strong>PC tools</strong> — Python client to sign and upload firmware over serial</li>
+  <li><strong>Portable <code>lib/</code></strong> — drivers, boot, and crypto can be reused in other projects</li>
+</ul>
+
+<h2 id="layout">3. Repository layout</h2>
+<pre><code>STM32F103C8T6-ota-base-metal/
+├── bootloader/          # Bootloader firmware + host tools
+│   ├── Src/             # Entry point (verify / jump / OTA)
+│   ├── lib/
+│   │   ├── drivers/     # Bare-metal MCU drivers
+│   │   ├── boot/        # Slot map, OTA, image verify, jump
+│   │   └── crypto/      # SHA-256 + micro-ecc (ECDSA P-256)
+│   └── tools/           # Python OTA client, signing, keygen
+│
+└── application/         # Example application (blink + UART)
+    ├── Src/             # App entry; press 'U' to request OTA
+    └── Inc/</code></pre>
+<p>Layering keeps dependencies one-way:</p>
+<pre><code>bootloader Src/main.c
+    ├── lib/drivers   (uart, flash, clock, gpio, …)
+    └── lib/boot      (ota, verify, jump)
+            └── lib/crypto   (sha256, ecdsa)</code></pre>
+<ul>
+  <li><code>lib/drivers</code> does not depend on boot or crypto</li>
+  <li><code>lib/boot</code> uses drivers and crypto only</li>
+  <li><code>lib/crypto</code> is standalone</li>
+</ul>
+
+<h2 id="hardware">4. Hardware</h2>
+<ul>
+  <li><strong>MCU:</strong> STM32F103C8T6 — 64 KB Flash, 20 KB RAM</li>
+  <li><strong>UART:</strong> USART1 — PA9 (TX), PA10 (RX)</li>
+  <li><strong>Baud rate:</strong> 115200, 8N1 (PLL at 72 MHz for accurate baud)</li>
+  <li><strong>Debugger:</strong> ST-Link — program the bootloader once</li>
+  <li><strong>USB–UART:</strong> CP2102 / CH340 / FT232 (or similar)</li>
+</ul>
+
+<h2 id="memory-map">5. Flash memory map (dual-slot A/B)</h2>
+<pre><code>Address        Size      Purpose
+────────────────────────────────────────────
+0x08000000     22 KB     Bootloader
+0x08005800     20.5 KB   APP1 slot (256 B header + payload)
+0x08005900               APP1 payload / vector table
+0x0800AA00     20.5 KB   APP2 slot (256 B header + payload)
+0x0800AB00               APP2 payload / vector table
+0x0800FC00      1 KB     OTA config (active_slot, OTA flag)
+0x08010000     (end)</code></pre>
+<p>OTA always programs the <strong>inactive</strong> slot. On success the bootloader updates <code>active_slot</code> and jumps to the new image. A failed update leaves the previous active slot intact.</p>
+<p>Applications must be linked to the correct payload address (<code>0x08005900</code> for APP1, <code>0x0800AB00</code> for APP2) and signed before upload.</p>
+
+<h2 id="boot-flow">6. Boot flow</h2>
+<pre><code>Reset → bootloader @ 0x08000000
+  │
+  ├─ OTA flag set (0xDEADBEEF)?  → OTA mode
+  ├─ No valid signed app?        → OTA mode
+  └─ Valid app
+        └─ Wait 3 s for 'U' on UART
+              ├─ 'U' received → OTA mode
+              └─ Timeout      → verify active (then inactive) slot → jump</code></pre>
+<p>From the running application, send <strong><code>U</code></strong> over UART to set the OTA flag and reset into the bootloader.</p>
+
+<h2 id="signed-images">7. Signed images</h2>
+<p>Each slot image is <code>[256-byte IMG1 header | payload]</code>. Before jumping, the bootloader:</p>
+<ol>
+  <li>Checks the header magic and layout</li>
+  <li>Hashes the payload with <strong>SHA-256</strong></li>
+  <li>Verifies the signature with <strong>ECDSA P-256</strong> against the embedded public key</li>
+</ol>
+<p>Only a valid signed image is allowed to run. Rotate keys with <code>keygen.py</code> and embed the new public key in the bootloader when needed — see <a href="articles/stm32-ota-bare-metal-part-2-keygen">Part 2</a> for a line-by-line walkthrough.</p>
+
+<h2 id="uart-protocol">8. UART OTA protocol</h2>
+<p>The host and bootloader exchange framed messages:</p>
+<ul>
+  <li><code>START</code> — begin a transfer (slot / size metadata)</li>
+  <li><code>DATA</code> — payload chunks with <strong>CRC16</strong></li>
+  <li><code>END</code> — finalize and trigger verify / slot swap</li>
+</ul>
+<p>Each frame is acknowledged with <strong>ACK</strong> or <strong>NACK</strong> so a bad chunk can be retried without bricking the active application.</p>
+
+<h2 id="quick-start">9. Quick start</h2>
+
+<h3 id="flash-bootloader">9.1 Build and flash the bootloader</h3>
+<ol>
+  <li>Open <code>bootloader/</code> in <strong>STM32CubeIDE</strong></li>
+  <li><strong>Project → Clean</strong>, then <strong>Build</strong></li>
+  <li>Program with ST-Link</li>
+</ol>
+
+<h3 id="build-app">9.2 Build the application</h3>
+<ol>
+  <li>Open <code>application/</code> in STM32CubeIDE</li>
+  <li>Link for the target slot (APP1 or APP2 payload origin)</li>
+  <li>Build and produce a <code>.bin</code> (or <code>.hex</code>)</li>
+</ol>
+
+<h3 id="sign-upload">9.3 Sign and upload over UART</h3>
+<pre><code>cd bootloader/tools
+pip install -r requirements.txt
+
+# Example (Windows COM port):
+python main.py COM6 path/to/app.bin --sign --enter-ota</code></pre>
+<p><code>--sign</code> builds a signed slot image (<code>[256 B header | payload]</code>). <code>--enter-ota</code> sends <code>U</code> so the device enters OTA mode.</p>
+
+<h2 id="requirements">10. Requirements</h2>
+<ul>
+  <li><strong>STM32CubeIDE</strong> (or another GCC ARM toolchain) for firmware builds</li>
+  <li><strong>Python 3</strong> with <code>pyserial</code> and <code>ecdsa</code> for host tools</li>
+  <li>ST-Link for the first bootloader flash</li>
+</ul>
+
+<h2 id="references">11. References</h2>
+<ul>
+  <li><a href="https://www.st.com/resource/en/reference_manual/cd00171190.pdf" target="_blank" rel="noopener noreferrer">RM0008 — STM32F103 Reference Manual</a></li>
+  <li><a href="https://www.st.com/resource/en/programming_manual/cd00443574.pdf" target="_blank" rel="noopener noreferrer">PM0214 — Cortex-M3 Programming Manual</a></li>
+  <li>Repo docs: <code>bootloader/README.md</code>, <code>application/README.md</code></li>
+</ul>

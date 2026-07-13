@@ -1,0 +1,79 @@
+<p>This post shows a minimal example: ESP32 + W5500 Ethernet connecting to an MQTT broker over TLS (MQTTS, port 8883), subscribing to a topic, publishing a simple "Hello World" message, and printing any received messages. Useful when Wi‑Fi is not available or you want a stable wired link for secure MQTT.</p>   <h2 id="what-is-w5500">What you need</h2> <p><strong>Hardware:</strong> ESP32, W5500 Ethernet module, Ethernet cable. Wire W5500 to ESP32 SPI (e.g. CS = GPIO 5) and 3.3V/GND.</p> <p><strong>Libraries:</strong> <code>SPI</code>, <code>Ethernet</code> (W5500), <code>SSLClient</code>, <code>PubSubClient</code>. You also need a <code>certificates.h</code> file that defines your broker’s Root CA (e.g. ISRG Root X1 for Let’s Encrypt) in the format expected by SSLClient (e.g. BearSSL <code>br_x509_trust_anchor</code>). You can generate it with tools like <code>pycert_bearssl</code>.</p>   <h2 id="full-example">Full example: send and receive data (Hello World)</h2> <p>The sketch below: initializes Ethernet (DHCP), wraps it with <code>SSLClient</code> using your CA, connects to the broker on port 8883, subscribes to <code>/test/hello</code>, and in <code>loop</code> publishes <code>Hello World</code> every 5 seconds. Incoming messages are printed in the callback.</p>   <h3 id="main-sketch">Main sketch</h3> <pre><code>#include &lt;SPI.h&gt;
+#include &lt;Ethernet.h&gt;
+#include &lt;SSLClient.h&gt;
+#include "certificates.h"
+#include &lt;PubSubClient.h&gt;
+
+#define W5500_CS 5
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+
+const char* mqtt_server = "your-broker.com";
+const int   mqtt_port   = 8883;
+const char* clientId    = "w5500_esp32_01";
+
+EthernetClient ethClient;
+SSLClient secureClient(ethClient, TAs, (size_t)TAs_NUM, 4096, 4096);
+PubSubClient mqtt(secureClient);
+
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message [");
+  Serial.print(topic);
+  Serial.print("]: ");
+  for (unsigned int i = 0; i &lt; length; i++) Serial.print((char)payload[i]);
+  Serial.println();
+}
+
+void reconnect() {
+  while (!mqtt.connected()) {
+    Serial.print("Connecting MQTT...");
+    if (mqtt.connect(clientId)) {
+      Serial.println(" connected");
+      mqtt.subscribe("/test/hello");
+    } else {
+      Serial.print(" failed, rc=");
+      Serial.println(mqtt.state());
+      delay(2000);
+    }
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  SPI.begin();
+  Ethernet.init(W5500_CS);
+  if (Ethernet.begin(mac) == 0) {
+    Serial.println("Ethernet DHCP failed");
+    return;
+  }
+  Serial.print("IP: ");
+  Serial.println(Ethernet.localIP());
+
+  mqtt.setServer(mqtt_server, mqtt_port);
+  mqtt.setCallback(callback);
+  mqtt.setBufferSize(512);
+}
+
+void loop() {
+  if (!mqtt.connected()) reconnect();
+  mqtt.loop();
+
+  static unsigned long last = 0;
+  if (millis() - last &gt;= 5000) {
+    last = millis();
+    mqtt.publish("/test/hello", "Hello World", false);
+    Serial.println("Published: Hello World");
+  }
+}</code></pre>   <h3 id="certificates">certificates.h</h3> <p><code>SSLClient</code> needs one or more Root CAs in BearSSL format. Your <code>certificates.h</code> should define <code>TAs_NUM</code> and the <code>TAs</code> array (e.g. ISRG Root X1 for Let’s Encrypt). Example structure:</p> <pre><code>#ifndef _CERTIFICATES_H_
+#define _CERTIFICATES_H_
+#ifdef __cplusplus
+extern "C" { #endif
+
+#define TAs_NUM 1
+static const br_x509_trust_anchor TAs[] = {
+  /* One entry per CA, e.g. ISRG Root X1 - use pycert_bearssl to generate */
+};
+
+#ifdef __cplusplus
+}
+#endif
+#endif</code></pre> <p>Generate the actual byte arrays with a tool like <code>pycert_bearssl</code> and include the resulting header in your project.</p>   <h2 id="summary">Summary</h2> <p>With the code above, the device connects to the broker over MQTTS (Ethernet + TLS), subscribes to <code>/test/hello</code>, publishes <code>Hello World</code> every 5 seconds, and prints any message it receives on that topic. Replace <code>mqtt_server</code> and your CA in <code>certificates.h</code> with your broker details.</p>

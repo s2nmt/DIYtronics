@@ -1,0 +1,112 @@
+<p>MQTT (Message Queuing Telemetry Transport) is a lightweight messaging protocol designed for IoT devices. Setting up an MQTT broker on Ubuntu allows you to create a central hub for your IoT projects.</p>
+
+<h2 id="what-is-mqtt-broker">What is MQTT Broker?</h2>
+<p>An MQTT broker is a server that receives messages from clients (publishers) and routes them to other clients (subscribers) based on topics. It acts as a central communication hub for IoT devices, enabling efficient and reliable message exchange with minimal overhead.</p>
+
+<h2 id="installing-aedes-mqtt-broker">Installing Aedes MQTT Broker</h2>
+<p>First, update your package list and install nodejs 18.x:</p>
+
+<pre><code>sudo apt update
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -</code></pre>
+
+<p>After installation, we are install nodejs to run aedes broker:</p>
+
+<pre><code>sudo apt install nodejs -y</code></pre>
+
+<p>Now, create a new directory for your MQTT broker project and install the required packages:</p>
+
+<pre><code>mkdir mqtt-broker
+cd mqtt-broker
+npm install aedes ws http net
+
+certbot certonly --standalone -d mqtt.example.com
+
+to get cert access this link https://letsencrypt.org/certs/isrgrootx1.pem
+</code></pre>
+
+<h3 id="step-1-code-example">Step 1: Code example to run aedes broker</h3>
+<p>Create a file named <code>broker.js</code> and add the following code:</p>
+
+<pre><code>const aedes = require('aedes')()
+const tls = require('tls')
+const fs = require('fs')
+const https = require('https')
+const ws = require('ws')
+
+// ===== Load cert =====
+const options = {
+    key: fs.readFileSync('/etc/letsencrypt/live/mqtt.example.com/fullchain.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/mqtt.example.com/privkey.pem')
+}
+
+// ===== MQTTs (TLS) =====
+tls.createServer(options, aedes.handle).listen(8883, () => {
+    console.log('MQTTS broker running on port 8883')
+})
+
+// ===== WSS (WebSocket Secure) =====
+const httpsServer = https.createServer(options)
+const wsServer = new ws.Server({ server: httpsServer })
+
+wsServer.on('connection', (socket) => {
+    const stream = ws.createWebSocketStream(socket)
+    aedes.handle(stream)
+})
+
+httpsServer.listen(8084, () => {
+    console.log('MQTT WSS running on port 8084')
+})
+
+// ===== Logs =====
+aedes.on('client', (client) => {
+    console.log('Client connected:', client.id)
+})
+
+aedes.on('publish', (packet, client) => {
+    if (client) {
+    console.log(`[${client.id}] ${packet.topic}: ${packet.payload.toString()}`)
+    }
+})
+</code></pre>
+
+<h3 id="step-2-run-broker">Step 2: Run aedes broker</h3>
+<p>Run the broker with the following command:</p>
+
+<pre><code>node broker.js</code></pre>
+<p>Output:</p>
+<pre><code>MQTTS running on  port 8883
+MQTT WSS running on port 8084</code></pre>
+<h2 id="testing-mqtt-broker">Testing the MQTT Broker</h2>
+<p>After configuring, you can use the following code example to test the broker. File cert.pem you have to download from server.</p>
+
+<p>Python code port 8084:</p>
+<pre><code>import ssl
+import certifi
+import paho.mqtt.client as mqtt
+
+BROKER = "your IP"
+PORT = 8084
+TOPIC = "test/topic"
+
+def on_connect(client, userdata, flags, rc):
+    print("Connected:", rc)
+    client.subscribe(TOPIC)
+    client.publish(TOPIC, "Hello from Python WSS")
+
+def on_message(client, userdata, msg):
+    print(msg.topic, msg.payload.decode())
+
+client = mqtt.Client(transport="websockets")
+client.on_connect = on_connect
+client.on_message = on_message
+
+client.tls_set(
+    ca_certs=certifi.where(),
+    tls_version=ssl.PROTOCOL_TLS_CLIENT
+)
+
+client.connect(BROKER, PORT, 60)
+client.loop_forever()
+</code></pre>
+
+<p>Congratulations! Your MQTT broker is now set up and running on Ubuntu. You can now connect your IoT devices to this broker and start building your IoT applications.</p>

@@ -1,0 +1,62 @@
+<p>Sending emails programmatically is a common requirement in modern web applications. Whether you need to send welcome emails, password reset links, or notifications, Node.js provides excellent libraries to handle email functionality. In this tutorial, we'll explore how to send emails using Node.js with the popular Nodemailer library.</p>   <h2 id="what-is-nodemailer">What is Nodemailer?</h2> <p>Nodemailer is a module for Node.js applications that allows you to send emails easily. It supports various transport methods including SMTP, sendmail, and more. It's one of the most popular and reliable email libraries for Node.js, with support for HTML emails, attachments, and embedded images.</p>   <h2 id="installing-nodemailer">Installing Nodemailer</h2> <p>First, create a new Node.js project and install Nodemailer:</p>   <pre><code>npm init -y
+npm install nodemailer</code></pre>    <h3 id="step-1-code-example">Step 1: Code example to send email</h3> <p>Create a file named <code>sendEmail.js</code> and add the following code:</p>   <pre><code>const nodemailer = require('nodemailer')
+
+// ===== Create transporter =====
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+        user: 'your-email@gmail.com',
+        pass: 'your-app-password' // Use App Password for Gmail
+    }
+})
+
+// ===== Email options =====
+const mailOptions = {
+    from: 'your-email@gmail.com',
+    to: 'recipient@example.com',
+    subject: 'Hello from Node.js',
+    text: 'This is a plain text email sent from Node.js using Nodemailer!',
+    html: '&lt;p&gt;Hello from Node.js!&lt;/p&gt;' +
+          '&lt;p&gt;This is an HTML email sent from Node.js using Nodemailer!&lt;/p&gt;'
+}
+
+// ===== Send email =====
+transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+        console.log('Error occurred:', error.message)
+    } else {
+        console.log('Email sent successfully!')
+        console.log('Message ID:', info.messageId)
+    }
+})</code></pre>   <h3 id="step-2-gmail-setup">Step 2: Setting up Gmail</h3> <p>If you're using Gmail, you need to enable 2-Step Verification and generate an App Password:</p> <ol>     <li>Go to your Google Account settings</li>     <li>Navigate to Security → 2-Step Verification → App passwords</li>     <li>Generate a new app password for "Mail"</li>     <li>Use this 16-character password in your code</li> </ol>   <h2 id="testing-email">Testing the Email</h2> <p>Run the script with the following command:</p>   <pre><code>node sendEmail.js</code></pre> <p>Output:</p> <pre><code>Email sent successfully!
+Message ID: &lt;message-id&gt;</code></pre>   <h2 id="async-await-example">Using Async/Await</h2> <p>Here's a more modern approach using async/await:</p>   <pre><code>const nodemailer = require('nodemailer')
+
+async function sendEmail() {
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+            user: 'your-email@gmail.com',
+            pass: 'your-app-password'
+        }
+    })
+
+    const mailOptions = {
+        from: 'your-email@gmail.com',
+        to: 'recipient@example.com',
+        subject: 'Test Email',
+        html: '&lt;h2&gt;Welcome!&lt;/h2&gt;&lt;p&gt;Thank you for signing up.&lt;/p&gt;'
+    }
+
+    try {
+        const info = await transporter.sendMail(mailOptions)
+        console.log('Email sent:', info.messageId)
+    } catch (error) {
+        console.error('Error sending email:', error)
+    }
+}
+
+sendEmail()</code></pre>   <p>Congratulations! You can now send emails using Node.js with Nodemailer. This library makes it easy to implement email functionality in your Node.js applications for notifications, welcome messages, and more.</p>

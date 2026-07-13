@@ -1,0 +1,76 @@
+import { useArticleToc } from "../hooks/useArticleToc";
+import { assetPath, rewriteArticleHtml } from "../utils/assetPath";
+import "../styles/article-page.css";
+
+export function ArticlePostShell({
+  bodyHtml,
+  title,
+  cover,
+  category,
+  metaLine,
+  contentId,
+  tocListId,
+  tocKey,
+  relatedPosts,
+  relatedHeading = "Related Articles",
+}) {
+  useArticleToc(`#${contentId}`, tocListId, tocKey);
+
+  return (
+    <div className="article-post-page">
+      <article className="article-page">
+        <div className="article-container">
+          <div className="article-wrapper">
+            <aside className="article-toc">
+              <div className="toc-title">Table of Contents</div>
+              <ul className="toc-list" id={tocListId} />
+            </aside>
+
+            <div className="article-main">
+              <header className="article-header">
+                <h1 className="article-title">{title}</h1>
+              </header>
+
+              <img src={assetPath(cover)} alt="" className="article-featured-image" />
+
+              <div
+                id={contentId}
+                className="article-content"
+                dangerouslySetInnerHTML={{ __html: rewriteArticleHtml(bodyHtml) }}
+              />
+
+              <div className="article-meta">
+                <span className="article-category">{category}</span>
+                <span className="article-date">
+                  <span>{metaLine}</span>
+                </span>
+              </div>
+            </div>
+
+            <aside className="article-sidebar">
+              <div className="article-footer-section">
+                <h4>{relatedHeading}</h4>
+                <div className="related-articles-grid">
+                  {relatedPosts.map((p) => (
+                    <a
+                      key={p.href}
+                      href={assetPath(p.href.replace(/^\//, ""))}
+                      className="related-article-card"
+                    >
+                      <div className="related-article-image">
+                        <img src={assetPath(p.cover)} alt="" />
+                      </div>
+                      <div className="related-article-content">
+                        <h5>{p.title}</h5>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </article>
+    </div>
+  );
+}

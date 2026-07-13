@@ -1,0 +1,187 @@
+.article-series-page-root {
+  background: transparent;
+  color: var(--dark);
+}
+
+.article-series-page-root .article-series-hero {
+  position: relative;
+  min-height: unset;
+  background: none !important;
+  display: block;
+  text-align: left;
+  color: var(--dark);
+  margin-top: 0;
+  padding: 3.5rem 1.25rem 2.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.article-series-page-root .article-series-hero-content {
+  width: min(100%, 1080px);
+  margin-inline: auto;
+  max-width: none;
+}
+
+.article-series-page-root .article-series-hero-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--primary);
+  opacity: 1;
+}
+
+.article-series-page-root .article-series-hero-content h1 {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 600;
+  margin-bottom: 0.85rem;
+  letter-spacing: -0.03em;
+  max-width: 18ch;
+  line-height: 1.15;
+}
+
+.article-series-page-root .article-series-hero-content p {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--gray);
+  max-width: 42ch;
+}
+
+.article-series-page-root .article-series-hero-meta {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  opacity: 1;
+}
+
+.article-series-page-root .article-series-page {
+  padding: 2.5rem 0 4rem;
+}
+
+.article-series-page-root .article-series-wrapper {
+  width: min(100% - 2.5rem, 1080px);
+  margin: 0 auto;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.article-series-page-root .article-series-main h2 {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.45rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+}
+
+.article-series-page-root .article-series-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.article-series-page-root .article-series-card {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 1.35rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  overflow: visible;
+  padding: 1.5rem 0;
+}
+
+.article-series-page-root .article-series-card-image {
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+
+.article-series-page-root .article-series-card-placeholder {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  min-height: 0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--light);
+  color: var(--gray);
+  font-weight: 700;
+  border-radius: 8px;
+  border: 1px dashed var(--border);
+}
+
+.article-series-page-root .article-series-card-content {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.article-series-page-root .article-series-card-part {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 0.35rem;
+}
+
+.article-series-page-root .article-series-card-content h3 {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  line-height: 1.3;
+}
+
+.article-series-page-root .article-series-card-content h3 a:hover {
+  color: var(--primary);
+}
+
+.article-series-page-root .article-series-card-date {
+  color: var(--gray);
+  font-size: 0.82rem;
+  margin-bottom: 0.5rem;
+}
+
+.article-series-page-root .article-series-card-content p {
+  color: var(--gray);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 0.65rem;
+}
+
+.article-series-page-root .article-series-card-link {
+  color: var(--dark);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  width: fit-content;
+}
+
+.article-series-page-root .article-series-card-link:hover {
+  color: var(--primary);
+}
+
+.article-series-page-root .article-series-card-planned {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.article-series-page-root .article-series-card--planned {
+  opacity: 0.7;
+}
+
+@media (max-width: 720px) {
+  .article-series-page-root .article-series-card {
+    grid-template-columns: 1fr;
+  }
+}

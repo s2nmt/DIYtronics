@@ -1,0 +1,29 @@
+.blog-shell {
+  /* Colors match main site — only type/layout differ */
+  --font-sans: "DM Sans", "Space Grotesk", system-ui, sans-serif;
+  --font-display: "Newsreader", Georgia, serif;
+  --bg: #f9fafb;
+
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--dark);
+  font-family: var(--font-sans);
+}
+
+.blog-shell__main {
+  flex: 1;
+}
+
+.blog-shell h1,
+.blog-shell h2,
+.blog-shell h3,
+.blog-shell .blog-post-title,
+.blog-shell .article-title,
+.blog-shell .article-series-hero-content h1,
+.blog-shell .article-content h2,
+.blog-shell .article-content h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}

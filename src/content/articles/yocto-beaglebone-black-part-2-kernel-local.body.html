@@ -1,0 +1,254 @@
+<p>This is <strong>Part 2</strong> of the <strong>Yocto on BeagleBone Black</strong> series. After <a href="../articles/yocto-beaglebone-black-part-1-introduction">Part 1</a> (image build and SD flash), this guide explains how to build the BeagleBone kernel from a <strong>local source tree</strong> using Yocto — how the upstream recipe and custom layer work together, and what happens at each stage.</p>
+
+<h2 id="overview">1. Overview</h2>
+<p>By default, Yocto clones the kernel from GitHub into a temporary build directory on every fresh build. This project instead:</p>
+<ul>
+  <li>Keeps a local clone of the BeagleBoard.org kernel at <code>linux-bb/</code></li>
+  <li>Uses a custom Yocto layer (<code>meta-bbb</code>) to tell BitBake to compile from that tree</li>
+  <li>Lets you edit kernel source directly and rebuild quickly</li>
+</ul>
+
+<p><strong>Kernel version</strong></p>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Value</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Recipe</td><td><code>linux-bb.org</code></td></tr>
+    <tr><td>Version</td><td><code>6.1.80-ti-r34</code></td></tr>
+    <tr><td>Repository</td><td><a href="https://github.com/beagleboard/linux" target="_blank" rel="noopener noreferrer">github.com/beagleboard/linux</a></td></tr>
+    <tr><td>Commit (armv7a / BBB)</td><td><code>4ca9ea30768d58c8d4d56d03dd1eaf8c8feb7ef9</code></td></tr>
+    <tr><td>Defconfig</td><td><code>bb.org_defconfig</code></td></tr>
+  </tbody>
+</table>
+
+<h2 id="project-layout">2. Project layout</h2>
+<pre><code>yocto-bbb/
+├── linux-bb/                                    ← local kernel source (edit here)
+└── poky/
+    ├── meta-ti/.../linux-bb.org_git.bb          ← upstream recipe
+    ├── meta-ti/.../linux-bb.org/defconfig       ← defconfig pointer
+    └── meta-bbb/.../linux-bb.org_%.bbappend    ← enables local build</code></pre>
+
+<p><strong>Why <code>meta-bbb</code>?</strong> <code>meta-bbb</code> is a custom Yocto layer for this project. It holds kernel customizations without modifying upstream layers like <code>meta-ti</code>. If you update <code>meta-ti</code>, your changes in <code>meta-bbb</code> are preserved.</p>
+
+<h2 id="base-recipe">3. The base recipe: <code>linux-bb.org_git.bb</code></h2>
+<p><strong>Location:</strong> <code>poky/meta-ti/meta-ti-bsp/recipes-kernel/linux/linux-bb.org_git.bb</code></p>
+<p>This is the upstream recipe from TI's <code>meta-ti</code> layer.</p>
+
+<pre><code>SECTION = "kernel"
+SUMMARY = "BeagleBoard.org Linux kernel"
+LICENSE = "GPL-2.0-only"
+COMPATIBLE_MACHINE = "beagle.*"
+
+inherit kernel
+require recipes-kernel/linux/setup-defconfig.inc
+require recipes-kernel/linux/ti-kernel.inc
+
+DEPENDS += "gmp-native libmpc-native"
+KERNEL_EXTRA_ARGS += "LOADADDR=${UBOOT_ENTRYPOINT} ${EXTRA_DTC_ARGS}"
+
+S = "${WORKDIR}/git"
+
+SRCREV:armv7a = "4ca9ea30768d58c8d4d56d03dd1eaf8c8feb7ef9"
+PV:armv7a = "6.1.80+git${SRCPV}"
+BRANCH:armv7a = "v6.1.80-ti-r34"
+
+SRC_URI = " \
+    git://github.com/beagleboard/linux.git;protocol=https;branch=${BRANCH} \
+    file://defconfig \
+"</code></pre>
+
+<p><strong>Key variables</strong></p>
+<table>
+  <thead>
+    <tr><th>Variable</th><th>Meaning</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>inherit kernel</code></td><td>Standard Yocto kernel build class</td></tr>
+    <tr><td><code>S = "${WORKDIR}/git"</code></td><td>Source directory after git fetch</td></tr>
+    <tr><td><code>SRCREV:armv7a</code></td><td>Fixed commit for 32-bit ARM (BeagleBone Black)</td></tr>
+    <tr><td><code>SRC_URI</code></td><td>Fetches kernel from GitHub + a small defconfig file</td></tr>
+  </tbody>
+</table>
+
+<h3 id="defconfig-pointer">The defconfig pointer file</h3>
+<p><strong>Location:</strong> <code>poky/meta-ti/meta-ti-bsp/recipes-kernel/linux/linux-bb.org/defconfig</code></p>
+<pre><code>use-kernel-config=bb.org_defconfig</code></pre>
+<p>This is not the full kernel config. It tells <code>setup-defconfig.inc</code> to use the in-tree defconfig:</p>
+<pre><code>linux-bb/arch/arm/configs/bb.org_defconfig</code></pre>
+<p>BitBake finds the pointer file because <code>file://defconfig</code> in <code>SRC_URI</code> resolves to the <code>linux-bb.org/</code> directory next to the recipe — a standard Yocto convention.</p>
+
+<h2 id="custom-append">4. The custom append: <code>linux-bb.org_%.bbappend</code></h2>
+<p><strong>Location:</strong> <code>poky/meta-bbb/recipes-kernel/linux/linux-bb.org_%.bbappend</code></p>
+
+<h3 id="append-filename">Why the filename matters</h3>
+<p>BitBake matches append files to recipes by name:</p>
+<pre><code>linux-bb.org_git.bb       ← base recipe (PN = linux-bb.org)
+linux-bb.org_%.bbappend   ← append (% = wildcard for _git, _6.1, etc.)</code></pre>
+<p>If the name does not match, BitBake <strong>silently ignores</strong> the file.</p>
+
+<h3 id="append-vs-overwrite">Append vs overwrite</h3>
+<p>A <code>.bbappend</code> does not replace the base recipe. BitBake <strong>merges</strong> them. The base recipe structure stays intact; the append adds or overrides specific variables.</p>
+
+<h3 id="full-append">Full append file</h3>
+<pre><code>FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+
+inherit externalsrc
+EXTERNALSRC = "/home/user/workspace/yocto-bbb/linux-bb"
+EXTERNALSRC_BUILD = "${WORKDIR}/build"</code></pre>
+<p>For a minimal local-kernel-only setup, that is all you need. The project may also include optional lines such as config fragments — those are separate from the core local-build mechanism.</p>
+
+<h3 id="append-line-by-line">Line-by-line</h3>
+<ul>
+  <li><code>FILESEXTRAPATHS:prepend</code> — tells BitBake where to find companion files (e.g. config fragments) in <code>meta-bbb/recipes-kernel/linux/linux-bb.org/</code>.</li>
+  <li><code>inherit externalsrc</code> — enables building from an external source directory instead of cloning into <code>WORKDIR</code>.</li>
+  <li><code>EXTERNALSRC</code> — absolute path to your local kernel tree (<code>linux-bb/</code>).</li>
+  <li><code>EXTERNALSRC_BUILD</code> — separate directory for build artifacts (.o files, <code>.config</code>). Keeps object files out of your git tree.</li>
+</ul>
+<p>To disable local build, comment out <code>inherit externalsrc</code>.</p>
+
+<h2 id="kernel-config-flow">5. Kernel configuration flow</h2>
+<pre><code>meta-ti/.../linux-bb.org/defconfig
+    → use-kernel-config=bb.org_defconfig
+        ↓
+linux-bb/arch/arm/configs/bb.org_defconfig
+    → base kernel .config
+        ↓
+(optional config fragments from meta-bbb)
+        ↓
+final .config in WORKDIR/build/</code></pre>
+<p><code>setup-defconfig.inc</code> handles this in <code>do_configure()</code>:</p>
+<ol>
+  <li>Read the recipe's defconfig pointer</li>
+  <li>Run <code>make bb.org_defconfig</code> against the kernel source</li>
+  <li>Merge any <code>KERNEL_CONFIG_FRAGMENTS</code> if defined</li>
+  <li>Run <code>oldconfig</code> to resolve dependencies</li>
+</ol>
+
+<h2 id="externalsrc">6. Local source with <code>externalsrc</code></h2>
+
+<h3 id="normal-flow">Normal flow (no externalsrc)</h3>
+<pre><code>do_fetch     → git clone to WORKDIR/git
+do_configure → configure in WORKDIR/git
+do_compile   → build in WORKDIR/git</code></pre>
+
+<h3 id="externalsrc-flow">With externalsrc</h3>
+<pre><code>do_fetch     → skip kernel clone (still fetches recipe companion files)
+do_configure → source = linux-bb/,  build = WORKDIR/build
+do_compile   → build in WORKDIR/build</code></pre>
+
+<p><strong>Benefits</strong></p>
+<ul>
+  <li>Edit kernel source directly in <code>linux-bb/</code></li>
+  <li>Use normal git workflow in that directory</li>
+  <li>Rebuild quickly with <code>bitbake linux-bb.org -c compile -f</code></li>
+  <li>No digging through <code>tmp/work/</code> for source</li>
+</ul>
+
+<p><strong>Requirements</strong></p>
+<ul>
+  <li><code>EXTERNALSRC</code> must be an absolute path</li>
+  <li>Local tree should match the <code>SRCREV</code> the recipe expects</li>
+</ul>
+
+<h2 id="setup-and-build">7. Setup and build</h2>
+
+<h3 id="step-clone">Step 1: Clone the kernel (one-time)</h3>
+<pre><code>cd /path/to/yocto-bbb
+
+git clone --branch v6.1.80-ti-r34 https://github.com/beagleboard/linux.git linux-bb
+git -C linux-bb checkout 4ca9ea30768d58c8d4d56d03dd1eaf8c8feb7ef9</code></pre>
+
+<h3 id="step-append">Step 2: Configure the append file</h3>
+<p>Ensure <code>linux-bb.org_%.bbappend</code> has <code>inherit externalsrc</code> and the correct <code>EXTERNALSRC</code> path. Add <code>meta-bbb</code> to <code>bblayers.conf</code>.</p>
+
+<h3 id="step-init">Step 3: Initialize the build environment</h3>
+<pre><code>cd poky
+source oe-init-build-env build-bbb</code></pre>
+<p>The build directory name (<code>build-bbb</code>, etc.) is arbitrary — each directory is an independent build environment.</p>
+
+<h3 id="step-build">Step 4: Build the kernel</h3>
+<pre><code>bitbake linux-bb.org</code></pre>
+
+<p><strong>Rebuild after source changes</strong></p>
+<pre><code>bitbake linux-bb.org -c compile -f
+bitbake linux-bb.org</code></pre>
+
+<p><strong>Build output</strong></p>
+<pre><code>poky/build-bbb/deploy-ti/images/beaglebone/
+├── zImage
+├── zImage-beaglebone.bin
+├── am335x-boneblack.dtb
+└── am335x-boneblack-beaglebone.dtb</code></pre>
+
+<h2 id="bitbake-merge">8. How BitBake merges recipes</h2>
+<p>When you run <code>bitbake linux-bb.org</code>:</p>
+<pre><code>1. Parse linux-bb.org_git.bb
+2. Merge linux-bb.org_%.bbappend (meta-bbb, higher priority)
+3. Effective recipe:
+   ├── Source:  EXTERNALSRC → linux-bb/  (overrides normal fetch for compile)
+   ├── Config:  bb.org_defconfig
+   └── Build:   inherit kernel (unchanged from base recipe)
+4. Run tasks: fetch → configure → compile → install → deploy</code></pre>
+
+<table>
+  <thead>
+    <tr><th>Setting</th><th>Source</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Kernel version / SRCREV</td><td><code>linux-bb.org_git.bb</code> (meta-ti)</td></tr>
+    <tr><td><code>inherit kernel</code></td><td><code>linux-bb.org_git.bb</code></td></tr>
+    <tr><td>Defconfig pointer</td><td><code>linux-bb.org/defconfig</code> (meta-ti)</td></tr>
+    <tr><td>Local source tree</td><td><code>linux-bb.org_%.bbappend</code> (meta-bbb)</td></tr>
+  </tbody>
+</table>
+
+<h2 id="dev-workflow">9. Development workflow</h2>
+<ol>
+  <li>Edit files in <code>linux-bb/</code></li>
+  <li><code>bitbake linux-bb.org -c compile -f &amp;&amp; bitbake linux-bb.org</code></li>
+  <li>Check output in <code>deploy-ti/images/beaglebone/</code></li>
+  <li>Commit changes in <code>linux-bb/</code> with git</li>
+</ol>
+
+<p><strong>Switching back to upstream fetch</strong> — comment out in <code>.bbappend</code>:</p>
+<pre><code># inherit externalsrc</code></pre>
+<p>BitBake will clone from GitHub again on the next build.</p>
+
+<h2 id="troubleshooting">10. Troubleshooting</h2>
+
+<p><strong>Append not taking effect</strong></p>
+<ul>
+  <li>Check filename: <code>linux-bb.org_%.bbappend</code></li>
+  <li>Confirm <code>meta-bbb</code> is in <code>bblayers.conf</code></li>
+  <li>Run: <code>bitbake-layers show-appends linux-bb.org</code></li>
+</ul>
+
+<p><strong><code>externalsrc</code> path error</strong></p>
+<ul>
+  <li><code>EXTERNALSRC</code> must be absolute</li>
+  <li>Directory must exist before building</li>
+</ul>
+
+<p><strong>Clean rebuild</strong></p>
+<pre><code>bitbake linux-bb.org -c cleansstate
+bitbake linux-bb.org</code></pre>
+
+<h2 id="summary">Summary</h2>
+<table>
+  <thead>
+    <tr><th>File</th><th>Role</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>linux-bb.org_git.bb</code></td><td>Upstream recipe — version, fetch, build class</td></tr>
+    <tr><td><code>linux-bb.org/defconfig</code></td><td>Points to <code>bb.org_defconfig</code> in kernel tree</td></tr>
+    <tr><td><code>linux-bb.org_%.bbappend</code></td><td>Enables local build via <code>externalsrc</code></td></tr>
+    <tr><td><code>linux-bb/</code></td><td>Your local kernel source — edit and rebuild here</td></tr>
+  </tbody>
+</table>
+
+<p>Standard Yocto practice: keep upstream layers untouched, put customization in <code>meta-bbb</code>, use <code>.bbappend</code> to extend the recipe, and use <code>externalsrc</code> for fast kernel iteration.</p>
+
+<h2 id="whats-next">What’s next (Part 3)</h2>
+<p><a href="../articles/yocto-beaglebone-black-part-3-st7789-display">Part 3</a> covers enabling the ST7789 TFT display — device tree, kernel modules, rootfs packages, and optional boot splash.</p>
