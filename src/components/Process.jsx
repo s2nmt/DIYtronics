@@ -7,7 +7,7 @@ const steps = [
   },
   {
     title: "Solution design",
-    desc: "Platform architecture, hardware BOM, or catalog device selection that fits.",
+    desc: "Platform architecture, PCB & firmware scope, or mechanical enclosure concept that fits.",
   },
   {
     title: "Prototype & field test",

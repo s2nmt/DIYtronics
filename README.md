@@ -1,6 +1,6 @@
 # Gemify Website
 
-React site for Gemify — IoT platform outsourcing, hardware development, and ready-made IoT device solutions.
+React site for Gemify — IoT platform outsourcing, PCB & firmware, and mechanical design.
 
 ## Run locally
 

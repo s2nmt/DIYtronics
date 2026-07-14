@@ -15,7 +15,7 @@ export default function Contact() {
         <div className="container cta__content">
           <h2 className="cta__title">Ready to start your IoT project?</h2>
           <p className="cta__text">
-            Tell us about platform outsourcing, hardware development, or device purchase —
+            Tell us about platform outsourcing, PCB & firmware, or mechanical design —
             we reply within one business day.
           </p>
           <div className="cta__actions">
@@ -43,8 +43,8 @@ export default function Contact() {
               Start your project with Gemify
             </h2>
             <p>
-              Briefly describe your need — platform outsourcing, hardware development, or
-              device purchase — and our team will follow up soon.
+              Briefly describe your need — platform outsourcing, PCB & firmware, or
+              mechanical design — and our team will follow up soon.
             </p>
 
             <dl className="contact-details">
@@ -94,12 +94,13 @@ export default function Contact() {
 
                 <label>
                   Interest
-                  <select name="need" defaultValue="climate">
+                  <select name="need" defaultValue="platform">
+                    <option value="platform">IoT platform outsourcing</option>
+                    <option value="hardware">PCB & firmware</option>
+                    <option value="mechanical">Mechanical design</option>
                     <option value="climate">Temp / humidity monitoring</option>
                     <option value="relay">Remote relay control</option>
                     <option value="rfid">NFC / RFID readers</option>
-                    <option value="platform">IoT platform outsourcing</option>
-                    <option value="hardware">Hardware development</option>
                     <option value="other">Other</option>
                   </select>
                 </label>

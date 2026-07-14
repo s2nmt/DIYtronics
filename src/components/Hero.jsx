@@ -24,7 +24,7 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           >
-            Outsource IoT platforms. Build hardware. Deploy ready-made devices.
+            Outsource IoT platforms. Build PCB & firmware. Design mechanics.
           </motion.p>
 
           <motion.p
@@ -33,8 +33,8 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
-            Gemify partners with you from idea to production — cloud platforms, board
-            design, and field-proven IoT solutions ready to ship.
+            Gemify partners with you from idea to production — cloud platforms, PCB
+            and firmware, and mechanical enclosures ready for manufacturing.
           </motion.p>
 
           <motion.div

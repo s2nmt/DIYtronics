@@ -9,15 +9,15 @@ const services = [
   },
   {
     num: "02",
-    title: "Hardware development",
-    desc: "Schematic design, SoC/module selection, PCB prototypes, embedded firmware, and EMC certification — from PoC to mass production.",
+    title: "PCB & firmware",
+    desc: "Schematic and multilayer PCB layout, DFM/Gerber delivery, plus bare-metal or RTOS firmware, drivers, and board bring-up — from concept to working hardware.",
     art: "hardware",
   },
   {
     num: "03",
-    title: "Ready-made device solutions",
-    desc: "Supply and customize field-proven IoT product lines: climate systems, relay controllers, and smart NFC/RFID readers.",
-    art: "devices",
+    title: "Mechanical design",
+    desc: "Enclosure and structural design in CAD, DFM for injection molding or sheet metal, 3D prototypes, and production-ready drawings for your electronics.",
+    art: "mechanical",
   },
 ];
 
@@ -59,10 +59,12 @@ function ServiceArt({ type }) {
   return (
     <svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <rect width="400" height="260" fill="#ecfdf5" />
-      <rect x="48" y="90" width="100" height="70" rx="10" fill="#fff" />
-      <circle cx="200" cy="110" r="36" fill="#059669" opacity="0.9" />
-      <rect x="250" y="70" width="90" height="120" rx="14" fill="#fff" />
-      <circle cx="295" cy="120" r="18" stroke="#a3e635" strokeWidth="3" fill="none" />
+      <rect x="70" y="55" width="160" height="150" rx="10" fill="#fff" stroke="#059669" strokeWidth="2" strokeOpacity="0.25" />
+      <rect x="95" y="80" width="110" height="70" rx="6" fill="#111827" opacity="0.88" />
+      <circle cx="290" cy="100" r="42" fill="none" stroke="#059669" strokeWidth="10" opacity="0.35" />
+      <circle cx="290" cy="100" r="18" fill="#a3e635" />
+      <circle cx="290" cy="175" r="28" fill="none" stroke="#111827" strokeWidth="8" opacity="0.45" />
+      <circle cx="290" cy="175" r="10" fill="#059669" />
     </svg>
   );
 }
@@ -75,7 +77,7 @@ export default function Services() {
           <p className="section-subtitle">Technology solutions</p>
           <h2 className="section-title">Our services</h2>
           <p className="section-description">
-            Deep platform outsourcing, end-to-end hardware, or deploy-ready products —
+            Platform outsourcing, PCB & firmware, and mechanical design —
             pick the model that fits your speed and budget.
           </p>
         </div>

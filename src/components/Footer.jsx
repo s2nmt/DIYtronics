@@ -10,8 +10,8 @@ export default function Footer() {
               Gemify
             </Link>
             <p className="footer-tag">
-              Your partner for IoT platform outsourcing, hardware development, and device
-              solutions.
+              Your partner for IoT platform outsourcing, PCB & firmware, and
+              mechanical design.
             </p>
           </div>
 
@@ -34,10 +34,10 @@ export default function Footer() {
                 <a href="/#services">Platform outsourcing</a>
               </li>
               <li>
-                <a href="/#services">Hardware development</a>
+                <a href="/#services">PCB & firmware</a>
               </li>
               <li>
-                <Link to="/products">Ready-made devices</Link>
+                <a href="/#services">Mechanical design</a>
               </li>
             </ul>
           </div>
