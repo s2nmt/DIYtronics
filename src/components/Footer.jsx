@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
-    <footer className="footer">
+    <footer className="footer" id="contact">
       <div className="container">
         <div className="footer-grid">
           <div className="footer-col">
@@ -10,34 +10,22 @@ export default function Footer() {
               Gemify
             </Link>
             <p className="footer-tag">
-              Your partner for IoT platform outsourcing, PCB & firmware, and
-              mechanical design.
+              Complete IoT solutions and hardware for monitoring, energy, and
+              autonomous vehicles.
             </p>
           </div>
 
           <div className="footer-col">
-            <h4>About</h4>
+            <h4>Solutions</h4>
             <ul>
               <li>
-                <a href="/#services">Services</a>
+                <a href="/#services">Monitoring & control</a>
               </li>
               <li>
-                <Link to="/products">Products</Link>
-              </li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
-            <h4>Services</h4>
-            <ul>
-              <li>
-                <a href="/#services">Platform outsourcing</a>
+                <a href="/#services">Energy management</a>
               </li>
               <li>
-                <a href="/#services">PCB & firmware</a>
-              </li>
-              <li>
-                <a href="/#services">Mechanical design</a>
+                <a href="/#services">Autonomous vehicles</a>
               </li>
             </ul>
           </div>
@@ -46,14 +34,12 @@ export default function Footer() {
             <h4>Contact</h4>
             <ul>
               <li>
-                <a href="/#contact">Get in touch</a>
-              </li>
-              <li>
-                <a href="mailto:hello@gemify.vn">hello@gemify.vn</a>
+                <a href="mailto:info@gemify.vn">info@gemify.vn</a>
               </li>
               <li>
                 <a href="tel:+842873008868">+84 28 7300 8868</a>
               </li>
+              <li>District 7, Ho Chi Minh City</li>
             </ul>
           </div>
         </div>

@@ -177,6 +177,7 @@
   line-height: 1.8;
   font-size: 1.05rem;
   color: #3f3f46;
+  max-width: 72ch;
 }
 
 .article-post-page .article-content h2 {
@@ -203,8 +204,9 @@
 
 .article-post-page .article-content ul,
 .article-post-page .article-content ol {
-  margin-left: 2rem;
+  margin-left: 1.35rem;
   margin-bottom: 1.5rem;
+  list-style: revert;
 }
 
 .article-post-page .article-content li {
@@ -238,29 +240,69 @@
 }
 
 .article-post-page .article-content code {
-  background: #f5f5f5;
-  padding: 0.2rem 0.5rem;
+  font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, Menlo, monospace;
+  font-size: 0.88em;
+  font-weight: 500;
+  color: #064e3b;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 0.12em 0.38em;
   border-radius: 4px;
-  font-family: 'Courier New', monospace;
-  font-size: 0.9em;
-  color: #d63384;
+  word-break: break-word;
 }
 
 .article-post-page .article-content pre {
-  background: #f8f9fa;
-  padding: 1.5rem;
-  border-radius: 8px;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 1.1rem 1.2rem;
+  border-radius: 6px;
   overflow-x: auto;
-  margin: 1.5rem 0;
-  border: 1px solid #e5e5e5;
+  margin: 1.35rem 0;
+  border: 1px solid #1e293b;
+  line-height: 1.7;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #475569 #0f172a;
+}
+
+.article-post-page .article-content pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+.article-post-page .article-content pre::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
 }
 
 .article-post-page .article-content pre code {
+  display: block;
+  width: max-content;
+  min-width: 100%;
   background: none;
+  border: none;
   padding: 0;
-  color: #333;
-  font-size: 0.95em;
+  color: #e2e8f0;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
   white-space: pre;
+  tab-size: 2;
+  word-break: normal;
+}
+
+@media (max-width: 640px) {
+  .article-post-page .article-content pre {
+    padding: 0.9rem 0.85rem;
+    margin-left: -0.25rem;
+    margin-right: -0.25rem;
+    border-radius: 4px;
+  }
+
+  .article-post-page .article-content pre code {
+    font-size: 0.8rem;
+  }
 }
 
 .article-post-page .article-footer-section {

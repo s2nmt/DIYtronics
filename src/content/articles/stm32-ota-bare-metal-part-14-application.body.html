@@ -1,26 +1,156 @@
-<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-13-ota-handlers">Part 13: OTA handlers</a> — next: <a href="articles/stm32-ota-bare-metal-part-15-startup-linker">Part 15: Startup & linker</a>.</p>
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-13-ota-handlers">Part 13: OTA handlers</a> — next: <a href="articles/stm32-ota-bare-metal-part-15-startup-linker">Part 15: Startup &amp; linker</a>.</p>
 
-<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/application/Src/main.c" target="_blank" rel="noopener noreferrer"><code>application/Src/main.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/application/Src/ota_req.c" target="_blank" rel="noopener noreferrer"><code>application/Src/ota_req.c</code></a>.</p>
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/application/Src/main.c" target="_blank" rel="noopener noreferrer"><code>application/Src/main.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/application/Src/ota_req.c" target="_blank" rel="noopener noreferrer"><code>application/Src/ota_req.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/application/Inc/ota_req.h" target="_blank" rel="noopener noreferrer"><code>application/Inc/ota_req.h</code></a>.</p>
+<p>The application is a thin demo: blink PC13, print a heartbeat over USART1, and when the host sends <code>'U'</code>, write the OTA request flag and reset. The bootloader then sees <code>0xDEADBEEF</code> and enters OTA <strong>immediately</strong> — there is no 3-second key window in <code>bootloader/Src/main.c</code>.</p>
 
-<h2 id="app-main">1. Application <code>main</code></h2>
-<p>Same bring-up as the bootloader (clock, GPIO, UART), then:</p>
+<h2 id="ota-req-h">1. <code>ota_req.h</code> — flag layout</h2>
+<pre><code>#define OTA_CONFIG_ADDR     0x0800FC00UL
+#define OTA_MAGIC_REQUEST   0xDEADBEEFUL
+#define OTA_MAGIC_NONE      0xFFFFFFFFUL
+#define OTA_SLOT_APP1       1U
+#define OTA_SLOT_APP2       2U
+#define OTA_UPDATE_KEY       'U'
+
+typedef struct {
+    uint32_t magic;
+    uint32_t active_slot;
+    uint32_t app_size;
+    uint32_t crc32;
+    uint32_t version;
+} ota_config_t;
+
+void ota_request_enter(void);</code></pre>
+<p>Same config page the bootloader uses (<code>OTA_CONFIG_ADDR</code> = last 1 KB of the 64 KB Flash). <code>magic == 0xDEADBEEF</code> means “enter OTA on next boot.”</p>
+
+<h2 id="app-main">2. Application <code>main()</code></h2>
+<pre><code>int main(void)
+{
+    __asm volatile("cpsie i" : : : "memory");
+
+    init();
+    SystemClock_Config();
+    GPIO_Init();
+    Uart1_Init();
+
+    printf("app 2 started\r\n");
+    printf("Press '%c' for OTA update\r\n", OTA_UPDATE_KEY);
+
+    Iwdg_Init();
+
+    while (1) {
+        app_poll_ota_key();
+        printf("[%lu] Hello world\r\n", tick_get());
+        Iwdg_Feed();
+        GPIO_Toggle(GPIOC, 13);
+        delay_ms(1000);
+    }
+}</code></pre>
+<ol>
+  <li><strong>Enable IRQs</strong> — then the same bring-up chain as the bootloader (init / clock / GPIO / UART).</li>
+  <li><strong>Banner</strong> — this build is linked as APP2, so it prints <code>app 2 started</code> and the <code>'U'</code> hint.</li>
+  <li><strong>IWDG</strong> — start the independent watchdog; the 1 Hz loop feeds it every iteration.</li>
+  <li><strong>Loop</strong> — poll for OTA key, print heartbeat with <code>tick_get()</code>, toggle PC13, delay 1 s.</li>
+</ol>
+
+<h2 id="rx">3. Simple RX path (not the bootloader ring)</h2>
+<p>The app keeps a tiny IRQ buffer and drains it in the main loop:</p>
+<pre><code>static volatile uint8_t s_rx_buf[64];
+static volatile uint8_t s_rx_count;
+
+void USART1_IRQHandler(void)
+{
+    if (USART1-&gt;USART_SR.BITS.RXNE) {
+        char c = (char)USART1-&gt;USART_DR.REG;
+        if (s_rx_count &lt; sizeof(s_rx_buf)) {
+            s_rx_buf[s_rx_count++] = (uint8_t)c;
+        }
+    }
+}
+
+static void app_poll_ota_key(void)
+{
+    uint8_t c;
+
+    while (app_take_rx_byte(&amp;c)) {
+        if (c == (uint8_t)OTA_UPDATE_KEY) {
+            printf("OTA requested, resetting...\r\n");
+            delay_ms(50);
+            ota_request_enter();
+        }
+    }
+}</code></pre>
 <ul>
-  <li>Prints which app started and the OTA key hint.</li>
-  <li>Enables IWDG.</li>
-  <li>Loop: poll for <code>'U'</code>, print heartbeat, toggle PC13, feed watchdog, <code>delay_ms(1000)</code>.</li>
+  <li>IRQ pushes bytes into <code>s_rx_buf</code> (drop if full).</li>
+  <li><code>app_take_rx_byte</code> pops from the front (shifts the rest down).</li>
+  <li>On <code>'U'</code>: log, short delay so the UART line can flush, then <code>ota_request_enter()</code> (does not return).</li>
 </ul>
+<p><code>_write</code> still retargets <code>printf</code> to <code>uart1_write</code>, same as the bootloader.</p>
 
-<h2 id="ota-req">2. <code>ota_request_enter</code></h2>
-<pre><code>guess active slot from APP_FLASH_ORIGIN (APP1 vs APP2 payload address)
-write ota_config_t { magic = 0xDEADBEEF, active_slot = … }
-system reset via AIRCR SYSRESETREQ</code></pre>
-<p>Bootloader sees the flag and enters OTA without waiting for the 3 s window.</p>
+<h2 id="ota-request">4. <code>ota_request_enter()</code> — flag + reset</h2>
+<pre><code>#define APP1_PAYLOAD 0x08005900UL
+#define APP2_PAYLOAD 0x0800AB00UL
 
-<h2 id="link">3. Link offsets</h2>
-<p>Two app builds (or two linker scripts) place the vector table at <code>APP1_START+0x100</code> (<code>0x08005900</code>) or <code>APP2_START+0x100</code> (<code>0x0800AB00</code>). Signing wraps that raw <code>.bin</code> with the 256-byte header; the slot image base is the APP1/APP2 start address.</p>
+static uint32_t app_active_slot_guess(void)
+{
+    if (APP_FLASH_ORIGIN == APP2_PAYLOAD) {
+        return OTA_SLOT_APP2;
+    }
+    return OTA_SLOT_APP1;
+}
 
-<h2 id="next">Next</h2><ul>
-  <li><a href="articles/stm32-ota-bare-metal-part-15-startup-linker">Part 15: Startup & linker</a></li>
+void ota_request_enter(void)
+{
+    const ota_config_t *cur = ota_config();
+    ota_config_t cfg;
+
+    if (cur-&gt;magic != OTA_MAGIC_NONE &amp;&amp; cur-&gt;magic != OTA_MAGIC_REQUEST) {
+        cfg = *cur;   /* keep existing metadata if page already used */
+    } else {
+        cfg.active_slot = app_active_slot_guess();
+        cfg.app_size = 0U;
+        cfg.crc32 = 0U;
+        cfg.version = 0U;
+    }
+
+    cfg.magic = OTA_MAGIC_REQUEST;
+
+    if (flash_unlock() != 0) return;
+    if (flash_erase_page(OTA_CONFIG_ADDR) != 0) { flash_lock(); return; }
+    if (flash_write_buffer(OTA_CONFIG_ADDR, (const uint8_t *)&amp;cfg, sizeof(cfg)) != 0) {
+        flash_lock();
+        return;
+    }
+    flash_lock();
+    system_reset();
+}</code></pre>
+<ol>
+  <li><strong>Guess active slot</strong> from <code>APP_FLASH_ORIGIN</code> in <code>conf.h</code> (must match the linker FLASH ORIGIN — this tree uses <code>0x0800AB00</code> for APP2).</li>
+  <li><strong>Preserve</strong> a live config page if it already holds real metadata; otherwise seed <code>active_slot</code> from the guess.</li>
+  <li><strong>Set</strong> <code>magic = 0xDEADBEEF</code>, erase/program the config page, lock Flash.</li>
+  <li><strong>Reset</strong> via <code>SCB_AIRCR</code> (<code>VECTKEY | SYSRESETREQ</code>) with IRQs masked — never returns.</li>
+</ol>
+
+<h2 id="bl-side">5. What the bootloader does (no key window)</h2>
+<p>On reset, <code>bootloader/Src/main.c</code> checks the flag first:</p>
+<pre><code>if (ota_flag_is_set()) {
+    printf("OTA flag set\r\n");
+    (void)ota_flag_clear();
+    boot_enter_ota();   /* prints "OTA RX ready", then ota_run() */
+}</code></pre>
+<p>There is <strong>no</strong> timed “press U within 3 s” path in the bootloader. Host tools that need OTA while an app is running must spam <code>'U'</code> to the <em>app</em> (Part 16’s <code>--enter-ota</code>), wait for the reset, then talk to the bootloader once it prints <code>OTA RX ready</code>.</p>
+
+<h2 id="link">6. Where this image lives</h2>
+<p>Payload vectors sit at slot base + 256-byte IMG1 header:</p>
+<ul>
+  <li><strong>APP1 payload</strong> — <code>0x08005800 + 0x100 = 0x08005900</code></li>
+  <li><strong>APP2 payload</strong> — <code>0x0800AA00 + 0x100 = 0x0800AB00</code> (this repo’s default linker / <code>APP_FLASH_ORIGIN</code>)</li>
+</ul>
+<p>Signing wraps the raw <code>.bin</code> with that 256-byte header; the slot image base is <code>APP1_START</code> / <code>APP2_START</code>. Part 15 covers the linker and startup details.</p>
+
+<h2 id="next">Next</h2>
+<p>Next we look at how both images are linked and started — vector table placement, APP1/APP2 offsets, and <code>Reset_Handler</code>.</p>
+<ul>
+  <li><a href="articles/stm32-ota-bare-metal-part-15-startup-linker">Part 15: Startup &amp; linker</a></li>
   <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
   <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
 </ul>

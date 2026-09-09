@@ -10,7 +10,6 @@
   --shadow: 0 8px 24px rgba(17, 24, 39, 0.06);
   --shadow-lg: 0 16px 40px rgba(5, 150, 105, 0.12);
   --font: "Space Grotesk", system-ui, sans-serif;
-  --max: 1200px;
   --radius: 16px;
   --radius-sm: 10px;
   --pill: 999px;
@@ -29,6 +28,7 @@
   --radius-md: var(--radius-sm);
   --radius-lg: var(--radius);
   --radius-full: var(--pill);
+  --header-height: 80px;
 }
 
 *,
@@ -41,6 +41,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-height) + 0.75rem);
 }
 
 body {
@@ -74,8 +75,11 @@ ol {
 }
 
 .container {
-  width: min(100% - 2.5rem, var(--max));
-  margin-inline: auto;
+  width: 100%;
+  max-width: none;
+  padding-inline: clamp(1.25rem, 6.5vw, 11rem);
+  margin-inline: 0;
+  box-sizing: border-box;
 }
 
 .gradient-text {
@@ -135,7 +139,8 @@ ol {
 }
 
 .section {
-  padding: clamp(4rem, 8vw, 5.5rem) 0;
+  padding-top: clamp(1.15rem, 2.2vw, 1.6rem);
+  padding-bottom: clamp(2.75rem, 5.5vw, 4rem);
 }
 
 .section--light {
@@ -144,7 +149,7 @@ ol {
 
 .section-header {
   text-align: center;
-  margin-bottom: 3.5rem;
+  margin-bottom: 2.75rem;
 }
 
 .section-subtitle {
@@ -163,7 +168,7 @@ ol {
 .section-title {
   font-size: clamp(1.85rem, 3.5vw, 2.6rem);
   font-weight: 700;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   color: var(--dark);
   letter-spacing: -0.03em;
 }

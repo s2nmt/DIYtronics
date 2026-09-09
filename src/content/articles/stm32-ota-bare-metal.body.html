@@ -70,13 +70,11 @@
 <h2 id="boot-flow">6. Boot flow</h2>
 <pre><code>Reset → bootloader @ 0x08000000
   │
-  ├─ OTA flag set (0xDEADBEEF)?  → OTA mode
-  ├─ No valid signed app?        → OTA mode
-  └─ Valid app
-        └─ Wait 3 s for 'U' on UART
-              ├─ 'U' received → OTA mode
-              └─ Timeout      → verify active (then inactive) slot → jump</code></pre>
-<p>From the running application, send <strong><code>U</code></strong> over UART to set the OTA flag and reset into the bootloader.</p>
+  ├─ OTA flag set (0xDEADBEEF)?  → OTA mode (then continue if idle timeout)
+  ├─ Valid signed slot (active, then inactive)? → jump
+  └─ No valid image → OTA mode
+        └─ after idle timeout → retry pick / OTA loop</code></pre>
+<p>From the running application, send <strong><code>U</code></strong> over UART to set the OTA flag and reset into the bootloader (handled in the app, not by a bootloader key-wait window).</p>
 
 <h2 id="signed-images">7. Signed images</h2>
 <p>Each slot image is <code>[256-byte IMG1 header | payload]</code>. Before jumping, the bootloader:</p>

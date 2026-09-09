@@ -1,26 +1,161 @@
-<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-11-img-verify">Part 11: img & verify</a> — next: <a href="articles/stm32-ota-bare-metal-part-13-ota-handlers">Part 13: OTA handlers</a>.</p>
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-11-img-verify">Part 11: img &amp; verify</a> — next: <a href="articles/stm32-ota-bare-metal-part-13-ota-handlers">Part 13: OTA handlers</a>.</p>
 
-<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/boot/src/ota.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/boot/src/ota.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/boot/inc/ota.h" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/boot/inc/ota.h</code></a> — framing half.</p>
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/boot/inc/ota.h" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/boot/inc/ota.h</code></a>, framing half of <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/boot/src/ota.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/boot/src/ota.c</code></a>.</p>
+<p>OTA is a simple framed protocol over USART1. This post covers constants, the RX state machine, CRC-16, idle timeout, and <code>ota_run</code>’s outer loop. Command handlers (START / DATA / END) are Part 13.</p>
 
-<h2 id="frame">1. Frame format</h2>
-<pre><code>STX(0x02) | CMD | LEN_L | LEN_H | PAYLOAD[len] | CRC16_L | CRC16_H | ETX(0x03)</code></pre>
+<h2 id="frame">1. Frame format and constants</h2>
+<pre><code>#define OTA_FRAME_STX           0x02U
+#define OTA_FRAME_ETX           0x03U
+
+#define OTA_CMD_START           0x01U
+#define OTA_CMD_DATA            0x02U
+#define OTA_CMD_END             0x03U
+
+#define OTA_RSP_ACK             0x06U
+#define OTA_RSP_NACK            0x15U
+
+#define OTA_CHUNK_SIZE          256U
+#define OTA_MAX_PAYLOAD         (2U + OTA_CHUNK_SIZE)  /* seq + data */
+
+#define OTA_IDLE_TIMEOUT_MS     5000U</code></pre>
+<p>On-wire layout:</p>
+<pre><code>STX (0x02)
+CMD
+LEN_L | LEN_H          /* little-endian payload length */
+PAYLOAD[len]           /* 0 … OTA_MAX_PAYLOAD bytes */
+CRC16_L | CRC16_H      /* CRC over CMD|LEN|PAYLOAD */
+ETX (0x03)</code></pre>
 <ul>
-  <li>Commands: <code>START=0x01</code>, <code>DATA=0x02</code>, <code>END=0x03</code></li>
-  <li>Responses: <code>ACK=0x06</code>, <code>NACK=0x15</code> (single byte)</li>
-  <li>Chunk size: 256 bytes max payload data</li>
+  <li>Host → device: framed START / DATA / END.</li>
+  <li>Device → host: single-byte <strong>ACK</strong> (<code>0x06</code>) or <strong>NACK</strong> (<code>0x15</code>) — not framed.</li>
+  <li>DATA payload is typically 2-byte sequence number + up to 256 data bytes.</li>
 </ul>
 
-<h2 id="fsm">2. RX state machine</h2>
+<h2 id="state">2. RX state machine</h2>
+<pre><code>typedef enum {
+    RX_WAIT_STX,
+    RX_WAIT_CMD,
+    RX_WAIT_LEN_L,
+    RX_WAIT_LEN_H,
+    RX_WAIT_PAYLOAD,
+    RX_WAIT_CRC_L,
+    RX_WAIT_CRC_H,
+    RX_WAIT_ETX
+} rx_state_t;
+
+static uint8_t    rx_payload[OTA_MAX_PAYLOAD];
+static uint16_t   rx_len;
+static uint16_t   rx_index;
+static uint8_t    rx_cmd;
+static uint16_t   rx_crc_recv;
+static rx_state_t rx_state;</code></pre>
+<p><code>ota_receive_frame()</code> consumes <strong>one byte per call</strong> from the UART ring and advances the state:</p>
 <pre><code>RX_WAIT_STX → CMD → LEN_L → LEN_H → PAYLOAD* → CRC_L → CRC_H → ETX</code></pre>
-<p><code>ota_receive_frame()</code> consumes one byte per call from the UART ring (with idle timeout). CRC-16/CCITT-ish (<code>poly 0x1021</code>, init <code>0xFFFF</code>) covers <code>CMD|LEN|PAYLOAD</code>.</p>
+<ol>
+  <li><strong>STX</strong> — ignore noise until <code>0x02</code>.</li>
+  <li><strong>CMD / LEN</strong> — store command; build 16-bit length. If <code>len &gt; OTA_MAX_PAYLOAD</code>, reset and return −1.</li>
+  <li><strong>PAYLOAD</strong> — fill <code>rx_payload[]</code>; skip straight to CRC if <code>len == 0</code>.</li>
+  <li><strong>CRC + ETX</strong> — on ETX, recompute CRC over <code>CMD|LEN_L|LEN_H|PAYLOAD</code>; mismatch → reset, −1. Match → return <code>0</code> (complete frame ready).</li>
+</ol>
+<p>Return values while assembling: <code>1</code> = need more bytes, <code>0</code> = frame OK, <code>-1</code> = framing/CRC error, <code>OTA_RX_TIMEOUT (-2)</code> = idle.</p>
 
-<h2 id="idle">3. Idle timeout</h2>
-<p><code>uart_rx_byte</code> refreshes the deadline when a frame is in progress or STX arrives. Pure idle for <code>OTA_IDLE_TIMEOUT_MS</code> (5 s default) returns to <code>main</code> so a hung host cannot wedge the bootloader forever.</p>
+<h2 id="crc16">3. Frame CRC-16</h2>
+<pre><code>static uint16_t crc16_update(uint16_t crc, uint8_t data)
+{
+    crc ^= (uint16_t)data &lt;&lt; 8;
+    for (int i = 0; i &lt; 8; i++) {
+        if (crc &amp; 0x8000U) {
+            crc = (uint16_t)((crc &lt;&lt; 1) ^ 0x1021U);
+        } else {
+            crc &lt;&lt;= 1;
+        }
+    }
+    return crc;
+}
 
-<h2 id="iwdg">4. Watchdog</h2>
-<p>Each wait loop calls <code>Iwdg_Feed()</code> so multi-second transfers stay alive.</p>
+static uint16_t crc16_calc(const uint8_t *data, uint32_t len)
+{
+    uint16_t crc = 0xFFFFU;
+    for (uint32_t i = 0; i &lt; len; i++) {
+        crc = crc16_update(crc, data[i]);
+    }
+    return crc;
+}</code></pre>
+<p>CRC-16/CCITT-style: poly <code>0x1021</code>, init <code>0xFFFF</code>. Covers the command and payload only — STX/ETX are framing markers, not part of the CRC body. The host tool must use the same polynomial.</p>
 
-<h2 id="next">Next</h2><ul>
+<h2 id="idle">4. Byte wait and idle timeout</h2>
+<pre><code>static int uart_rx_byte(uint8_t *out)
+{
+    uint32_t deadline = tick_get() + s_idle_limit;
+
+    while ((int32_t)(tick_get() - deadline) &lt; 0) {
+        if (uart1_rx_get(out) != 0) {
+            /* Refresh idle only when in a frame, or STX arrives */
+            if (rx_state != RX_WAIT_STX || *out == OTA_FRAME_STX) {
+                deadline = tick_get() + s_idle_limit;
+            }
+            return 0;
+        }
+        Iwdg_Feed();
+    }
+    return OTA_RX_TIMEOUT;
+}</code></pre>
+<ul>
+  <li>Reads from Part 6’s IRQ ring buffer — no busy-spin on the USART status register in the foreground for OTA data.</li>
+  <li><strong>Idle deadline</strong> refreshes when a frame is in progress, or when STX starts one. Random noise that is not STX does <em>not</em> keep the session alive forever.</li>
+  <li>Default limit is <code>OTA_IDLE_TIMEOUT_MS</code> (5 s). Pure silence → return to <code>main</code>.</li>
+  <li>Every wait loop feeds the IWDG so multi-second transfers do not reset the MCU.</li>
+</ul>
+
+<h2 id="ack">5. ACK / NACK TX</h2>
+<pre><code>static void ota_tx_ack(void)
+{
+    ota_tx_byte(OTA_RSP_ACK);
+    while ((USART1-&gt;USART_SR.REG &amp; USART_SR_TC) == 0U) {
+    }
+}
+
+static void ota_tx_nack(void)
+{
+    ota_tx_byte(OTA_RSP_NACK);
+    while ((USART1-&gt;USART_SR.REG &amp; USART_SR_TC) == 0U) {
+    }
+}</code></pre>
+<p>Polled single-byte replies. Waiting for <code>TC</code> (transmission complete) matters before <code>jump_to_application</code> disables USART — otherwise the host can miss the final ACK.</p>
+
+<h2 id="run">6. <code>ota_run</code> — outer loop</h2>
+<pre><code>void ota_run(uint32_t idle_timeout_ms)
+{
+    s_idle_limit = idle_timeout_ms;
+    uart1_rx_flush();
+    ota_reset_rx();
+
+    while (1) {
+        int st = ota_receive_frame();
+
+        if (st == OTA_RX_TIMEOUT) {
+            return;                 /* back to main */
+        }
+
+        if (st == 0) {
+            ota_process_frame();    /* Part 13 handlers */
+            ota_reset_rx();
+        } else if (st &lt; 0) {
+            ota_tx_nack();          /* bad framing / CRC */
+        }
+    }
+}</code></pre>
+<ol>
+  <li>Flush UART ring + hardware RX so a previous session’s garbage does not look like STX.</li>
+  <li>Assemble frames one byte at a time.</li>
+  <li>Complete frame → <code>ota_process_frame()</code> (START/DATA/END).</li>
+  <li>Framing/CRC fail → NACK and keep listening (state already reset inside the receiver).</li>
+  <li>Idle timeout → return. Success path never returns: END jumps to the new app inside the handler.</li>
+</ol>
+
+<h2 id="next">Next</h2>
+<p>Framing is in place. Next we look at what happens when a valid START, DATA, or END frame arrives — erase, program, verify, swap, and jump.</p>
+<ul>
   <li><a href="articles/stm32-ota-bare-metal-part-13-ota-handlers">Part 13: OTA handlers</a></li>
   <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
   <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>

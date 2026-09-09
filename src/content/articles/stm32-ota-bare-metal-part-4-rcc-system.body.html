@@ -1,27 +1,110 @@
 <p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-3-main">Part 3: bootloader main.c</a> — next: <a href="articles/stm32-ota-bare-metal-part-5-gpio">Part 5: GPIO</a>.</p>
 
-<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/inc/types.h" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/inc/types.h</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/inc/conf.h" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/inc/conf.h</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/rcc.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/rcc.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/system.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/system.c</code></a>.</p>
-<p>Before UART or Flash, the MCU needs a stable clock. This layer is pure register programming — no STM32 HAL clock tree helpers.</p>
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/inc/types.h" target="_blank" rel="noopener noreferrer"><code>types.h</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/inc/conf.h" target="_blank" rel="noopener noreferrer"><code>conf.h</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/inc/rcc.h" target="_blank" rel="noopener noreferrer"><code>rcc.h</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/rcc.c" target="_blank" rel="noopener noreferrer"><code>rcc.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/system.c" target="_blank" rel="noopener noreferrer"><code>system.c</code></a>.</p>
+<p>In Part 3, <code>main()</code> calls <code>SystemClock_Config()</code> early. This post shows what that init layer actually does — no STM32 HAL clock helpers, only registers.</p>
 
 <h2 id="types-conf">1. <code>types.h</code> and <code>conf.h</code></h2>
-<p><code>types.h</code> defines packed register access helpers (bitfield + <code>REG</code> union style) used across drivers. <code>conf.h</code> holds board constants: HSE/HSI assumptions, USART baud, pin maps, and Flash page size (1 KB on the F103 medium-density parts used here).</p>
+<p><code>types.h</code> is tiny: shared return codes used by drivers.</p>
+<pre><code>typedef enum {
+    STATUS_OK = 0x00U,
+    STATUS_ERROR = 0x01U,
+    STATUS_BUSY = 0x02U,
+    STATUS_TIMEOUT = 0x03U
+} status_t;</code></pre>
+<p><code>conf.h</code> holds the board clock numbers the rest of the code assumes:</p>
+<pre><code>#define TICK_INT_PRIORITY   15U
+#define TICK_FREQ_HZ        1000U
 
-<h2 id="rcc">2. <code>rcc.c</code></h2>
-<p>Thin wrappers to enable peripheral clocks (GPIOA/C, USART1, etc.) by setting the right bits in <code>RCC_APB2ENR</code> / <code>RCC_APB1ENR</code>. Calling these once from <code>init()</code> / MSP keeps the higher-level drivers free of clock noise.</p>
-
-<h2 id="system">3. <code>SystemClock_Config</code></h2>
-<p><code>system.c</code> configures the F103 for a typical 72 MHz SYSCLK from HSE + PLL (or a documented HSI fallback in the file). Important side effects:</p>
+#define HSI_VALUE           8000000UL   /* 8 MHz internal RC */
+#define HSE_VALUE           8000000UL   /* 8 MHz crystal on Blue Pill */
+#define SYSCLK_FREQ_HZ      72000000UL  /* target after PLL */
+#define UART1_PCLK_HZ       SYSCLK_FREQ_HZ
+#define HSE_STARTUP_TIMEOUT 0x5000U</code></pre>
 <ul>
-  <li>Flash wait states via <code>flash_latency_config()</code> before raising the clock.</li>
-  <li>Prefetch buffer enable for denser instruction fetch.</li>
-  <li><code>SystemClock_DeInit()</code> — used by <code>jump_to_application()</code> to leave a clean clock state for the app.</li>
+  <li><strong>HSI / HSE</strong> — both 8 MHz on this board. HSE is the crystal; HSI is the fallback RC.</li>
+  <li><strong>SYSCLK 72 MHz</strong> — HSE × PLL×9. UART baud and SysTick 1 ms are computed from this.</li>
+  <li><strong>HSE_STARTUP_TIMEOUT</strong> — how long <code>SystemClock_Config</code> waits for HSE/PLL ready before giving up.</li>
 </ul>
-<p>Read the full sequence in <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/system.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/system.c</code></a> — order matters: you must not run Flash at 72 MHz with zero wait states.</p>
 
-<h2 id="takeaway">4. Takeaway</h2>
-<p>Clock bring-up is the first place bare-metal projects silently fail. Keeping it in one file makes the rest of the bootloader (UART baud, SysTick 1 ms) deterministic.</p>
+<h2 id="rcc">2. <code>rcc.h</code> / <code>rcc.c</code> — turn peripheral clocks on</h2>
+<p>On STM32, a peripheral does nothing until its clock bit is set in RCC. The header maps the RCC block at <code>0x40021000</code> and defines which bit enables which APB2 device:</p>
+<pre><code>#define RCC ((RCC_TypeDef *)0x40021000)
 
-<h2 id="next">Next</h2><ul>
+typedef enum {
+    APB2_AFIO   = 1 &lt;&lt; 0,
+    APB2_PORT_A = 1 &lt;&lt; 2,
+    APB2_PORT_B = 1 &lt;&lt; 3,
+    APB2_PORT_C = 1 &lt;&lt; 4,
+    /* ... */
+    APB2_USART1 = 1 &lt;&lt; 14
+} APB2EN_REG_TypeDef;</code></pre>
+<p>The C file is one helper that ORs those bits into <code>RCC_APB2ENR</code>:</p>
+<pre><code>void enable_RCC_APB2ENR(unsigned long REG){
+    RCC-&gt;RCC_APB2ENR.REG |= REG;
+}</code></pre>
+<p>Example: GPIO init calls something like <code>enable_RCC_APB2ENR(APB2_PORT_C)</code> so PORTC (LED on PC13) gets a clock before you touch its registers. Same idea for <code>APB2_PORT_A</code> + <code>APB2_USART1</code> before UART. Drivers call this instead of scattering raw bit masks everywhere.</p>
+
+<h2 id="system">3. <code>SystemClock_Config()</code> — reach 72 MHz</h2>
+<p>This is the function <code>main()</code> calls. Goal: HSE 8 MHz → PLL ×9 → SYSCLK 72 MHz, APB1 at 36 MHz (max for that bus), then start SysTick.</p>
+<pre><code>status_t SystemClock_Config(void)
+{
+    uint32_t timeout;
+    uint32_t cfgr;
+
+    flash_latency_config(2U);   /* Flash needs wait states at 72 MHz */
+    flash_prefetch_enable();
+
+    RCC-&gt;RCC_CR.REG |= RCC_CR_HSEON;          /* turn crystal on */
+    timeout = HSE_STARTUP_TIMEOUT;
+    while (((RCC-&gt;RCC_CR.REG &amp; RCC_CR_HSERDY) == 0U) &amp;&amp; (timeout &gt; 0U)) {
+        timeout--;
+    }
+    if (timeout == 0U) {
+        RCC-&gt;RCC_CR.REG &amp;= ~RCC_CR_HSEON;
+        SystemCoreClock = HSI_VALUE;
+        return STATUS_ERROR;                  /* no crystal → stay on HSI */
+    }
+
+    cfgr = RCC-&gt;RCC_CFGR.REG;
+    cfgr &amp;= ~(/* SW, HPRE, PPRE1/2, PLLSRC, PLLMUL, ... */);
+    cfgr |= RCC_CFGR_PPRE1_DIV2;              /* APB1 = SYSCLK/2 = 36 MHz */
+    cfgr |= RCC_CFGR_PLLSRC_HSE;              /* PLL input = HSE */
+    cfgr |= RCC_CFGR_PLLMUL9;                 /* ×9 → 72 MHz */
+    RCC-&gt;RCC_CFGR.REG = cfgr;
+
+    RCC-&gt;RCC_CR.REG |= RCC_CR_PLLON;          /* start PLL */
+    /* wait PLLRDY (same timeout pattern) … */
+
+    cfgr = RCC-&gt;RCC_CFGR.REG;
+    cfgr &amp;= ~RCC_CFGR_SW_Msk;
+    cfgr |= RCC_CFGR_SW_PLL;                  /* switch SYSCLK to PLL */
+    RCC-&gt;RCC_CFGR.REG = cfgr;
+    /* wait SWS == PLL … */
+
+    SystemCoreClockUpdate();                  /* refresh global Hz variable */
+    if (tick_init(TICK_INT_PRIORITY) != STATUS_OK) {
+        return STATUS_ERROR;
+    }
+    return STATUS_OK;
+}</code></pre>
+<ol>
+  <li><strong>Flash wait states first</strong> — at 72 MHz the Flash cannot serve an instruction every cycle with 0 wait states. Configure latency <em>before</em> raising the clock or the core can hard-fault.</li>
+  <li><strong>Enable HSE, wait ready</strong> — if the crystal never locks, return error and leave <code>SystemCoreClock</code> at HSI 8 MHz.</li>
+  <li><strong>Program PLL</strong> — source HSE, multiply ×9, APB1 ÷2 (STM32F103 rule: APB1 max 36 MHz).</li>
+  <li><strong>Switch SYSCLK to PLL</strong> — write <code>SW</code>, then poll <code>SWS</code> until the hardware confirms the switch.</li>
+  <li><strong>SysTick</strong> — <code>tick_init()</code> sets up 1 ms ticks used later for <code>delay_ms()</code> and OTA idle timeout.</li>
+</ol>
+
+<h2 id="deinit-update">4. <code>SystemClock_DeInit</code> and <code>SystemCoreClockUpdate</code></h2>
+<p><code>SystemCoreClockUpdate()</code> reads the live <code>SWS</code> / PLL / AHB prescaler bits and writes the global <code>SystemCoreClock</code> (Hz). Baud-rate math and tick reload use that value.</p>
+<p><code>SystemClock_DeInit()</code> is the reverse path used when jumping to the application: switch back toward HSI, turn PLL/HSE off, clear CFGR, reset Flash ACR bits, then refresh <code>SystemCoreClock</code>. The app can then run its own <code>SystemClock_Config()</code> from a known-clean state instead of inheriting the bootloader’s PLL setup blindly.</p>
+
+<h2 id="takeaway">5. Takeaway</h2>
+<p>Order matters: Flash latency → HSE → PLL → switch SYSCLK → SysTick. Peripheral drivers only need <code>enable_RCC_APB2ENR(...)</code> so GPIO/UART clocks are on. Get this wrong and UART baud, delays, and OTA timeouts all drift or fail silently.</p>
+
+<h2 id="next">Next</h2>
+<p>Next we look at GPIO bring-up — how PORTC (and the other ports) get enabled and how PC13 is driven as the status LED.</p>
+<ul>
   <li><a href="articles/stm32-ota-bare-metal-part-5-gpio">Part 5: GPIO</a></li>
   <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
   <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>

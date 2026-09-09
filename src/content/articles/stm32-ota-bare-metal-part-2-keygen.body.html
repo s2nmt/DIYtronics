@@ -1,18 +1,24 @@
 <p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal">Part 1: Overview &amp; Architecture</a>.</p>
 <p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/tools/keygen.py" target="_blank" rel="noopener noreferrer"><code>bootloader/tools/keygen.py</code></a> in <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">STM32F103C8T6-ota-base-metal</a>.</p>
-<p>This post walks through <code>keygen.py</code> line by line. The script is the <strong>trust anchor setup</strong> for the OTA stack: it derives an ECDSA P-256 key pair from a fixed seed, then writes the <strong>public key only</strong> into C source so the bootloader can verify signed images. The private key stays on the PC and is reused by <code>sign_image.py</code> and <code>main.py --sign</code>.</p>
+<p>This post walks through <code>keygen.py</code> line by line. Think of the OTA trust model as three jobs that share one key pair:</p>
+<ol>
+  <li><strong><code>keygen.py</code> (setup, once)</strong> — derive an ECDSA P-256 key pair from a fixed seed, then write the <strong>public key only</strong> into C source (<code>boot_pubkey.c</code>). That public key is baked into the bootloader when you flash it.</li>
+  <li><strong><code>sign_image.py</code> / <code>main.py --sign</code> (on the PC, every release)</strong> — take the app binary, hash it, and sign the hash with the <strong>private key</strong>. The private key never goes on the MCU; it stays on the PC and is derived again via the same <code>derive_signing_key()</code> helper from <code>keygen.py</code>. Output is a slot image: header (with signature) + payload.</li>
+  <li><strong>Bootloader <code>verify.c</code> (on the MCU, every boot / OTA)</strong> — recompute the payload hash and run ECDSA verify against the baked-in <code>bootloader_pubkey[64]</code>. Match → jump to the app. Fail → reject the image (tampered bytes, wrong signer, or pubkey out of sync).</li>
+</ol>
+<p>In short: <code>keygen</code> stamps the public key onto the chip; <code>sign_image</code> seals each firmware with the private key; <code>verify.c</code> checks that seal before running code. This post focuses on the first job — how <code>keygen.py</code> builds that trust anchor.</p>
 
 <h2 id="keygen-role">1. Where it fits</h2>
-<pre><code>keygen.py
-    └── writes bootloader/lib/boot/src/boot_pubkey.c  (64-byte public key)
+<pre><code>keygen.py                          (PC, setup)
+    └── writes boot_pubkey.c       → public key baked into bootloader Flash
 
-sign_image.py / main.py --sign
-    └── import derive_signing_key() from keygen.py
-    └── sign payload with private key
+sign_image.py / main.py --sign     (PC, each firmware build)
+    └── import derive_signing_key() from keygen.py   → same private key
+    └── hash payload + sign → IMG1 header ‖ app.bin
 
-bootloader verify.c
-    └── ECDSA verify using bootloader_pubkey[64]</code></pre>
-<p>After running <code>keygen.py</code> you must <strong>rebuild and reflash the bootloader</strong>. Images signed before a key change will no longer verify.</p>
+bootloader verify.c                (MCU, each boot / OTA)
+    └── ECDSA verify(pubkey, hash, signature) → accept or reject</code></pre>
+<p>Private and public keys match because both sides call the same seed-based derivation. After running <code>keygen.py</code> you must <strong>rebuild and reflash the bootloader</strong>. Images signed before a key change will no longer verify.</p>
 
 <h2 id="keygen-deps">2. Dependencies and constants</h2>
 <p>Full script (~45 lines):</p>
@@ -32,7 +38,6 @@ OUT_C = Path(__file__).resolve().parent.parent / "lib" / "boot" / "src" / "boot_
   <li><strong><code>OUT_C</code></strong> — output path resolved relative to the script: <code>bootloader/lib/boot/src/boot_pubkey.c</code>. Parent of <code>tools/</code> is <code>bootloader/</code>, then <code>lib/boot/src/</code>.</li>
   <li><strong><code>ecdsa</code></strong> — Python package (<code>pip install ecdsa</code>). Uses curve <code>NIST256p</code> (same as ECDSA P-256 / secp256r1 on the MCU).</li>
 </ul>
-<p>If <code>ecdsa</code> is missing, the script prints <code>Thieu ecdsa. Chay: pip install ecdsa</code> and exits with code 1.</p>
 
 <h2 id="keygen-derive">3. <code>derive_signing_key()</code></h2>
 <pre><code>def derive_signing_key() -&gt; SigningKey:
@@ -40,10 +45,23 @@ OUT_C = Path(__file__).resolve().parent.parent / "lib" / "boot" / "src" / "boot_
     if priv == 0:
         priv = 1
     return SigningKey.from_secret_exponent(priv, curve=NIST256p)</code></pre>
+<p>One line of code turns a string into a private key. The pipeline is <strong>seed → digest → scalar</strong>:</p>
+<ul>
+  <li><strong>Seed</strong> — the raw input you choose: <code>KEY_SEED = b"stm32-bare-metal-dev-fixture"</code>. Same seed always yields the same key pair. It is not yet a key; it is just a fixed byte string.</li>
+  <li><strong>Digest</strong> — <code>SHA-256(seed)</code>, a fixed-length 32-byte hash. Hashing spreads the seed into a uniform-looking bit string of the size ECDSA expects, instead of using the seed bytes directly.</li>
+  <li><strong>Scalar</strong> — that digest interpreted as a big integer, then reduced with <code>% NIST256p.order</code> so it lies in the valid range for the curve. This integer <code>priv</code> <em>is</em> the ECDSA private key <code>d</code>. On the curve, public key = <code>d · G</code>.</li>
+</ul>
+<p>Why mention production? In this tutorial the seed is <strong>public in the repo</strong>, so anyone can re-derive the same private key and forge “valid” signatures. That is fine for learning. In a real product you would not do this:</p>
+<ul>
+  <li><strong>Secret material</strong> — keep the real private key (or the secret used to derive it) offline or in a signing server, never in Git.</li>
+  <li><strong>HSM</strong> (Hardware Security Module) — a dedicated box or cloud service that holds the private key and performs signing inside the device so the key never leaves. Your build pipeline asks the HSM to sign; it returns only the signature bytes.</li>
+  <li><strong>KDF / HKDF</strong> — a dedicated “recipe” for turning a secret into a private key. This tutorial takes a shortcut: run <code>SHA-256</code> once on the string <code>"stm32-bare-metal-dev-fixture"</code> and treat the result as the key. That is easy to follow in code, but weak: the string is short, public, and a single hash is not how production keys are meant to be made. A real setup often uses <strong>HKDF</strong> (one kind of KDF): you give it a long random secret that nobody else knows, plus optional context such as product id or key version, and HKDF outputs the private key. From one master secret you can derive different keys per product or key rotation without ever putting that master secret in the firmware repo.</li>
+</ul>
+<p>This post still uses the simple seed→digest→scalar path so the code stays short and deterministic. Step by step in the function:</p>
 <ol>
-  <li><strong>SHA-256 the seed</strong> — <code>hashlib.sha256(KEY_SEED)</code> produces 32 bytes. This is a simple key derivation: seed → digest → scalar. Production systems would use proper KDF (e.g. HKDF) and a secret stored in an HSM.</li>
-  <li><strong>Interpret as integer</strong> — <code>int.from_bytes(..., "big")</code> treats the digest as an unsigned big-endian integer.</li>
-  <li><strong>Reduce modulo curve order</strong> — <code>% NIST256p.order</code> ensures the scalar lies in the valid range for secp256r1 (order ≈ 2<sup>256</sup>). Without this step, the value could be out of range and key creation would fail.</li>
+  <li><strong>SHA-256 the seed</strong> — <code>hashlib.sha256(KEY_SEED).digest()</code> produces the 32-byte digest.</li>
+  <li><strong>Interpret as integer</strong> — <code>int.from_bytes(..., "big")</code> treats those bytes as an unsigned big-endian integer.</li>
+  <li><strong>Reduce modulo curve order</strong> — <code>% NIST256p.order</code> makes the scalar valid for secp256r1 (order ≈ 2<sup>256</sup>). Without this, the value could be out of range and key creation would fail.</li>
   <li><strong>Reject zero</strong> — private key 0 is invalid; force to 1 if the modulo result is 0 (extremely unlikely with this seed).</li>
   <li><strong>Build <code>SigningKey</code></strong> — <code>SigningKey.from_secret_exponent(priv, curve=NIST256p)</code> creates the object used later to sign (<code>sign_image.py</code>) or to extract the public key (<code>main()</code>).</li>
 </ol>
@@ -81,14 +99,15 @@ const uint8_t bootloader_pubkey[64] = {
 <p>Header <code>boot_pubkey.h</code> only declares <code>extern const uint8_t bootloader_pubkey[64];</code> — verify code includes this and passes the array to micro-ecc ECDSA verify.</p>
 
 <h2 id="keygen-sign-link">5. Link to <code>sign_image.py</code></h2>
-<p><code>sign_image.py</code> imports the same helper:</p>
+<p>Signing is the second job from the intro. <code>sign_image.py</code> imports the same helper so the private key used on the PC matches the public key already in Flash:</p>
 <pre><code>from keygen import derive_signing_key
 
 def build_header(payload: bytes, version: int) -&gt; bytes:
     digest = sha256(payload)
     sk = derive_signing_key()
     signature = sk.sign_digest(digest, sigencode=...)</code></pre>
-<p>Flow: hash the app payload with SHA-256 → sign the 32-byte digest with the derived private key → pack into the 256-byte <code>IMG1</code> header. The bootloader recomputes SHA-256 and verifies the 64-byte (r, s) signature against <code>bootloader_pubkey</code>. If <code>keygen.py</code> was never run (or bootloader not reflashed after keygen), verify fails and the image is rejected.</p>
+<p>Flow on the PC: hash the app payload with SHA-256 → sign the 32-byte digest with the derived private key → pack digest + signature into the 256-byte <code>IMG1</code> header, then append the payload.</p>
+<p>Flow on the MCU (<code>verify.c</code>): recompute SHA-256 of the payload, then ECDSA-verify the 64-byte <code>(r, s)</code> against <code>bootloader_pubkey</code>. If <code>keygen.py</code> was never run (or the bootloader was not reflashed after a key change), verify fails and the image is rejected — that is intentional.</p>
 
 <h2 id="keygen-usage">6. How to run</h2>
 <pre><code>cd bootloader/tools

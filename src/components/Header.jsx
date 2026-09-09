@@ -45,12 +45,18 @@ export default function Header() {
         </button>
 
         <nav className={`nav-menu ${open ? "open" : ""}`}>
-          <a href={hashLink("services")} className="nav-link" onClick={() => setOpen(false)}>
-            Services
+          <a href={hashLink("home")} className="nav-link" onClick={() => setOpen(false)}>
+            Home
           </a>
-          <Link to="/products" className="nav-link" onClick={() => setOpen(false)}>
-            Products
-          </Link>
+          <a href={hashLink("services")} className="nav-link" onClick={() => setOpen(false)}>
+            Solutions
+          </a>
+          <a href={hashLink("hardware")} className="nav-link" onClick={() => setOpen(false)}>
+            Hardware
+          </a>
+          <a href={hashLink("industries")} className="nav-link" onClick={() => setOpen(false)}>
+            Applications
+          </a>
           <a href={hashLink("process")} className="nav-link" onClick={() => setOpen(false)}>
             Process
           </a>

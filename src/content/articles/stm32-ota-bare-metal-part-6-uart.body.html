@@ -1,26 +1,146 @@
 <p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-5-gpio">Part 5: GPIO</a> — next: <a href="articles/stm32-ota-bare-metal-part-7-flash">Part 7: Flash</a>.</p>
 
-<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/uart.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/uart.c</code></a>.</p>
-<p>USART1 is the OTA pipe and the log console. RX is interrupt-driven into a ring buffer; TX is polled for simplicity.</p>
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/inc/uart.h" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/inc/uart.h</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/uart.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/uart.c</code></a>.</p>
+<p>USART1 is the OTA data pipe and the log console. Pins PA9/PA10 were already set in Part 5’s <code>GPIO_Init()</code>. This file only programs the USART peripheral: baud, RX interrupt into a ring buffer, and polled TX.</p>
 
-<h2 id="init">1. Init</h2>
-<p><code>Uart1_Init()</code> enables GPIOA + USART1 clocks, sets PA9/PA10 to AF push-pull / input floating, programs baud (typically 115200), enables RXNE IRQ, and turns the USART on.</p>
+<h2 id="registers">1. Registers and masks</h2>
+<p>USART1 is mapped at <code>0x40013800</code>. The header exposes <code>SR</code>, <code>DR</code>, <code>BRR</code>, <code>CR1</code>, … The driver writes control/status with <strong>full-register masks</strong> (not bitfield members), as noted in the header:</p>
+<pre><code>#define USART1 ((USART_TypeDef*)0x40013800)
 
-<h2 id="ring">2. Ring buffer RX</h2>
+#define USART_SR_RXNE   (1UL &lt;&lt; 5)   /* RX data ready */
+#define USART_SR_TXE    (1UL &lt;&lt; 7)   /* TX data register empty */
+#define USART_SR_ORE    (1UL &lt;&lt; 3)   /* overrun */
+
+#define USART_CR1_RE     (1UL &lt;&lt; 2)  /* receiver enable */
+#define USART_CR1_TE     (1UL &lt;&lt; 3)  /* transmitter enable */
+#define USART_CR1_RXNEIE (1UL &lt;&lt; 5)  /* RXNE interrupt enable */
+#define USART_CR1_UE     (1UL &lt;&lt; 13) /* USART enable */
+
+#define UART_BAUD_115200 115200U</code></pre>
+<p>OTA and logs use <strong>115200</strong> baud. Match that on the PC (<code>main.py --baud</code>).</p>
+
+<h2 id="ring-state">2. RX ring buffer state</h2>
+<pre><code>#define UART1_RX_BUF_SIZE 512U
+
+static volatile uint8_t  s_rx_buf[UART1_RX_BUF_SIZE];
+static volatile uint16_t s_rx_head;   /* IRQ writes here */
+static volatile uint16_t s_rx_tail;   /* uart1_rx_get reads here */</code></pre>
+<p>512 bytes is enough to absorb UART bursts while <code>main</code> / OTA is busy erasing Flash or verifying. <code>head == tail</code> means empty. If the buffer is full, the IRQ <strong>drops</strong> new bytes rather than overwriting unread data.</p>
+
+<h2 id="brr">3. <code>uart_brr_calc</code> — baud rate register</h2>
+<pre><code>static uint16_t uart_brr_calc(uint32_t pclk_hz, uint32_t baud)
+{
+    uint32_t divider = (25U * pclk_hz) / (4U * baud);
+    uint32_t mantissa = divider / 100U;
+    uint32_t fraction = (((divider - mantissa * 100U) * 16U) + 50U) / 100U;
+
+    if (fraction &gt;= 16U) {
+        fraction = 0U;
+        mantissa++;
+    }
+    return (uint16_t)((mantissa &lt;&lt; 4) | (fraction &amp; 0xFU));
+}</code></pre>
+<p>STM32 USART baud is programmed as mantissa + fraction/16 in <code>USART_BRR</code>. This helper follows the reference-manual style formula using the USART clock (<code>SystemCoreClock</code> after Part 4’s PLL setup — on this wiring USART1 runs from that PCLK). Wrong <code>SystemCoreClock</code> → wrong baud → garbage on the wire.</p>
+
+<h2 id="init">4. <code>Uart1_Init()</code></h2>
+<pre><code>void Uart1_Init(void)
+{
+    enable_RCC_APB2ENR(APB2_USART1);
+    USART1-&gt;USART_CR1.REG = 0U;
+    USART1-&gt;USART_CR2.REG = 0U;
+    USART1-&gt;USART_CR3.REG = 0U;
+    USART1-&gt;USART_BRR.REG = uart_brr_calc(SystemCoreClock, UART_BAUD_115200);
+
+    s_rx_head = 0U;
+    s_rx_tail = 0U;
+
+    /* UE | TE | RE | RXNEIE */
+    USART1-&gt;USART_CR1.REG =
+        USART_CR1_UE | USART_CR1_TE | USART_CR1_RE | USART_CR1_RXNEIE;
+    nvic_irq_enable(USART1_IRQn);
+}</code></pre>
+<ol>
+  <li><strong>Clock</strong> — enable USART1 on APB2 (pins were already clocked/configured in <code>GPIO_Init</code>).</li>
+  <li><strong>Reset CR1/CR2/CR3</strong> — known clean state (8N1, no fancy modes).</li>
+  <li><strong>BRR</strong> — 115200 from current <code>SystemCoreClock</code>.</li>
+  <li><strong>Empty the software ring</strong> — head/tail = 0.</li>
+  <li><strong>Enable USART</strong> — UE (peripheral on), TE (TX), RE (RX), RXNEIE (interrupt when a byte arrives).</li>
+  <li><strong>NVIC</strong> — unmask <code>USART1_IRQn</code> so <code>USART1_IRQHandler</code> can run.</li>
+</ol>
+
+<h2 id="irq">5. <code>USART1_IRQHandler</code> — push into the ring</h2>
+<pre><code>void USART1_IRQHandler(void)
+{
+    uint32_t sr = USART1-&gt;USART_SR.REG;
+
+    /* RXNE or ORE: reading DR clears the flag(s) */
+    if ((sr &amp; (USART_SR_RXNE | USART_SR_ORE)) != 0U) {
+        uint8_t b = (uint8_t)(USART1-&gt;USART_DR.REG &amp; 0xFFU);
+        uint16_t next = (uint16_t)((s_rx_head + 1U) % UART1_RX_BUF_SIZE);
+
+        if (next != s_rx_tail) {
+            s_rx_buf[s_rx_head] = b;
+            s_rx_head = next;
+        }
+    }
+}</code></pre>
 <ul>
-  <li><code>USART1_IRQHandler</code> (or the IRQ hook used by this tree) pushes bytes into a fixed circular buffer.</li>
-  <li><code>uart1_rx_get(&amp;c)</code> pops one byte; returns 0 if empty.</li>
-  <li><code>uart1_rx_flush()</code> clears stale bytes before the 3 s OTA key window.</li>
+  <li>Handle <strong>RXNE</strong> (byte ready) and <strong>ORE</strong> (overrun): you must read <code>DR</code> to clear those flags, or the IRQ can stick.</li>
+  <li>Compute <code>next = (head + 1) % 512</code>. If <code>next == tail</code>, buffer is full → drop this byte.</li>
+  <li>Otherwise store at <code>head</code> and advance <code>head</code>.</li>
 </ul>
-<p>OTA framing in <code>ota.c</code> only reads through this API — never busy-spins on <code>USART_SR.RXNE</code> in the hot path (except TX empty waits).</p>
+<p>The foreground never spins on <code>RXNE</code> for OTA; it only calls <code>uart1_rx_get()</code>.</p>
 
-<h2 id="printf">3. printf</h2>
-<p><code>uart1_write(ptr, len)</code> + <code>_write</code> in <code>main.c</code> make <code>printf("…\r\n")</code> work in both bootloader and app builds.</p>
+<h2 id="get-flush">6. <code>uart1_rx_get</code> / <code>uart1_rx_flush</code></h2>
+<pre><code>int uart1_rx_get(uint8_t *out)
+{
+    if (out == NULL) return 0;
 
-<h2 id="pins">4. Wiring</h2>
-<p>Host USB–UART adapter: TX→PA10 (USART1_RX), RX→PA9 (USART1_TX), GND common. Match baud with <code>main.py --baud</code>.</p>
+    __asm volatile("cpsid i" ::: "memory");
+    if (s_rx_head == s_rx_tail) {
+        __asm volatile("cpsie i" ::: "memory");
+        return 0;                 /* empty */
+    }
+    *out = s_rx_buf[s_rx_tail];
+    s_rx_tail = (uint16_t)((s_rx_tail + 1U) % UART1_RX_BUF_SIZE);
+    __asm volatile("cpsie i" ::: "memory");
+    return 1;                     /* got one byte */
+}</code></pre>
+<p><code>cpsid i</code> / <code>cpsie i</code> briefly mask IRQs so the handler cannot move <code>head</code> while you update <code>tail</code> (avoids a race on the ring indices).</p>
+<pre><code>void uart1_rx_flush(void)
+{
+    __asm volatile("cpsid i" ::: "memory");
+    s_rx_head = 0U;
+    s_rx_tail = 0U;
+    while ((USART1-&gt;USART_SR.REG &amp; (USART_SR_RXNE | USART_SR_ORE)) != 0U) {
+        (void)USART1-&gt;USART_DR.REG;   /* drain hardware too */
+    }
+    __asm volatile("cpsie i" ::: "memory");
+}</code></pre>
+<p>Clears both the software ring and any pending byte still sitting in the USART data register — useful before starting a clean OTA session.</p>
 
-<h2 id="next">Next</h2><ul>
+<h2 id="tx">7. TX — polled <code>uart1_putc</code> / <code>uart1_write</code></h2>
+<pre><code>static void uart1_putc(char c)
+{
+    while ((USART1-&gt;USART_SR.REG &amp; USART_SR_TXE) == 0U) {
+    }
+    USART1-&gt;USART_DR.REG = (uint8_t)c;
+}
+
+void uart1_write(const char *buf, int len)
+{
+    for (int i = 0; i &lt; len; i++) {
+        uart1_putc(buf[i]);
+    }
+}</code></pre>
+<p>TX waits until <code>TXE</code> (transmit data register empty), then writes one byte. No TX IRQ — fine for logs and small ACKs. In <code>main.c</code>, newlib’s <code>_write</code> calls <code>uart1_write</code>, so <code>printf(...)</code> goes out USART1.</p>
+
+<h2 id="wiring">8. Wiring</h2>
+<p>USB–UART adapter: adapter TX → <strong>PA10</strong> (MCU RX), adapter RX → <strong>PA9</strong> (MCU TX), GND common. Baud 115200 8N1.</p>
+
+<h2 id="next">Next</h2>
+<p>With a working serial pipe, the next piece the OTA path needs is Flash — erase/program the inactive slot while bytes arrive over UART.</p>
+<ul>
   <li><a href="articles/stm32-ota-bare-metal-part-7-flash">Part 7: Flash</a></li>
   <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
   <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>

@@ -1,29 +1,291 @@
 <p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-6-uart">Part 6: UART</a> — next: <a href="articles/stm32-ota-bare-metal-part-8-nvic-tick-iwdg">Part 8: NVIC / tick / IWDG</a>.</p>
 
-<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/flash.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/flash.c</code></a>.</p>
-<p>All OTA durability goes through this driver: unlock → erase page → program half-words → lock. Mistakes here brick a slot (recoverable via the other slot or ST-Link).</p>
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/inc/flash.h" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/inc/flash.h</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/flash.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/flash.c</code></a>.</p>
+<p>OTA must erase and program the inactive app slot while UART chunks arrive. On the F103 that means talking to the Flash controller at <code>0x40022000</code>: unlock, page erase, half-word program, then lock. This driver also supplies the ACR helpers Part 4 uses before raising SYSCLK to 72&nbsp;MHz.</p>
 
-<h2 id="ops">1. Core operations</h2>
+<h2 id="map">1. Memory map and register block</h2>
+<pre><code>/* STM32F103C8: 64 KB main Flash, 1 KB page */
+#define FLASH_MEM_BASE  0x08000000UL
+#define FLASH_MEM_SIZE  0x00010000UL
+#define FLASH_MEM_END   (FLASH_MEM_BASE + FLASH_MEM_SIZE)
+#define FLASH_PAGE_SIZE 0x00000400UL
+
+#define FLASH_KEY1 0x45670123UL
+#define FLASH_KEY2 0xCDEF89ABUL
+
+#define FLASH ((FLASH_TypeDef *)0x40022000UL)</code></pre>
 <ul>
-  <li><code>flash_unlock</code> / <code>flash_lock</code> — KEY1/KEY2 sequence; LOCK bit in <code>FLASH_CR</code>.</li>
-  <li><code>flash_erase_page(addr)</code> — PER + AR + STRT; waits BSY; checks PGERR/WRPRTERR.</li>
-  <li><code>flash_write_buffer(addr, data, len)</code> — programs in 16-bit units as required by F1 Flash.</li>
-  <li><code>flash_latency_config</code> / <code>flash_prefetch_enable</code> — used during clock setup.</li>
+  <li><strong>Main Flash</strong> — <code>0x08000000</code> … <code>0x08010000</code> (64&nbsp;KB). Every erase/write argument is checked against this window.</li>
+  <li><strong>Page size</strong> — 1&nbsp;KB on medium-density F103. Erase is always whole pages.</li>
+  <li><strong>KEY1 / KEY2</strong> — the unlock sequence required by the reference manual before <code>FLASH_CR</code> accepts erase/program bits.</li>
+</ul>
+<p>Important registers used below:</p>
+<ul>
+  <li><strong><code>FLASH_ACR</code></strong> — latency and prefetch (clock bring-up).</li>
+  <li><strong><code>FLASH_KEYR</code></strong> — write KEY1 then KEY2 to clear LOCK.</li>
+  <li><strong><code>FLASH_SR</code></strong> — <code>BSY</code>, <code>PGERR</code>, <code>WRPRTERR</code>, <code>EOP</code>.</li>
+  <li><strong><code>FLASH_CR</code></strong> — <code>PG</code> (program), <code>PER</code> (page erase), <code>STRT</code>, <code>LOCK</code>.</li>
+  <li><strong><code>FLASH_AR</code></strong> — page address for erase.</li>
+  <li><strong><code>FLASH_WRPR</code></strong> — write-protection bits (option bytes mirror).</li>
+</ul>
+<p>Status/control ops use full <code>.REG</code> masks. Comments in the C file call out why: bitfield read-modify-write is unsafe on <code>FLASH_CR</code>/<code>FLASH_SR</code> (some bits are write-only or clear-by-write-1).</p>
+
+<h2 id="acr">2. Latency and prefetch (clock path)</h2>
+<pre><code>void flash_prefetch_enable(void)
+{
+    uint32_t acr = FLASH-&gt;FLASH_ACR.REG;
+    acr |= FLASH_ACR_PRFTBE_Msk;
+    FLASH-&gt;FLASH_ACR.REG = acr;
+}
+
+void flash_latency_config(uint32_t latency)
+{
+    uint32_t acr = FLASH-&gt;FLASH_ACR.REG;
+    acr &amp;= ~FLASH_ACR_LATENCY_Msk;
+    acr |= (latency &amp; FLASH_ACR_LATENCY_Msk);
+    FLASH-&gt;FLASH_ACR.REG = acr;
+}</code></pre>
+<p><code>SystemClock_Config()</code> calls these with latency <code>2</code> <em>before</em> switching to 72&nbsp;MHz. At that speed the Flash needs wait states; prefetch hides some of the cost. Wrong order → hard fault while fetching instructions.</p>
+
+<h2 id="unlock-lock">3. Unlock / lock</h2>
+<pre><code>int flash_unlock(void)
+{
+    if ((FLASH-&gt;FLASH_CR.REG &amp; FLASH_CR_LOCK) != 0U) {
+        FLASH-&gt;FLASH_KEYR = FLASH_KEY1;
+        FLASH-&gt;FLASH_KEYR = FLASH_KEY2;
+    }
+    return ((FLASH-&gt;FLASH_CR.REG &amp; FLASH_CR_LOCK) != 0U) ? -1 : 0;
+}
+
+void flash_lock(void)
+{
+    uint32_t timeout = FLASH_OP_TIMEOUT;
+    while ((FLASH-&gt;FLASH_SR.REG &amp; FLASH_SR_BSY) != 0U) {
+        if (--timeout == 0U) {
+            break;
+        }
+    }
+    FLASH-&gt;FLASH_CR.REG |= FLASH_CR_LOCK;
+}</code></pre>
+<ol>
+  <li><strong>Unlock</strong> — if <code>LOCK</code> is set, write KEY1 then KEY2 to <code>FLASH_KEYR</code>. Re-read <code>LOCK</code>; still set → return <code>-1</code>.</li>
+  <li><strong>Lock</strong> — wait until <code>BSY</code> clears (or timeout), then set <code>LOCK</code> so accidental writes cannot program Flash.</li>
+</ol>
+<p>OTA unlocks once at START, then locks after END (or on failure).</p>
+
+<h2 id="guards">4. Range check and WRPR</h2>
+<pre><code>static int flash_addr_in_range(uint32_t addr, uint32_t len)
+{
+    if (len == 0U) {
+        return 0;
+    }
+    if (addr &lt; FLASH_MEM_BASE) {
+        return -1;
+    }
+    if ((addr + len) &lt; addr) {
+        return -1;   /* overflow */
+    }
+    if ((addr + len) &gt; FLASH_MEM_END) {
+        return -1;
+    }
+    return 0;
+}
+
+static int flash_page_is_protected(uint32_t page_addr)
+{
+    uint32_t page = (page_addr - FLASH_MEM_BASE) / FLASH_PAGE_SIZE;
+    uint32_t wrp_bit = page / 2U;
+
+    if (wrp_bit &gt;= 32U) {
+        return 0;
+    }
+    /* WRPR bit = 0: write protection active on 2-page group */
+    if ((FLASH-&gt;FLASH_WRPR &amp; (1UL &lt;&lt; wrp_bit)) == 0U) {
+        return 1;
+    }
+    return 0;
+}</code></pre>
+<ul>
+  <li><strong>Range</strong> — reject anything outside the 64&nbsp;KB array, and reject length overflow (<code>addr + len</code> wraps).</li>
+  <li><strong>WRPR</strong> — on F103 each protection bit covers <strong>two</strong> 1&nbsp;KB pages. Bit cleared (<code>0</code>) means that pair is write-protected. Erase/program refuse that page instead of relying only on the hardware <code>WRPRTERR</code> flag.</li>
 </ul>
 
-<h2 id="safety">2. Safety checks</h2>
-<pre><code>flash_addr_in_range()   // stay inside [FLASH_MEM_BASE, FLASH_MEM_END)
-flash_page_is_protected() // respect WRPR if set
-flash_wait_ready()        // timeout on BSY</code></pre>
-<p>Status bits are cleared by writing 1 (RM0008). The driver uses full <code>REG</code> writes to avoid read-modify-write hazards on bitfield structs.</p>
+<h2 id="wait">5. Wait for ready / done</h2>
+<pre><code>static void flash_clear_status(void)
+{
+    /* RM: write 1 to clear PGERR, WRPRTERR, EOP */
+    FLASH-&gt;FLASH_SR.REG = FLASH_SR_PGERR | FLASH_SR_WRPRTERR | FLASH_SR_EOP;
+}
 
-<h2 id="who-calls">3. Callers</h2>
+static int flash_wait_ready(void)
+{
+    uint32_t timeout = FLASH_OP_TIMEOUT;
+    while (((FLASH-&gt;FLASH_SR.REG &amp; FLASH_SR_BSY) != 0U) &amp;&amp; (timeout &gt; 0U)) {
+        timeout--;
+    }
+    return (timeout &gt; 0U) ? 0 : -1;
+}
+
+static int flash_wait_done(void)
+{
+    if (flash_wait_ready() != 0) {
+        return -1;
+    }
+    if ((FLASH-&gt;FLASH_SR.REG &amp; (FLASH_SR_PGERR | FLASH_SR_WRPRTERR)) != 0U) {
+        flash_clear_status();
+        return -1;
+    }
+    flash_clear_status();
+    return 0;
+}</code></pre>
+<ol>
+  <li>Spin on <code>BSY</code> with a software timeout (~1M loops).</li>
+  <li>After an op, treat <code>PGERR</code> (programming error) or <code>WRPRTERR</code> as failure.</li>
+  <li>Clear sticky status bits by writing 1 (RM0008 rule).</li>
+</ol>
+
+<h2 id="erase">6. Page erase and region erase</h2>
+<pre><code>int flash_erase_page(uint32_t page_addr)
+{
+    if ((page_addr &amp; (FLASH_PAGE_SIZE - 1U)) != 0U) {
+        return -1;   /* must be page-aligned */
+    }
+    if (flash_addr_in_range(page_addr, FLASH_PAGE_SIZE) != 0) {
+        return -1;
+    }
+    if (flash_page_is_protected(page_addr)) {
+        return -1;
+    }
+
+    flash_clear_op_bits();
+    if (flash_wait_ready() != 0) {
+        return -1;
+    }
+    flash_clear_status();
+
+    /* PER then STRT via OR — do not RMW bitfields (STRT is write-only) */
+    FLASH-&gt;FLASH_CR.REG |= FLASH_CR_PER;
+    FLASH-&gt;FLASH_AR = page_addr;
+    FLASH-&gt;FLASH_CR.REG |= FLASH_CR_STRT;
+
+    if (flash_wait_done() != 0) {
+        FLASH-&gt;FLASH_CR.REG &amp;= ~FLASH_CR_PER;
+        return -1;
+    }
+    FLASH-&gt;FLASH_CR.REG &amp;= ~FLASH_CR_PER;
+    return 0;
+}</code></pre>
+<ol>
+  <li>Require a page-aligned address inside Flash, not WRPR-protected.</li>
+  <li>Clear leftover <code>PG</code>/<code>PER</code>, wait idle, clear status.</li>
+  <li>Set <code>PER</code>, load <code>FLASH_AR</code>, set <code>STRT</code> — hardware erases that 1&nbsp;KB page.</li>
+  <li>Wait done; clear <code>PER</code>.</li>
+</ol>
+<pre><code>int flash_erase_region(uint32_t start, uint32_t size)
+{
+    uint32_t addr;
+    uint32_t end;
+
+    if (size == 0U) {
+        return 0;
+    }
+    if (flash_addr_in_range(start, size) != 0) {
+        return -1;
+    }
+
+    addr = start &amp; ~(FLASH_PAGE_SIZE - 1U);
+    end = start + size;
+
+    while (addr &lt; end) {
+        if (flash_erase_page(addr) != 0) {
+            return -1;
+        }
+        addr += FLASH_PAGE_SIZE;
+    }
+    return 0;
+}</code></pre>
+<p>OTA START rounds the image size up to whole pages and calls <code>flash_erase_region</code> on the inactive slot only — faster than wiping the entire slot every time.</p>
+
+<h2 id="program">7. Half-word program — <code>flash_write_buffer</code></h2>
+<p>F1 Flash programs in <strong>16-bit</strong> units. Address and length must both be even.</p>
+<pre><code>int flash_write_buffer(uint32_t addr, const uint8_t *data, uint32_t len)
+{
+    uint32_t i;
+
+    if (data == NULL) {
+        return -1;
+    }
+    if (len == 0U) {
+        return 0;
+    }
+    if ((addr &amp; 1U) != 0U || (len &amp; 1U) != 0U) {
+        return -1;
+    }
+    if (flash_addr_in_range(addr, len) != 0) {
+        return -1;
+    }
+
+    for (i = 0U; i &lt; len; i += 2U) {
+        uint32_t write_addr = addr + i;
+        uint16_t half = (uint16_t)data[i]
+                      | ((uint16_t)data[i + 1U] &lt;&lt; 8);
+        volatile uint16_t *flash_ptr = (volatile uint16_t *)write_addr;
+
+        if (flash_page_is_protected(write_addr &amp; ~(FLASH_PAGE_SIZE - 1U))) {
+            return -1;
+        }
+
+        flash_clear_op_bits();
+        if (flash_wait_ready() != 0) {
+            return -1;
+        }
+        flash_clear_status();
+
+        FLASH-&gt;FLASH_CR.REG |= FLASH_CR_PG;
+        *flash_ptr = half;
+
+        if (flash_wait_done() != 0) {
+            FLASH-&gt;FLASH_CR.REG &amp;= ~FLASH_CR_PG;
+            return -1;
+        }
+        FLASH-&gt;FLASH_CR.REG &amp;= ~FLASH_CR_PG;
+
+        if (*flash_ptr != half) {
+            return -1;   /* verify readback */
+        }
+    }
+    return 0;
+}</code></pre>
+<ol>
+  <li>Pack two bytes little-endian into a half-word.</li>
+  <li>Set <code>PG</code>, store the half-word to the Flash address (that store triggers the program pulse).</li>
+  <li>Wait for done, clear <code>PG</code>.</li>
+  <li><strong>Read back</strong> the half-word; mismatch → fail (catches stuck bits / protect issues early).</li>
+</ol>
+<p>OTA DATA pads an odd chunk with <code>0xFF</code> so <code>len</code> stays even before calling this.</p>
+
+<h2 id="read">8. Reads</h2>
+<pre><code>uint16_t flash_read_halfword(uint32_t addr)
+{
+    return *(volatile const uint16_t *)addr;
+}
+
+uint32_t flash_read_word(uint32_t addr)
+{
+    return *(volatile const uint32_t *)addr;
+}</code></pre>
+<p>Main Flash is memory-mapped, so a normal load is enough. Verify/OTA also treat payload as a <code>const uint8_t *</code> at the slot address for CRC and SHA-256.</p>
+
+<h2 id="who-calls">9. Who calls this</h2>
 <ul>
-  <li><code>ota.c</code> — erase inactive slot pages, write DATA chunks.</li>
-  <li><code>ota_flag_clear</code> / app <code>ota_request_enter</code> — rewrite the 1 KB config page at <code>0x0800FC00</code>.</li>
+  <li><strong><code>ota.c</code></strong> — unlock → erase inactive pages → write DATA chunks → rewrite the 1&nbsp;KB config page → lock.</li>
+  <li><strong>OTA flag / config</strong> — erase/program the page at <code>OTA_CONFIG_ADDR</code> (<code>0x0800FC00</code>).</li>
+  <li><strong><code>SystemClock_Config</code></strong> — latency + prefetch only (no unlock needed).</li>
 </ul>
 
-<h2 id="next">Next</h2><ul>
+<h2 id="next">Next</h2>
+<p>Flash can store a new image; next we look at NVIC, SysTick timing, and the independent watchdog — the pieces that keep UART RX, idle timeouts, and long erase/program sessions sane.</p>
+<ul>
   <li><a href="articles/stm32-ota-bare-metal-part-8-nvic-tick-iwdg">Part 8: NVIC / tick / IWDG</a></li>
   <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
   <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>

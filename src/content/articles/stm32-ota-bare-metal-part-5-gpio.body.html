@@ -1,24 +1,120 @@
-<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-4-rcc-system">Part 4: RCC & system</a> — next: <a href="articles/stm32-ota-bare-metal-part-6-uart">Part 6: UART</a>.</p>
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-4-rcc-system">Part 4: RCC &amp; system</a> — next: <a href="articles/stm32-ota-bare-metal-part-6-uart">Part 6: UART</a>.</p>
 
-<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/gpio.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/gpio.c</code></a>.</p>
-<p>The Blue Pill LED on <strong>PC13</strong> is the only user-facing GPIO in the bootloader path — useful as a heartbeat while waiting for OTA or after a failed jump.</p>
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/inc/gpio.h" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/inc/gpio.h</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/gpio.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/gpio.c</code></a>.</p>
+<p>After clocks are up, <code>main()</code> calls <code>GPIO_Init()</code>. On this board that sets up three pins the bootloader actually uses: <strong>PA9 / PA10</strong> for USART1, and <strong>PC13</strong> for the Blue Pill LED.</p>
 
-<h2 id="api">1. API surface</h2>
+<h2 id="map">1. How pins are mapped in hardware</h2>
+<p>Each GPIO port is a block of registers. The header points at the F103 addresses:</p>
+<pre><code>#define GPIOA ((GPIO_TypeDef *)0x40010800)
+#define GPIOB ((GPIO_TypeDef *)0x40010C00)
+#define GPIOC ((GPIO_TypeDef *)0x40011000)</code></pre>
+<p>Important registers for this driver:</p>
 <ul>
-  <li><code>GPIO_Init()</code> — enables GPIOC clock, configures PC13 as push-pull output.</li>
-  <li><code>GPIO_Write</code> / <code>GPIO_Toggle</code> — bit-band style set/clear via ODR/BSRR patterns in the driver.</li>
+  <li><strong><code>CRL</code> / <code>CRH</code></strong> — pin mode. Pins 0–7 live in <code>CRL</code>; pins 8–15 in <code>CRH</code>. Each pin owns <strong>4 bits</strong>: <code>MODE</code> (2) + <code>CNF</code> (2).</li>
+  <li><strong><code>IDR</code></strong> — read pin level (input).</li>
+  <li><strong><code>ODR</code></strong> — current output data (also used to know “is the pin high or low?”).</li>
+  <li><strong><code>BSRR</code></strong> — atomic set/reset. Low 16 bits set a pin; high 16 bits reset it. Safer than read-modify-write on <code>ODR</code> when IRQ can interrupt you.</li>
 </ul>
 
-<h2 id="registers">2. Register access pattern</h2>
-<p>Pins are programmed through <code>CRL</code>/<code>CRH</code> mode bits (output 2/10/50 MHz, CNF push-pull). The driver avoids HAL <code>GPIO_InitTypeDef</code> and writes the packed register fields defined in the local header map.</p>
-<pre><code>/* Conceptual */
-GPIOC_CRH: MODE13 = output, CNF13 = push-pull
-GPIOC_ODR: bit 13 toggled for LED</code></pre>
+<h2 id="modes">2. Mode constants — what the 4 bits mean</h2>
+<p>F103 packs CNF and MODE into one nibble. The enum builds that nibble:</p>
+<pre><code>typedef enum {
+    GPIO_MODE_INPUT_FLOAT              = (1 &lt;&lt; 2) | 0,  /* CNF=01, MODE=00 */
+    GPIO_MODE_OUTPUT_OPEN_50MHz        = (1 &lt;&lt; 2) | 3,  /* CNF=01, MODE=11 */
+    GPIO_MODE_AF_OUTPUT_PUSHPULL_50MHz = (2 &lt;&lt; 2) | 3,  /* CNF=10, MODE=11 */
+    /* … other speed / CNF combinations … */
+} GPIO_MODE;</code></pre>
+<ul>
+  <li><strong>MODE</strong> — <code>00</code> = input; <code>01/10/11</code> = output at 10 / 2 / 50 MHz max slew.</li>
+  <li><strong>CNF (input)</strong> — analog / floating / pull-up-down.</li>
+  <li><strong>CNF (output)</strong> — push-pull, open-drain, or alternate-function versions of those.</li>
+</ul>
+<p>This project needs three concrete modes:</p>
+<ul>
+  <li><strong>PA9</strong> — AF push-pull 50 MHz (USART1 TX).</li>
+  <li><strong>PA10</strong> — floating input (USART1 RX).</li>
+  <li><strong>PC13</strong> — open-drain output 50 MHz (onboard LED; Blue Pill LED is wired active-low on an open-drain-friendly pin).</li>
+</ul>
 
-<h2 id="why-bl">3. Why the bootloader needs GPIO</h2>
-<p>During bring-up you can confirm life before trusting UART. The application reuses the same driver to blink once per second — same pin, same code path.</p>
+<h2 id="gpio-init">3. <code>GPIO_Init()</code> — what <code>main()</code> calls</h2>
+<pre><code>void GPIO_Init(void)
+{
+    enable_RCC_APB2ENR(APB2_PORT_A | APB2_PORT_C | APB2_USART1);
 
-<h2 id="next">Next</h2><ul>
+    GPIO_Mode(GPIOA, 9,  GPIO_MODE_AF_OUTPUT_PUSHPULL_50MHz);
+    GPIO_Mode(GPIOA, 10, GPIO_MODE_INPUT_FLOAT);
+    GPIO_Mode(GPIOC, 13, GPIO_MODE_OUTPUT_OPEN_50MHz);
+}</code></pre>
+<ol>
+  <li><strong>Enable clocks</strong> — PORTA, PORTC, and USART1 on APB2 (the helper from Part 4). Without this, writes to GPIO/USART registers do nothing useful.</li>
+  <li><strong>Configure TX/RX pins</strong> — so Part 6’s <code>Uart1_Init()</code> can talk over the wire. GPIO owns the pin mux; UART owns baud and IRQ.</li>
+  <li><strong>Configure LED</strong> — PC13 ready for <code>GPIO_Toggle</code> / <code>GPIO_Write</code> as a heartbeat.</li>
+</ol>
+
+<h2 id="gpio-mode">4. <code>GPIO_Mode()</code> — write one pin’s nibble</h2>
+<pre><code>void GPIO_Mode(volatile GPIO_TypeDef* GPIO, uint8_t GPIO_PIN, GPIO_MODE Mode)
+{
+    unsigned int reset = ~0, set = 0;
+
+    reset &amp;= ~(((1 &lt;&lt; 4) - 1) &lt;&lt; ((GPIO_PIN % 8) * 4));
+    set   |= Mode &lt;&lt; ((GPIO_PIN % 8) * 4);
+
+    if (GPIO_PIN &gt; 7) {
+        GPIO-&gt;CRH.REG &amp;= reset;
+        GPIO-&gt;CRH.REG |= set;
+    } else {
+        GPIO-&gt;CRL.REG &amp;= reset;
+        GPIO-&gt;CRL.REG |= set;
+    }
+}</code></pre>
+<p>Walkthrough for <strong>PC13</strong>:</p>
+<ol>
+  <li>Pin 13 → use <code>CRH</code> (because <code>&gt; 7</code>).</li>
+  <li>Inside CRH, pin 13 is the slot for “pin index 5” of that register: <code>(13 % 8) * 4 = 20</code> — so bits 20–23.</li>
+  <li><code>reset</code> clears those 4 bits; <code>set</code> writes the new MODE+CNF nibble.</li>
+  <li>Other pins in the same register stay untouched.</li>
+</ol>
+<p>Same math for PA9 (CRH, nibble for pin 1) and PA10 (CRH, nibble for pin 2).</p>
+
+<h2 id="read-write-toggle">5. Read / Write / Toggle</h2>
+
+<h3 id="read">5.1 <code>GPIO_Read</code></h3>
+<pre><code>GPIO_STATE GPIO_Read(volatile GPIO_TypeDef* GPIO, uint8_t PIN){
+    return (GPIO-&gt;IDR.REG &gt;&gt; PIN) &amp; 1;
+}</code></pre>
+<p>Shift the IDR bit for that pin and mask to 0/1. Useful for inputs; the bootloader path mostly uses write/toggle for the LED.</p>
+
+<h3 id="write">5.2 <code>GPIO_Write</code></h3>
+<pre><code>void GPIO_Write(volatile GPIO_TypeDef* GPIO, uint8_t PIN, GPIO_STATE state){
+    if (((GPIO-&gt;ODR.REG &gt;&gt; PIN) &amp; 1) == state) return;
+
+    switch (state) {
+    case GPIO_RESET:
+        GPIO-&gt;BSRR.REG = (1UL &lt;&lt; (16 + PIN));  /* reset bit in high half */
+        break;
+    case GPIO_SET:
+        GPIO-&gt;BSRR.REG = (1UL &lt;&lt; PIN);          /* set bit in low half */
+        break;
+    }
+}</code></pre>
+<ul>
+  <li>If ODR already matches the requested state, return (no bus write).</li>
+  <li>Otherwise use <strong>BSRR</strong>: set = bit <code>PIN</code>; reset = bit <code>16+PIN</code>. One write, atomic.</li>
+</ul>
+<p>On Blue Pill, LED on means drive PC13 <strong>low</strong> (active-low), so “LED on” is typically <code>GPIO_Write(GPIOC, 13, GPIO_RESET)</code>.</p>
+
+<h3 id="toggle">5.3 <code>GPIO_Toggle</code></h3>
+<pre><code>void GPIO_Toggle(volatile GPIO_TypeDef* GPIO, uint8_t PIN){
+    GPIO-&gt;BSRR.REG = (1UL &lt;&lt; (16 * ((GPIO-&gt;ODR.REG &gt;&gt; PIN) &amp; 1) + PIN));
+}</code></pre>
+<p>Read current ODR bit. If it is 0, write set (<code>1 &lt;&lt; PIN</code>). If it is 1, write reset (<code>1 &lt;&lt; (16+PIN)</code>). The app’s 1 Hz heartbeat loop calls this on PC13.</p>
+
+<h2 id="why">6. Why mention GPIO here</h2>
+<p>This GPIO layer is only an introduction. It is <strong>not</strong> part of the OTA protocol. In this project we use PC13 simply as a status signal (heartbeat / life LED) so you can see the MCU is running while bring-up and the main loop execute.</p>
+
+<h2 id="next">Next</h2>
+<p>Pins are ready; next we bring up USART1 itself — baud rate, RX interrupt ring buffer, and how <code>printf</code> reaches the wire.</p>
+<ul>
   <li><a href="articles/stm32-ota-bare-metal-part-6-uart">Part 6: UART</a></li>
   <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
   <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>

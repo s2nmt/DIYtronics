@@ -1,31 +1,120 @@
-<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-15-startup-linker">Part 15: Startup & linker</a>.</p>
+<p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-15-startup-linker">Part 15: Startup &amp; linker</a> — next: <a href="blog/series/stm32-ota-bare-metal">series index</a>.</p>
 
-<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/tools/main.py" target="_blank" rel="noopener noreferrer"><code>bootloader/tools/main.py</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/tools/serial.py" target="_blank" rel="noopener noreferrer"><code>bootloader/tools/serial.py</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/tools/sign_image.py" target="_blank" rel="noopener noreferrer"><code>bootloader/tools/sign_image.py</code></a>, plus Part 2 <code>keygen.py</code>.</p>
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/tools/main.py" target="_blank" rel="noopener noreferrer"><code>bootloader/tools/main.py</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/tools/sign_image.py" target="_blank" rel="noopener noreferrer"><code>sign_image.py</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/tools/serial.py" target="_blank" rel="noopener noreferrer"><code>serial.py</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/tools/keygen.py" target="_blank" rel="noopener noreferrer"><code>keygen.py</code></a> (Part 2).</p>
+<p>Host side of the OTA path: build an IMG1-signed slot image, tell a running app to reset into the bootloader, then push START / DATA / END frames over USART1 at 115200.</p>
 
-<h2 id="sign">1. <code>sign_image.py</code></h2>
-<pre><code>payload = read(app.bin)
-digest = SHA-256(payload)
-sig = ECDSA_P256_sign(digest)   # r||s 64 bytes via keygen.derive_signing_key()
-header = pack(IMG1 fields) + digest + sig + pad to 256
-write header + payload</code></pre>
-
-<h2 id="serial">2. <code>serial.py</code></h2>
-<p>Small helper around PySerial port open/close used by the uploader (or inlined patterns in <code>main.py</code> depending on revision).</p>
-
-<h2 id="main">3. <code>main.py</code> host uploader</h2>
-<ul>
-  <li>Load <code>.bin</code> / Intel HEX.</li>
-  <li>Optional <code>--sign</code> to produce a slot image.</li>
-  <li><code>--enter-ota</code> spam <code>U</code> / wait for bootloader banner.</li>
-  <li>Send START → DATA chunks (256 B) → END with CRC16 frames matching <code>ota.c</code>.</li>
-  <li>Wait ACK/NACK; log device printf lines on the same UART.</li>
-</ul>
+<h2 id="deps">1. Setup</h2>
+<pre><code>cd bootloader/tools
+pip install -r requirements.txt   # pyserial, ecdsa</code></pre>
+<p>Typical upload (sign + force OTA from the app + transfer):</p>
 <pre><code>python main.py COM6 path/to/app.bin --sign --enter-ota</code></pre>
 
-<h2 id="end">4. Series wrap-up</h2>
-<p>You now have the full path: keys → signed IMG1 → bare-metal drivers → dual-slot bootloader → UART protocol → app request flag → host tool. Clone <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">STM32F103C8T6-ota-base-metal</a>, flash the bootloader once with ST-Link, and iterate apps over serial.</p>
+<h2 id="sign">2. <code>sign_image.py</code> — raw payload → slot image</h2>
+<pre><code>IMG_MAGIC = 0x494D4731          # "IMG1"
+IMG_HEADER_SIZE = 0x100
 
-<h2 id="next">Next</h2><ul>
+def build_header(payload: bytes, version: int) -&gt; bytes:
+    digest = sha256(payload)
+    sk = derive_signing_key()   # from keygen.py (same seed as Part 2)
+    signature = sk.sign_digest(
+        digest,
+        sigencode=lambda r, s, order: r.to_bytes(32, "big") + s.to_bytes(32, "big"),
+    )
+
+    hdr = struct.pack(
+        "&lt;6I",
+        IMG_MAGIC,
+        IMG_TYPE_APP,       # 1
+        PAYLOAD_OFFSET,     # 0x100
+        len(payload),
+        version,
+        0,
+    )
+    hdr += digest           # 32 B SHA-256
+    hdr += signature        # 64 B r||s
+    hdr += b"\x00" * 32
+    hdr += b"\x00" * (IMG_HEADER_SIZE - len(hdr))
+    return hdr
+
+signed = build_header(payload, version) + payload</code></pre>
+<ol>
+  <li>Read the raw app <code>.bin</code> (linked at slot+0x100 — Part 15).</li>
+  <li>SHA-256 the payload; ECDSA P-256 sign the digest with <code>derive_signing_key()</code>.</li>
+  <li>Pack the 256-byte header (magic, type, offset, size, version, digest, sig, pad).</li>
+  <li>Write <code>header || payload</code> — that whole blob is what UART OTA programs into the inactive slot.</li>
+</ol>
+<p>CLI: <code>python sign_image.py app.bin -o app_signed.bin --version 1</code>. <code>main.py --sign</code> shells out to the same script and uploads the <code>*_signed.bin</code>.</p>
+
+<h2 id="serial">3. <code>serial.py</code> — quick UART monitor</h2>
+<p>A small helper (not required for upload). Opens a hardcoded <code>COM6</code> @ 115200, optionally sends <code>UPDATE\r\n</code> with <code>--send-update</code>, and prints whatever the MCU sends. Note the path hack: the file is named <code>serial.py</code>, so it removes its own directory from <code>sys.path</code> before <code>import serial</code> so PySerial wins — <code>main.py</code> does the same.</p>
+
+<h2 id="main">4. <code>main.py</code> — OTA client</h2>
+
+<h3 id="protocol">4.1 Frame format (matches <code>ota.h</code>)</h3>
+<pre><code>STX = 0x02
+ETX = 0x03
+CMD_START, CMD_DATA, CMD_END = 0x01, 0x02, 0x03
+RSP_ACK, RSP_NACK = 0x06, 0x15
+CHUNK_SIZE = 256
+
+def build_frame(cmd: int, payload: bytes) -&gt; bytes:
+    body = bytes([cmd]) + struct.pack("&lt;H", len(payload)) + payload
+    crc = crc16_ccitt(body)
+    return bytes([STX]) + body + struct.pack("&lt;H", crc) + bytes([ETX])</code></pre>
+<p>CRC16-CCITT over <code>cmd || length || payload</code>. Firmware CRC32 (for START) uses the reflected poly <code>0xEDB88320</code> over the whole upload blob.</p>
+
+<h3 id="enter-ota">4.2 <code>--enter-ota</code> — talk to the app, not a BL key window</h3>
+<pre><code>def enter_ota_mode(log, ser, verbose=False):
+    """Send 'U' so the app sets the OTA flag, then wait for 'OTA RX ready'.
+
+    Do not keep sending 'U' after the app resets — the bootloader has
+    no 'Press U' window.
+    """
+    # wait for "app 1/2 started" / "Hello world" / "OTA requested..."
+    # spam 'U' while the app is alive
+    # after reset: expect "OTA RX ready" (or "OTA flag set")</code></pre>
+<p>Flow matches Part 14: PC sees the app banner → writes <code>'U'</code> a few times → app prints <code>OTA requested, resetting...</code> → bootloader prints <code>OTA flag set</code> then <code>OTA RX ready</code>. Without <code>--enter-ota</code>, the tool only waits for an already-open OTA session (<code>OTA RX ready</code> within 15 s).</p>
+
+<h3 id="upload">4.3 Upload sequence</h3>
+<pre><code>if sign:
+    upload_path = sign_firmware_file(firmware_path, version=...)
+
+fw = load_firmware(upload_path)   # .bin or Intel HEX
+fw_crc = crc32_firmware(fw)
+
+# optional enter_ota_mode(...)
+send_frame(..., CMD_START, pack("&lt;II", fw_size, fw_crc), ...)
+
+seq = 0
+while offset &lt; fw_size:
+    chunk = fw[offset : offset + 256]
+    send_frame(..., CMD_DATA, pack("&lt;H", seq) + chunk, ...)
+    seq += 1
+
+send_frame(..., CMD_END, b"", ...)</code></pre>
+<ol>
+  <li><strong>Optional sign</strong> — produce <code>*_signed.bin</code> via <code>sign_image.py</code>.</li>
+  <li><strong>Open COM</strong> without toggling DTR/RTS (avoids accidental MCU reset on port open).</li>
+  <li><strong>Background reader</strong> — <code>UartLogReader</code> thread demuxes MCU <code>printf</code> text from ACK/NACK bytes.</li>
+  <li><strong>START</strong> — little-endian size + CRC32 of the signed image.</li>
+  <li><strong>DATA</strong> — 256-byte chunks with a 16-bit sequence number; retries on timeout/NACK.</li>
+  <li><strong>END</strong> — empty payload; if ACK is lost but the MCU already printed <code>OTA OK</code> / app started, treat as success.</li>
+</ol>
+
+<h2 id="cli">5. CLI flags</h2>
+<ul>
+  <li><code>port</code> / <code>firmware</code> — required (e.g. <code>COM3</code>, <code>app.bin</code> or <code>.hex</code>).</li>
+  <li><code>--baud</code> — default 115200 (must match Part 6).</li>
+  <li><code>--sign</code> / <code>--version N</code> — sign before upload.</li>
+  <li><code>--enter-ota</code> — drive the app’s <code>'U'</code> path into the flag-based OTA entry.</li>
+  <li><code>--timeout</code> / <code>-v</code> — ACK wait and hex dumps.</li>
+</ul>
+
+<h2 id="wrap">6. Series wrap-up</h2>
+<p>Full path: keys (<code>keygen.py</code>) → signed IMG1 → bare-metal drivers → dual-slot bootloader → UART protocol → app request flag → this host tool. Clone <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">STM32F103C8T6-ota-base-metal</a>, flash the bootloader once with ST-Link, and iterate apps over serial.</p>
+
+<h2 id="next">Next</h2>
+<ul>
   <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
   <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>
 </ul>

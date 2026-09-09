@@ -3,7 +3,9 @@ import { useId } from "react";
 const covers = {
   mqtt: ["#111827", "#059669", "MQTT"],
   climate: ["#059669", "#a3e635", "24°"],
+  camera: ["#111827", "#059669", "CAM"],
   relay: ["#047857", "#111827", "I/O"],
+  energy: ["#064e3b", "#a3e635", "kWh"],
   rfid: ["#111827", "#34d399", "NFC"],
   pcb: ["#064e3b", "#059669", "PCB"],
   cloud: ["#059669", "#a3e635", "API"],

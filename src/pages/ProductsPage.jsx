@@ -1,50 +1,48 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
-import { products } from "../data/products";
+import { hardware } from "../data/hardware";
+import { assetPath } from "../utils/assetPath";
 import "../styles/products-page.css";
 
 export default function ProductsPage() {
   useEffect(() => {
-    document.title = "Products | Gemify";
+    document.title = "Hardware | Gemify";
   }, []);
 
   return (
     <div className="products-overview-root">
-      <section className="products-overview-hero">
+      <section
+        className="products-overview-hero"
+        style={{ "--products-hero-image": `url("${assetPath("images/product-control.jpg")}")` }}
+      >
         <div className="container">
           <div className="products-overview-hero-content">
-            <h1>Our products</h1>
-            <p>
-              Field-ready IoT systems for climate monitoring, remote relay control, and
-              smart NFC/RFID — explore details or request a quote.
-            </p>
+            <h1>Hardware</h1>
+            <p>Sensors, controllers, meters, and autonomous vehicles.</p>
           </div>
         </div>
       </section>
 
       <section className="products-overview-page">
         <div className="container">
-          <div className="products-overview-welcome">
-            <h2>Featured solutions</h2>
-            <p>
-              Buy off the shelf or customize sensors, enclosures, firmware, and cloud
-              integration to match your deployment.
-            </p>
-          </div>
-
           <div className="products-overview-grid">
-            {products.map((product) => (
+            {hardware.map((product) => (
               <article className="products-overview-card" key={product.slug}>
-                <div className="products-overview-card-head">
-                  <div className="products-overview-icon">{product.icon}</div>
+                <div className="products-overview-card-media">
+                  <img
+                    src={assetPath(product.image)}
+                    alt={product.imageAlt}
+                    width="1280"
+                    height="720"
+                    loading="lazy"
+                  />
                 </div>
                 <div className="products-overview-card-content">
                   <p className="products-overview-cat">{product.cat}</p>
                   <h3>{product.name}</h3>
                   <p>{product.shortDesc}</p>
-                  <Link className="products-overview-read-more" to={`/products/${product.slug}`}>
-                    Read more →
-                  </Link>
+                  <a className="products-overview-read-more" href="/#contact">
+                    Request a quote →
+                  </a>
                 </div>
               </article>
             ))}

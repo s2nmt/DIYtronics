@@ -1,25 +1,224 @@
 <p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-12-ota-parser">Part 12: OTA parser</a> — next: <a href="articles/stm32-ota-bare-metal-part-14-application">Part 14: Application</a>.</p>
 
-<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/boot/src/ota.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/boot/src/ota.c</code></a> — command handlers and slot swap.</p>
+<p>Source: command handlers and session state in <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/boot/src/ota.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/boot/src/ota.c</code></a>.</p>
+<p>Part 12 delivered a complete frame into <code>rx_cmd</code> / <code>rx_payload</code>. This post is what <code>ota_process_frame()</code> does with START, DATA, and END — plus early slot rejection, ACK/NACK, and the jump after a successful update.</p>
 
-<h2 id="start">1. START</h2>
-<p>Payload carries firmware size / CRC metadata expected by the host tool. Handler selects <strong>inactive</strong> slot base, records <code>fw_write_addr</code>, erases required pages, resets sequence counters, ACKs.</p>
+<h2 id="session">1. Session state</h2>
+<pre><code>static uint32_t fw_size;
+static uint32_t fw_crc32;
+static uint32_t fw_written;
+static uint16_t fw_seq_expected;
+static uint32_t fw_write_addr;
+static uint32_t fw_slot_size;
+static uint8_t  fw_slot_checked; /* vector/link check already done */
+static uint8_t  fw_aborted;      /* early reject — NACK every frame after */</code></pre>
+<p>START fills these; DATA advances <code>fw_written</code> / sequence; END checks them against Flash. Once <code>fw_aborted</code> is set, DATA always fails so the host cannot keep writing after a wrong-slot image was detected.</p>
 
-<h2 id="data">2. DATA</h2>
-<p>Each chunk: sequence number + up to 256 data bytes. Writes via <code>flash_write_buffer</code> at the running address. After enough bytes exist, <code>ota_early_slot_check()</code> parses the IMG1 header and verifies the vector table belongs to <em>this</em> slot — rejecting a wrong-linked image before the transfer finishes.</p>
+<h2 id="dispatch">2. Dispatch — <code>ota_process_frame</code></h2>
+<pre><code>static void ota_process_frame(void)
+{
+    int rc = -1;
 
-<h2 id="end">3. END</h2>
+    switch (rx_cmd) {
+    case OTA_CMD_START:
+        rc = ota_handle_start();
+        break;
+    case OTA_CMD_DATA:
+        rc = ota_handle_data();
+        break;
+    case OTA_CMD_END:
+        /* Success: handle_end ACKs + jumps; does not return. */
+        rc = ota_handle_end();
+        break;
+    default:
+        break;
+    }
+
+    if (rc == 0) {
+        ota_tx_ack();
+    } else {
+        ota_tx_nack();
+    }
+}</code></pre>
+<p>Unknown commands NACK. On END success the handler sends its own ACK and jumps before this function would ACK again.</p>
+
+<h2 id="start">3. START — target inactive slot and erase</h2>
+<p>Payload is exactly 8 bytes: little-endian <code>fw_size</code> then little-endian expected <code>fw_crc32</code> of the full image blob.</p>
+<pre><code>static int ota_handle_start(void)
+{
+    if (rx_len != 8U) {
+        return -1;
+    }
+
+    fw_size  = /* LE u32 from rx_payload[0..3] */;
+    fw_crc32 = /* LE u32 from rx_payload[4..7] */;
+
+    uint32_t active   = app_get_active_start();
+    uint32_t inactive = app_get_inactive_start();
+
+    /* Only program the inactive bank — never overwrite the live app. */
+    if ((inactive != APP1_START &amp;&amp; inactive != APP2_START) ||
+        (inactive == active)) {
+        return -1;
+    }
+
+    fw_write_addr   = inactive;
+    fw_slot_size    = ota_slot_size(fw_write_addr);
+    fw_written      = 0U;
+    fw_seq_expected = 0U;
+    fw_slot_checked = 0U;
+    fw_aborted      = 0U;
+
+    if (fw_size == 0U || fw_size &gt; fw_slot_size) {
+        return -1;
+    }
+
+    flash_unlock();
+    /* Erase only enough pages for fw_size (rounded up), not the whole slot. */
+    erase_size = (fw_size + FLASH_PAGE_SIZE - 1U) &amp; ~(FLASH_PAGE_SIZE - 1U);
+    flash_erase_region(fw_write_addr, erase_size);
+    …
+}</code></pre>
 <ol>
-  <li>Confirm length / CRC32 of what was written (as implemented in the file).</li>
-  <li><code>boot_verify_slot</code> on the inactive slot (SHA-256 + ECDSA).</li>
-  <li>Update <code>ota_config_t</code>: flip <code>active_slot</code> to the newly programmed slot.</li>
-  <li>ACK, then <code>jump_to_application</code> — success does not return to <code>main</code>.</li>
+  <li>Parse size + image CRC32 from the START payload.</li>
+  <li>Resolve inactive slot via Part 10 helpers; refuse if it looks invalid.</li>
+  <li>Reset write pointer, sequence, abort flags.</li>
+  <li>Reject zero / oversized images.</li>
+  <li>Unlock Flash and erase a region covering the image (faster than wiping the full 20.5 KB every time).</li>
+</ol>
+<p>ACK means “ready for DATA seq 0.”</p>
+
+<h2 id="data">4. DATA — program chunks + early slot check</h2>
+<pre><code>static int ota_handle_data(void)
+{
+    uint16_t seq;
+    uint32_t chunk_len;
+    uint8_t  pad[OTA_CHUNK_SIZE + 2U];
+
+    if (fw_aborted != 0U) {
+        return -1;
+    }
+
+    seq = (uint16_t)rx_payload[0] | ((uint16_t)rx_payload[1] &lt;&lt; 8);
+    if (seq != fw_seq_expected) {
+        return -1;
+    }
+
+    chunk_len = (uint32_t)rx_len - 2U;
+    if ((fw_written + chunk_len) &gt; fw_size || chunk_len == 0U) {
+        return -1;
+    }
+
+    memcpy(pad, rx_payload + 2U, chunk_len);
+    if (chunk_len &amp; 1U) {
+        pad[chunk_len++] = 0xFFU;   /* Flash half-word writes need even length */
+    }
+
+    if (flash_write_buffer(fw_write_addr + fw_written, pad, chunk_len) != 0) {
+        return -1;
+    }
+
+    fw_written     += (uint32_t)rx_len - 2U;  /* count real bytes, not pad */
+    fw_seq_expected = (uint16_t)(fw_seq_expected + 1U);
+
+    if (ota_early_slot_check() != 0) {
+        fw_aborted = 1U;
+        flash_lock();
+        return -1;
+    }
+    return 0;
+}</code></pre>
+<ul>
+  <li>Strict sequence numbers — out-of-order → NACK.</li>
+  <li>Odd-length chunks get a <code>0xFF</code> pad for half-word Flash programming; <code>fw_written</code> still tracks the host’s byte count.</li>
+  <li>After enough bytes exist, <code>ota_early_slot_check()</code> runs.</li>
+</ul>
+
+<h3 id="early">4.1 <code>ota_early_slot_check</code></h3>
+<pre><code>/* Once header + SP/Reset exist: reject wrong-linked images before transfer ends. */
+if (fw_written &lt; sizeof(img_header_t)) return 0;
+
+img_header_parse(fw_write_addr, &amp;hdr);
+img_payload_bounds(...);
+
+need = (payload_addr - fw_write_addr) + 8U;  /* header + SP + Reset */
+if (fw_written &lt; need) return 0;
+
+if (payload_addr != (fw_write_addr + IMG_HEADER_SIZE)) return -1;
+if (!app_is_valid_at(payload_addr)) {
+    printf("OTA: wrong slot img\r\n");
+    return -1;
+}
+fw_slot_checked = 1U;</code></pre>
+<p>An APP1-linked binary written into APP2 fails here (~264 bytes in) instead of after a full transfer and crypto verify. Sets <code>fw_aborted</code> so later DATA frames NACK.</p>
+
+<h2 id="end">5. END — CRC32, verify, swap, jump</h2>
+<pre><code>static int ota_handle_end(void)
+{
+    if (fw_written != fw_size) {
+        printf("OTA: size mismatch\r\n");
+        return -1;
+    }
+
+    calc = crc32_flash(fw_write_addr, fw_size);
+    if (calc != fw_crc32) {
+        printf("OTA: CRC fail\r\n");
+        flash_lock();
+        return -1;
+    }
+
+    if (fw_write_addr == app_get_active_start()) {
+        flash_lock();
+        return -1;   /* must never commit onto the active bank */
+    }
+
+    if (boot_verify_slot(fw_write_addr, slot_size, &amp;jump_addr) != 0) {
+        printf("OTA: verify fail\r\n");
+        flash_lock();
+        return -1;
+    }
+
+    if (jump_addr != (fw_write_addr + IMG_HEADER_SIZE)) {
+        printf("OTA: bad link\r\n");
+        flash_lock();
+        return -1;
+    }
+
+    /* Flip active_slot to the bank we just programmed */
+    cfg.magic       = OTA_MAGIC_NONE;
+    cfg.active_slot = (fw_write_addr == APP2_START) ? OTA_SLOT_APP2 : OTA_SLOT_APP1;
+    cfg.app_size    = fw_size;
+    cfg.crc32       = fw_crc32;
+    cfg.version     = 0U;
+
+    flash_erase_page(OTA_CONFIG_ADDR);
+    flash_write_buffer(OTA_CONFIG_ADDR, (const uint8_t *)&amp;cfg, sizeof(cfg));
+    flash_lock();
+
+    printf("OTA OK %08lX\r\n", (unsigned long)jump_addr);
+    ota_tx_ack();
+    jump_to_application(jump_addr);
+    return 0;
+}</code></pre>
+<ol>
+  <li><strong>Length</strong> — every START byte must have been written.</li>
+  <li><strong>CRC-32</strong> — recompute over Flash (<code>poly 0xEDB88320</code>, init/final invert) and match START’s <code>fw_crc32</code>. Transport integrity before crypto.</li>
+  <li><strong>SHA-256 + ECDSA</strong> — <code>boot_verify_slot</code> (Part 11). Bad signature → leave previous active slot untouched.</li>
+  <li><strong>Link check</strong> — jump address must be <code>slot + 0x100</code>.</li>
+  <li><strong>Commit</strong> — erase/write OTA config with new <code>active_slot</code>, magic cleared.</li>
+  <li><strong>ACK + jump</strong> — print <code>OTA OK</code> (host tool matches this string), ACK, then <code>jump_to_application</code>. Does not return to <code>main</code> on success.</li>
 </ol>
 
-<h2 id="abort">4. Abort / NACK</h2>
-<p>Once <code>fw_aborted</code> is set (bad header, wrong slot, verify fail), subsequent frames NACK until the session ends. The previous active slot remains bootable.</p>
+<h2 id="abort">6. Failure behavior</h2>
+<ul>
+  <li>Any handler failure → NACK; previous <code>active_slot</code> unchanged → next boot still picks the old verified image.</li>
+  <li><code>fw_aborted</code> after early slot check → every subsequent DATA NACKs until the host stops or idle timeout returns to <code>main</code>.</li>
+  <li>Idle timeout from Part 12 returns from <code>ota_run</code>; <code>main</code> may <code>boot_pick_slot</code> again or re-enter OTA.</li>
+</ul>
 
-<h2 id="next">Next</h2><ul>
+<h2 id="next">Next</h2>
+<p>The bootloader side of OTA is complete. Next is the application: how it runs in a slot, requests OTA via the flag, and what the host expects on the wire.</p>
+<ul>
   <li><a href="articles/stm32-ota-bare-metal-part-14-application">Part 14: Application</a></li>
   <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
   <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>

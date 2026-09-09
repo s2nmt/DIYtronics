@@ -2,20 +2,20 @@ import { motion } from "framer-motion";
 
 const steps = [
   {
-    title: "Discovery & scope",
-    desc: "Clarify the problem, deployment environment, cost constraints, and timeline.",
+    title: "Site survey",
+    desc: "Existing equipment, network, and goals — monitoring, control, energy, or autonomous vehicles.",
   },
   {
     title: "Solution design",
-    desc: "Platform architecture, PCB & firmware scope, or mechanical enclosure concept that fits.",
+    desc: "Camera, sensor, meter, and AGV layout; automation scenes, routes, and the operations dashboard.",
   },
   {
-    title: "Prototype & field test",
-    desc: "On-site PoC, RF validation, firmware tuning, and dashboard iteration.",
+    title: "Install & commission",
+    desc: "On-site setup, threshold tuning, and checks on alerts, control, and reports before handoff.",
   },
   {
-    title: "Production & handoff",
-    desc: "Volume manufacturing, system integration, operator training, and warranty support.",
+    title: "Train & support",
+    desc: "Operator training, maintenance, extra measurement points, and upgrades as you grow.",
   },
 ];
 
@@ -24,11 +24,10 @@ export default function Process() {
     <section className="section section--light" id="process">
       <div className="container">
         <div className="section-header">
-          <p className="section-subtitle">How we work</p>
-          <h2 className="section-title">From brief to devices in the field</h2>
+          <h2 className="section-title">From survey to live operations</h2>
           <p className="section-description">
-            A clear path that lowers technical risk and shortens time-to-market for IoT
-            projects.
+            Built around your site — existing equipment, network, and operating
+            goals.
           </p>
         </div>
 

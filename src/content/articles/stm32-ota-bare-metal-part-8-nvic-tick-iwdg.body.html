@@ -1,20 +1,171 @@
 <p>Series: <a href="blog/series/stm32-ota-bare-metal">STM32F103 Bare-Metal Secure OTA Bootloader</a> — <a href="articles/stm32-ota-bare-metal-part-7-flash">Part 7: Flash</a> — next: <a href="articles/stm32-ota-bare-metal-part-9-crypto">Part 9: Crypto</a>.</p>
 
-<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/nvic.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/nvic.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/tick.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/tick.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/iwdg.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/iwdg.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/init.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/init.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/msp.c" target="_blank" rel="noopener noreferrer"><code>bootloader/lib/drivers/src/msp.c</code></a>.</p>
+<p>Source: <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/nvic.c" target="_blank" rel="noopener noreferrer"><code>nvic.c</code></a> / <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/inc/nvic.h" target="_blank" rel="noopener noreferrer"><code>nvic.h</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/tick.c" target="_blank" rel="noopener noreferrer"><code>tick.c</code></a> / <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/inc/tick.h" target="_blank" rel="noopener noreferrer"><code>tick.h</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/iwdg.c" target="_blank" rel="noopener noreferrer"><code>iwdg.c</code></a> / <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/inc/iwdg.h" target="_blank" rel="noopener noreferrer"><code>iwdg.h</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/init.c" target="_blank" rel="noopener noreferrer"><code>init.c</code></a>, <a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal/blob/main/bootloader/lib/drivers/src/msp.c" target="_blank" rel="noopener noreferrer"><code>msp.c</code></a>.</p>
+<p>These files sit under the same early bring-up path Part 3 showed: <code>main()</code> calls <code>init()</code>, then <code>SystemClock_Config()</code>, GPIO, UART. There is <strong>no</strong> 3-second “press a key for OTA” window in the current bootloader <code>main.c</code>. SysTick here is for <code>delay_ms()</code>, the OTA UART idle timeout, and the short delay before jumping to the app.</p>
 
-<h2 id="nvic">1. NVIC</h2>
-<p>Enables USART1 IRQ priority/enable so the RX ring fills in the background. On jump-to-app, <code>bootloader.c</code> disables all NVIC enables/pending bits itself — the NVIC helper is for normal runtime.</p>
+<h2 id="init">1. <code>init()</code> — first call from <code>main</code></h2>
+<pre><code>status_t init(void)
+{
+    nvic_priority_group_config(NVIC_PRIORITYGROUP_4);
 
-<h2 id="tick">2. SysTick</h2>
-<p><code>tick.c</code> programs SysTick for 1 ms ticks (<code>tick_get()</code>, <code>delay_ms()</code>). OTA idle timeout and the bootloader's 3 s key window both depend on this free-running counter.</p>
+    if (tick_init(TICK_INT_PRIORITY) != STATUS_OK) {
+        return STATUS_ERROR;
+    }
 
-<h2 id="iwdg">3. Independent watchdog</h2>
-<p><code>Iwdg_Init</code> / <code>Iwdg_Feed</code> keep long OTA transfers from resetting the MCU. <code>ota.c</code> feeds the dog while waiting for UART bytes.</p>
+    msp_init();
 
-<h2 id="init-msp">4. <code>init()</code> and MSP</h2>
-<p><code>init.c</code> is the single bring-up call from <code>main</code>: Flash prefetch/latency hooks, NVIC/SysTick baseline, then MSP low-level pin/clock prep. Keeping MSP tiny avoids Cube-generated sprawl.</p>
+    return STATUS_OK;
+}</code></pre>
+<ol>
+  <li><strong>Priority grouping</strong> — all 4 priority bits are preemption bits (<code>NVIC_PRIORITYGROUP_4</code>). Do this before enabling IRQs so later priority writes mean the same thing.</li>
+  <li><strong>SysTick</strong> — start a 1&nbsp;ms tick (see below). After reset the chip is still on HSI 8&nbsp;MHz; <code>SystemClock_Config()</code> later reloads SysTick once the PLL is at 72&nbsp;MHz.</li>
+  <li><strong><code>msp_init()</code></strong> — board hook (default empty).</li>
+</ol>
+<p><code>init()</code> does <em>not</em> turn on the PLL, GPIO, or UART — those stay in the steps Part 4–6 already covered.</p>
 
-<h2 id="next">Next</h2><ul>
+<h2 id="msp">2. MSP hook</h2>
+<pre><code>/* msp.h */
+void msp_init(void);
+
+/* msp.c — default weak stub */
+__attribute__((weak)) void msp_init(void)
+{
+}</code></pre>
+<p>Weak so a board file can override it without editing the shared driver. On this Blue Pill bootloader the default is empty: pin/clock work lives in <code>GPIO_Init</code> / <code>Uart1_Init</code> instead.</p>
+
+<h2 id="nvic">3. NVIC helpers</h2>
+<p><code>nvic.h</code> maps the Cortex-M3 NVIC at <code>0xE000E100</code> and SysTick at <code>0xE000E010</code>, plus the F103 IRQ numbers (<code>USART1_IRQn = 37</code>, …).</p>
+<pre><code>void nvic_priority_group_config(nvic_priority_group_t group)
+{
+    SCB_AIRCR = (SCB_AIRCR &amp; ~(SCB_AIRCR_VECTKEY | SCB_AIRCR_PRIGROUP_MSK))
+              | SCB_AIRCR_VECTKEY
+              | ((uint32_t)group &lt;&lt; 8);
+}
+
+void nvic_irq_priority_set(IRQn_Type irqn, uint8_t preempt, uint8_t sub)
+{
+    uint32_t priority = ((uint32_t)preempt &lt;&lt; 4) | ((uint32_t)sub &amp; 0x0FU);
+    volatile uint8_t *ipr = (volatile uint8_t *)&amp;NVIC-&gt;NVIC_IPR[0];
+    ipr[(uint32_t)irqn] = (uint8_t)priority;
+}
+
+void nvic_systick_priority_set(uint8_t priority)
+{
+    SCB_SHPR3 = (SCB_SHPR3 &amp; 0x00FFFFFFUL) | ((uint32_t)priority &lt;&lt; 24);
+}
+
+void nvic_irq_enable(IRQn_Type irqn)
+{
+    NVIC-&gt;NVIC_ISER[(uint32_t)irqn / 32U].REG =
+        (1UL &lt;&lt; ((uint32_t)irqn % 32U));
+}
+
+void nvic_irq_disable(IRQn_Type irqn)
+{
+    NVIC-&gt;NVIC_ICER[(uint32_t)irqn / 32U].REG =
+        (1UL &lt;&lt; ((uint32_t)irqn % 32U));
+}</code></pre>
+<ul>
+  <li><strong>AIRCR</strong> — needs the <code>0x05FA</code> vector key whenever you change priority grouping.</li>
+  <li><strong>IRQ priority</strong> — packed into the NVIC IPR byte (preempt in the high nibble with this grouping).</li>
+  <li><strong>SysTick priority</strong> — lives in <code>SCB_SHPR3</code> bits 31:24, not in NVIC IPR. <code>conf.h</code> sets <code>TICK_INT_PRIORITY</code> to <code>15</code> (lowest urgency) so USART RX can preempt the tick if needed.</li>
+  <li><strong>Enable / disable</strong> — set the bit in <code>ISER</code> / <code>ICER</code>. Part 6’s <code>Uart1_Init()</code> calls <code>nvic_irq_enable(USART1_IRQn)</code> after programming the USART.</li>
+</ul>
+<p>When jumping to the application, <code>bootloader.c</code> clears NVIC enables/pending itself so the app starts from a clean IRQ state — these helpers are for normal runtime bring-up.</p>
+
+<h2 id="tick">4. SysTick — 1&nbsp;ms time base</h2>
+<p>From <code>conf.h</code>: <code>TICK_FREQ_HZ = 1000</code>. Reload = <code>SystemCoreClock / 1000</code>.</p>
+<pre><code>static volatile uint32_t s_tick;
+
+status_t tick_init(uint8_t priority)
+{
+    uint32_t reload = SystemCoreClock / TICK_FREQ_HZ;
+
+    if (reload == 0U) {
+        return STATUS_ERROR;
+    }
+
+    SysTick-&gt;STK_CTRL.BITS.ENABLE = 0;
+    SysTick-&gt;STK_LOAD.BITS.LOAD = reload - 1U;
+    SysTick-&gt;STK_VAL.REG = 0U;
+    SysTick-&gt;STK_CTRL.BITS.CLKSOURCE = 1;   /* processor clock */
+    SysTick-&gt;STK_CTRL.BITS.TICKINT = 1;    /* exception on count=0 */
+    nvic_systick_priority_set(priority);
+    SysTick-&gt;STK_CTRL.BITS.ENABLE = 1;
+
+    return STATUS_OK;
+}
+
+void SysTick_Handler(void)
+{
+    s_tick++;
+}
+
+uint32_t tick_get(void)
+{
+    return s_tick;
+}
+
+void delay_ms(uint32_t ms)
+{
+    const uint32_t start = tick_get();
+    while ((tick_get() - start) &lt; ms) {
+    }
+}</code></pre>
+<ol>
+  <li>Stop the counter, load <code>reload - 1</code>, clear current value.</li>
+  <li>Use the CPU clock as the source, enable the tick interrupt, set priority, then enable.</li>
+  <li>Every 1&nbsp;ms, <code>SysTick_Handler</code> increments <code>s_tick</code>.</li>
+  <li><code>delay_ms</code> is a busy wait on that counter (fine for short pauses).</li>
+</ol>
+
+<h3 id="tick-uses">Where the bootloader uses the tick</h3>
+<ul>
+  <li><strong><code>delay_ms(50)</code></strong> in <code>main.c</code> — short pause after a slot verifies, before <code>jump_to_application()</code> (lets the last UART log bytes finish shifting out).</li>
+  <li><strong>OTA idle timeout</strong> — <code>ota_run(OTA_IDLE_TIMEOUT_MS)</code> with <code>OTA_IDLE_TIMEOUT_MS = 5000</code>. Inside <code>ota.c</code>, <code>uart_rx_byte()</code> does <code>deadline = tick_get() + s_idle_limit</code> and returns when no useful RX arrives before that deadline.</li>
+</ul>
+<p>Again: current <code>main.c</code> does <strong>not</strong> wait 3 seconds for a UART key to enter OTA. OTA entry is flag-based, “no valid signed app”, or returning from a previous OTA idle timeout (Part 3).</p>
+
+<h2 id="iwdg">5. Independent watchdog</h2>
+<pre><code>#define IWDG ((IWDG_TypeDef *)0x40003000)
+#define IWDG_KEY_ENABLE  0xCCCCU
+#define IWDG_KEY_RELOAD  0xAAAAU
+#define IWDG_KEY_UNLOCK  0x5555U
+
+void Iwdg_Init(void)
+{
+    RCC-&gt;RCC_CSR.REG |= (1UL &lt;&lt; 0);           /* LSION */
+    while ((RCC-&gt;RCC_CSR.REG &amp; (1UL &lt;&lt; 1)) == 0U) {
+    }                                         /* wait LSIRDY */
+
+    IWDG-&gt;IWDG_KR.REG = IWDG_KEY_UNLOCK;      /* 0x5555: allow PR/RLR write */
+    IWDG-&gt;IWDG_PR.REG = 4U;                   /* /64 */
+    IWDG-&gt;IWDG_KR.REG = IWDG_KEY_ENABLE;      /* 0xCCCC: start IWDG */
+    while (IWDG-&gt;IWDG_SR.REG &amp; 0x1U) {
+    }                                         /* wait PVU */
+    IWDG-&gt;IWDG_RLR.REG = 4999U;
+    while (IWDG-&gt;IWDG_SR.REG &amp; 0x2U) {
+    }                                         /* wait RVU */
+}
+
+void Iwdg_Feed(void)
+{
+    IWDG-&gt;IWDG_KR.REG = IWDG_KEY_RELOAD;      /* 0xAAAA */
+}</code></pre>
+<ol>
+  <li>Turn on the internal LSI oscillator (~40&nbsp;kHz) and wait until it is ready.</li>
+  <li>Unlock the IWDG registers with <code>0x5555</code>, set prescaler <code>PR = 4</code> (÷64).</li>
+  <li>Start the watchdog with <code>0xCCCC</code>, then program reload <code>RLR = 4999</code>.</li>
+  <li>Timeout ≈ <code>(RLR + 1) × 64 / 40000</code> ≈ <strong>8&nbsp;s</strong> if LSI is near 40&nbsp;kHz. Feed with <code>0xAAAA</code> before that elapses.</li>
+</ol>
+<p>The application <code>main</code> calls <code>Iwdg_Init()</code> once, then <code>Iwdg_Feed()</code> in its 1&nbsp;Hz loop. Bootloader <code>ota.c</code> calls <code>Iwdg_Feed()</code> while spinning for UART bytes and after erase/program steps so a long transfer does not trip a dog that was already armed. Once started, IWDG cannot be turned off except by reset — which is why feed sites matter during Flash-heavy OTA work.</p>
+
+<h2 id="takeaway">6. Takeaway</h2>
+<p><code>init()</code> sets IRQ grouping + SysTick; NVIC enable is what makes USART1 RX fill the ring buffer; the free-running millisecond counter drives <code>delay_ms</code> and the 5&nbsp;s OTA idle limit; IWDG is the last-resort reset if software stops feeding during a hang.</p>
+
+<h2 id="next">Next</h2>
+<p>With timing and IRQs in place, the next piece is the crypto path used before any jump: SHA-256 over the payload and ECDSA P-256 verify against the bootloader public key.</p>
+<ul>
   <li><a href="articles/stm32-ota-bare-metal-part-9-crypto">Part 9: Crypto</a></li>
   <li><a href="blog/series/stm32-ota-bare-metal">Series index</a></li>
   <li><a href="https://github.com/s2nmt/STM32F103C8T6-ota-base-metal" target="_blank" rel="noopener noreferrer">GitHub repository</a></li>

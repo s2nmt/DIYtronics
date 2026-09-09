@@ -38,7 +38,7 @@ export const articleSeriesBySlug = {
         part: 3,
         date: "Jul 13, 2026",
         excerpt:
-          "Bootloader main.c: OTA flag, 3 s key window, dual-slot verify, and enter ota_run().",
+          "Bootloader main.c: OTA flag, dual-slot verify-and-jump, and ota_run() retry loop.",
       },
       {
         status: "published",
