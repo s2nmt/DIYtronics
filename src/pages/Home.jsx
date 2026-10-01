@@ -1,7 +1,6 @@
 import Hero from "../components/Hero";
 import Services from "../components/Services";
-import Hardware from "../components/Hardware";
-import Industries from "../components/Industries";
+import Projects from "../components/Projects";
 import Process from "../components/Process";
 import Contact from "../components/Contact";
 
@@ -10,8 +9,7 @@ export default function Home() {
     <>
       <Hero />
       <Services />
-      <Hardware />
-      <Industries />
+      <Projects />
       <Process />
       <Contact />
     </>

@@ -18,8 +18,8 @@ createRoot(document.getElementById("root")).render(
       <Routes>
         <Route element={<App />}>
           <Route path="/" element={<Home />} />
-          <Route path="/products" element={<Navigate to="/#hardware" replace />} />
-          <Route path="/products/:slug" element={<Navigate to="/#hardware" replace />} />
+          <Route path="/products" element={<Navigate to="/" replace />} />
+          <Route path="/products/:slug" element={<Navigate to="/" replace />} />
         </Route>
 
         <Route element={<BlogLayout />}>

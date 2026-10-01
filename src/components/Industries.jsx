@@ -4,21 +4,21 @@ import { assetPath } from "../utils/assetPath";
 const industries = [
   {
     title: "Agriculture",
-    desc: "Greenhouses, irrigation, and crop climate. Cameras for pests and security. Automate pumps and shade — and move harvest or inputs with autonomous vehicles.",
+    desc: "Boards and firmware for greenhouse climate, irrigation, and sensing — plus the dashboards your agronomists will use. You own production and field rollout.",
     image: "images/industry-agriculture.jpg",
-    alt: "Smart greenhouse with irrigation and sensors",
+    alt: "Greenhouse as an application domain for embedded design",
   },
   {
     title: "Livestock",
-    desc: "Barn climate, toxic gas, and cameras. Control ventilation, heat, and feed lines. AGVs for feed or waste runs when staff should not walk every aisle.",
+    desc: "Design for barn climate, gas sensing, and feed-line control. We deliver the design package; your team installs and operates on site.",
     image: "images/industry-livestock.jpg",
-    alt: "Modern livestock facility with climate sensors and cameras",
+    alt: "Livestock facility as an application domain",
   },
   {
     title: "Factories",
-    desc: "Area and line cameras, energy by production line, and AGVs that haul pallets between cells — one operations view for people and vehicles.",
+    desc: "Line monitoring, energy metering, and machine I/O designed as a stack you can manufacture and maintain in-house.",
     image: "images/industry-factory.jpg",
-    alt: "Factory production line with cameras and monitoring kiosk",
+    alt: "Factory as an application domain for embedded design",
   },
 ];
 
@@ -27,10 +27,10 @@ export default function Industries() {
     <section className="section" id="industries">
       <div className="container">
         <div className="section-header">
-          <h2 className="section-title">Agriculture, livestock, and factories</h2>
+          <h2 className="section-title">Where the designs get used</h2>
           <p className="section-description">
-            One stack for monitoring, energy, and autonomous vehicles — configured
-            for each industry.
+            Agriculture, livestock, and factories are application domains — not
+            turnkey sites we operate.
           </p>
         </div>
 

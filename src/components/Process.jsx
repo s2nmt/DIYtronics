@@ -2,32 +2,32 @@ import { motion } from "framer-motion";
 
 const steps = [
   {
-    title: "Site survey",
-    desc: "Existing equipment, network, and goals — monitoring, control, energy, or autonomous vehicles.",
+    title: "Spec",
+    desc: "Interfaces, MCU or SoC, PCB constraints, and what your team must own at handoff.",
   },
   {
-    title: "Solution design",
-    desc: "Camera, sensor, meter, and AGV layout; automation scenes, routes, and the operations dashboard.",
+    title: "Architecture",
+    desc: "PCB stack-up, firmware or Linux BSP, and software APIs — reviewed with your engineers before anything is frozen.",
   },
   {
-    title: "Install & commission",
-    desc: "On-site setup, threshold tuning, and checks on alerts, control, and reports before handoff.",
+    title: "Bring-up",
+    desc: "Board bring-up, driver work, image builds, and a working unit you can evaluate.",
   },
   {
-    title: "Train & support",
-    desc: "Operator training, maintenance, extra measurement points, and upgrades as you grow.",
+    title: "Handoff",
+    desc: "Gerber, firmware, BSP recipes, and docs. Your team maintains and ships from there.",
   },
 ];
 
 export default function Process() {
   return (
-    <section className="section section--light" id="process">
+    <section className="section" id="process">
       <div className="container">
         <div className="section-header">
-          <h2 className="section-title">From survey to live operations</h2>
+          <p className="section-subtitle">How we work</p>
+          <h2 className="section-title">From spec to handoff</h2>
           <p className="section-description">
-            Built around your site — existing equipment, network, and operating
-            goals.
+            Spec, architecture, bring-up, then a source handoff.
           </p>
         </div>
 

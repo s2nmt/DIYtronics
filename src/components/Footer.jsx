@@ -7,25 +7,36 @@ export default function Footer() {
         <div className="footer-grid">
           <div className="footer-col">
             <Link to="/" className="logo">
-              Gemify
+              Gemify <span>Technology</span>
             </Link>
             <p className="footer-tag">
-              Complete IoT solutions and hardware for monitoring, energy, and
-              autonomous vehicles.
+              Project-based embedded engineering. You keep the source.
             </p>
           </div>
 
           <div className="footer-col">
-            <h4>Solutions</h4>
+            <h4>About</h4>
             <ul>
               <li>
-                <a href="/#services">Monitoring & control</a>
+                <a href="/#services">Services</a>
               </li>
               <li>
-                <a href="/#services">Energy management</a>
+                <a href="/#projects">Projects</a>
+              </li>
+            </ul>
+          </div>
+
+          <div className="footer-col">
+            <h4>Services</h4>
+            <ul>
+              <li>
+                <a href="/#services">Hardware PCB</a>
               </li>
               <li>
-                <a href="/#services">Autonomous vehicles</a>
+                <a href="/#services">Firmware & Embedded Linux</a>
+              </li>
+              <li>
+                <a href="/#services">IoT platform</a>
               </li>
             </ul>
           </div>
@@ -45,7 +56,7 @@ export default function Footer() {
         </div>
 
         <p className="footer-bottom">
-          © {new Date().getFullYear()} Gemify. All rights reserved.
+          © {new Date().getFullYear()} Gemify Technology. All rights reserved.
         </p>
       </div>
     </footer>

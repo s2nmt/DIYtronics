@@ -4,24 +4,27 @@ import { assetPath } from "../utils/assetPath";
 const services = [
   {
     num: "01",
-    title: "Monitoring & control",
-    desc: "Watch sites through cameras and sensors. Automate pumps, fans, valves, and lights on schedules, thresholds, or remote commands — one system for farms, barns, and plants.",
-    image: "images/service-monitor.jpg",
-    alt: "Cameras and sensors for IoT monitoring",
+    title: "Hardware PCB",
+    desc: "Schematic, multilayer PCB layout, DFM, and Gerber — a board your firmware or Linux image can boot on, ready for your manufacturer.",
+    points: ["Schematic & multilayer PCB", "DFM and Gerber", "Bring-up against the board"],
+    image: "images/service-pcb.jpg",
+    alt: "PCB schematic and layout design",
   },
   {
     num: "02",
-    title: "Energy management",
-    desc: "Track electricity by zone and asset, catch anomalies, cut operating cost, and report usage for farms or factories.",
-    image: "images/service-energy.jpg",
-    alt: "Electrical room and energy management dashboard",
+    title: "Firmware & Embedded Linux",
+    desc: "Bare-metal and RTOS on MCUs, or Yocto/Buildroot BSPs on SoCs — drivers, bootloaders, OTA, device trees, and production images as one stack.",
+    points: ["Bare-metal / RTOS / OTA", "Yocto, device tree, kernel", "Board bring-up"],
+    image: "images/service-firmware.jpg",
+    alt: "Processor in a socket — firmware and Embedded Linux",
   },
   {
     num: "03",
-    title: "Autonomous vehicles",
-    desc: "AGVs and AMRs that move materials on farms, in barns, and across factory floors — mapped routes, obstacle avoidance, and fleet status on the same dashboard.",
-    image: "images/service-agv.jpg",
-    alt: "Autonomous mobile robot on a factory floor",
+    title: "IoT platform",
+    desc: "Dashboards, APIs, and device data pipelines that sit on top of the board — sized to the product, not a generic platform.",
+    points: ["Device APIs & MQTT", "Dashboards and alerts", "Handoff with source"],
+    image: "images/service-iot.jpg",
+    alt: "IoT dashboard and device software",
   },
 ];
 
@@ -30,10 +33,10 @@ export default function Services() {
     <section className="section section--light" id="services">
       <div className="container">
         <div className="section-header">
-          <h2 className="section-title">Three platforms for smarter operations</h2>
+          <p className="section-subtitle">What we do</p>
+          <h2 className="section-title">The stack</h2>
           <p className="section-description">
-            Gemify connects field devices, energy, and autonomous vehicles to
-            dashboards, alerts, and automation.
+            PCB, firmware &amp; Embedded Linux, and IoT platform.
           </p>
         </div>
 
@@ -41,7 +44,7 @@ export default function Services() {
           {services.map((s, i) => (
             <motion.article
               key={s.num}
-              className="card"
+              className="card card--industry"
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
@@ -54,6 +57,11 @@ export default function Services() {
                 <div className="card__icon">{s.num}</div>
                 <h3 className="card__title">{s.title}</h3>
                 <p className="card__desc">{s.desc}</p>
+                <ul className="card__list">
+                  {s.points.map((p) => (
+                    <li key={p}>{p}</li>
+                  ))}
+                </ul>
                 <a href="#contact" className="card__link">
                   Talk to us →
                 </a>

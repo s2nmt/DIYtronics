@@ -30,7 +30,7 @@ export default function Header() {
     <header className={`header ${scrolled || open ? "header--scrolled" : ""}`}>
       <div className="container navbar">
         <Link to="/" className="logo" onClick={() => setOpen(false)}>
-          Gemify
+          Gemify <span>Technology</span>
         </Link>
 
         <button
@@ -49,13 +49,10 @@ export default function Header() {
             Home
           </a>
           <a href={hashLink("services")} className="nav-link" onClick={() => setOpen(false)}>
-            Solutions
+            Services
           </a>
-          <a href={hashLink("hardware")} className="nav-link" onClick={() => setOpen(false)}>
-            Hardware
-          </a>
-          <a href={hashLink("industries")} className="nav-link" onClick={() => setOpen(false)}>
-            Applications
+          <a href={hashLink("projects")} className="nav-link" onClick={() => setOpen(false)}>
+            Projects
           </a>
           <a href={hashLink("process")} className="nav-link" onClick={() => setOpen(false)}>
             Process
