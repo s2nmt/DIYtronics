@@ -4,27 +4,27 @@ import { assetPath } from "../utils/assetPath";
 const services = [
   {
     num: "01",
-    title: "Hardware PCB",
+    title: "Hardware",
     desc: "Schematic, multilayer PCB layout, DFM, and Gerber — a board your firmware or Linux image can boot on, ready for your manufacturer.",
     points: ["Schematic & multilayer PCB", "DFM and Gerber", "Bring-up against the board"],
     image: "images/service-pcb.jpg",
-    alt: "PCB schematic and layout design",
+    alt: "Printed circuit board",
   },
   {
     num: "02",
     title: "Firmware & Embedded Linux",
-    desc: "Bare-metal and RTOS on MCUs, or Yocto/Buildroot BSPs on SoCs — drivers, bootloaders, OTA, device trees, and production images as one stack.",
+    desc: "Bare-metal and RTOS on MCUs, or Yocto/Buildroot BSPs on SoCs — drivers, bootloaders, OTA, device trees, and production images.",
     points: ["Bare-metal / RTOS / OTA", "Yocto, device tree, kernel", "Board bring-up"],
     image: "images/service-firmware.jpg",
-    alt: "Processor in a socket — firmware and Embedded Linux",
+    alt: "Processor in a socket",
   },
   {
     num: "03",
-    title: "IoT platform",
+    title: "IoT",
     desc: "Dashboards, APIs, and device data pipelines that sit on top of the board — sized to the product, not a generic platform.",
     points: ["Device APIs & MQTT", "Dashboards and alerts", "Handoff with source"],
     image: "images/service-iot.jpg",
-    alt: "IoT dashboard and device software",
+    alt: "IoT dashboard",
   },
 ];
 
@@ -33,10 +33,10 @@ export default function Services() {
     <section className="section section--light" id="services">
       <div className="container">
         <div className="section-header">
-          <p className="section-subtitle">What we do</p>
-          <h2 className="section-title">The stack</h2>
+          <p className="section-subtitle">What we offer</p>
+          <h2 className="section-title">We provide the solutions.</h2>
           <p className="section-description">
-            PCB, firmware &amp; Embedded Linux, and IoT platform.
+            Hardware, firmware &amp; Embedded Linux, and IoT.
           </p>
         </div>
 
@@ -62,9 +62,6 @@ export default function Services() {
                     <li key={p}>{p}</li>
                   ))}
                 </ul>
-                <a href="#contact" className="card__link">
-                  Talk to us →
-                </a>
               </div>
             </motion.article>
           ))}

@@ -14,10 +14,10 @@ export const projects = [
     imageAlt: "Energy monitoring",
   },
   {
-    title: "Camera AI",
-    role: "Embedded Linux · IoT platform",
-    desc: "Camera stream with on-device detection — people or objects — and a simple view on the dashboard.",
-    image: "images/project-camera.jpg",
-    imageAlt: "Camera used for AI detection",
+    title: "Autonomous vehicle",
+    role: "Firmware · Embedded Linux · IoT platform",
+    desc: "An AGV for material transport — onboard control, and a simple view on the dashboard.",
+    image: "images/service-agv.jpg",
+    imageAlt: "Autonomous vehicle in a factory",
   },
 ];
