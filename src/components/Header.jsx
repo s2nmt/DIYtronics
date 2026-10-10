@@ -51,6 +51,9 @@ export default function Header() {
           <a href={hashLink("services")} className="nav-link" onClick={() => setOpen(false)}>
             Services
           </a>
+          <a href={hashLink("about")} className="nav-link" onClick={() => setOpen(false)}>
+            About
+          </a>
           <a href={hashLink("projects")} className="nav-link" onClick={() => setOpen(false)}>
             Projects
           </a>

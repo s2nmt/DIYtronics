@@ -7,17 +7,10 @@ export const projects = [
     imageAlt: "Monitoring and control system",
   },
   {
-    title: "Energy monitoring",
-    role: "PCB · Firmware · IoT platform",
-    desc: "Measure electricity use and show it on a dashboard.",
-    image: "images/project-energy.jpg",
-    imageAlt: "Energy monitoring",
-  },
-  {
-    title: "Autonomous vehicle",
+    title: "Autonomous robot",
     role: "Firmware · Embedded Linux · IoT platform",
-    desc: "An AGV for material transport — onboard control, and a simple view on the dashboard.",
+    desc: "An autonomous vehicle for material transport — onboard control, and a simple view on the dashboard.",
     image: "images/service-agv.jpg",
-    imageAlt: "Autonomous vehicle in a factory",
+    imageAlt: "Autonomous robot in a factory",
   },
 ];

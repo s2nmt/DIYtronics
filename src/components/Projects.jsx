@@ -7,14 +7,15 @@ export default function Projects() {
     <section className="section" id="projects">
       <div className="container">
         <div className="section-header">
-          <p className="section-subtitle">Selected work</p>
-          <h2 className="section-title">Reference projects</h2>
+          <p className="section-subtitle">Experience</p>
+          <h2 className="section-title">Where we focus</h2>
           <p className="section-description">
-            A few engagements across PCB, firmware, Embedded Linux, and IoT.
+            We concentrate on the fields below — and that is where we have the
+            most experience.
           </p>
         </div>
 
-        <div className="cards-grid">
+        <div className="cards-grid cards-grid--two">
           {projects.map((p, i) => (
             <motion.article
               key={p.title}
