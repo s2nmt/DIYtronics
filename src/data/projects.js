@@ -3,7 +3,7 @@ export const projects = [
     title: "Monitoring and Control System",
     role: "PCB · Firmware · IoT platform",
     desc: "Read sensors, show them on a dashboard, and switch equipment remotely.",
-    image: "images/project-climate.jpg",
+    image: "images/Monitoring-and-control-system.png",
     imageAlt: "Monitoring and control system",
   },
   {
